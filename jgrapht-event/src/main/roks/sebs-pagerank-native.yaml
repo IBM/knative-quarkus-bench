@@ -1,0 +1,16 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: sebs-pagerank
+spec:
+  template:
+    metadata:
+      name: sebs-pagerank-native
+#      annotations:
+#        autoscaling.knative.dev/target: "1"
+    spec:
+      containers:
+        - image: res-cpe-team-docker-local.artifactory.swg-devops.com/quarkus/sebs-pagerank:native
+          env:
+            - name: TEST
+              value: "test"

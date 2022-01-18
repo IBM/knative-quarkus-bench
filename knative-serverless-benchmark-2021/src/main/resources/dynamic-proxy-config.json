@@ -1,0 +1,6 @@
+[
+    ["org.apache.http.conn.HttpClientConnectionManager"],
+    ["org.apache.http.pool.ConnPoolControl"],
+    ["com.ibm.cloud.objectstorage.http.conn.Wrapped"],
+    ["org.apache.http.conn.HttpClientConnectionManager", "org.apache.http.pool.ConnPoolControl", "com.ibm.cloud.objectstorage.http.conn.Wrapped"]
+]

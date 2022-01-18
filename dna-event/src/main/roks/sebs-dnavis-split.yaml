@@ -1,0 +1,28 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: sebs-dnavis
+spec:
+  # Add follinging configuration to Service definition yaml to controll
+  # reuqest splitting ratios.
+  # (Note: Applying this yaml alone causes an error)
+  #
+  # To change the ratio dynamically using cli:
+  #
+  #   kn service update sebs-dnavis \
+  #      --traffic sebs-dnavis-jvm=50 \
+  #      --traffic sebs-dnavis-native=50
+  #
+  # Use "@latest=50" for [ latestRevision: true, percent: 50 ]
+  #
+  # To verify current split configuration:
+  #
+  #   kn revisions list
+  #
+  traffic:
+#  - latestRevision: true
+#    percent: 50
+  - revisionName: sebs-dnavis-jvm
+    percent: 50
+  - revisionName: sebs-dnavis-native
+    percent: 50
