@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: sebs-pagerank-native
+spec:
+  template:
+    spec:
+      containers:
+        - image: res-cpe-team-docker-local.artifactory.swg-devops.com/quarkus/sebs-pagerank:native
+          env:
+            - name: RUNTIME
+              value: "native"
