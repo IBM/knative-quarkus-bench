@@ -27,6 +27,13 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>ai.djl</groupId>
+        <artifactId>bom</artifactId>
+        <version>0.14.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -71,6 +78,27 @@
       <groupId>com.hubspot.jinjava</groupId>
       <artifactId>jinjava</artifactId>
       <version>2.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.djl.pytorch</groupId>
+      <artifactId>pytorch-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>model-zoo</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.djl.pytorch</groupId>
+      <artifactId>pytorch-model-zoo</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.bramp.ffmpeg</groupId>
+      <artifactId>ffmpeg</artifactId>
+      <version>0.6.2</version>
     </dependency>
   </dependencies>
   <build>
