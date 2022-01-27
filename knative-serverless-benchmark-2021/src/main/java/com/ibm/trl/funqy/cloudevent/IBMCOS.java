@@ -31,6 +31,8 @@ import com.ibm.cloud.objectstorage.services.s3.model.ListObjectsV2Result;
 import com.ibm.cloud.objectstorage.services.s3.model.GetObjectRequest;
 import com.ibm.cloud.objectstorage.services.s3.model.ObjectListing;
 import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectSummary;
+import com.ibm.cloud.objectstorage.services.s3.model.S3Object;
+import com.ibm.cloud.objectstorage.services.s3.model.PutObjectResult;
 
 public class IBMCOS {
     private static final Logger log = Logger.getLogger(IBMCOS.class);
@@ -41,6 +43,7 @@ public class IBMCOS {
     private String COS_BUCKET_LOCATION = "us-south";
     private String COS_IN_BUCKET = "trl-knative-benchmark-bucket-1";
     private String COS_OUT_BUCKET = "trl-knative-benchmark-bucket-2";
+    private String COS_MODEL_BUCKET = "trl-knative-benchmark-bucket";
     private AmazonS3 cosClient = null;
 
     public IBMCOS() throws Exception {
@@ -60,6 +63,9 @@ public class IBMCOS {
 
         if ((value = System.getenv("COS_OUT_BUCKET")) != null)
             COS_OUT_BUCKET = value;
+
+        if ((value = System.getenv("COS_MODEL_BUCKET")) != null)
+            COS_MODEL_BUCKET = value;
 
         if ((value = System.getenv("COS_BUCKET_LOCATION")) != null)
             COS_BUCKET_LOCATION = value;
@@ -112,6 +118,11 @@ public class IBMCOS {
         return (COS_OUT_BUCKET);
     }
 
+    public String getModelBucket() {
+        return (COS_MODEL_BUCKET);
+    }
+
+
     public void uploadFile(String bucket, String key, String filePath) {
         log.info("Uploading "+filePath+" as "+key+" to bucket "+bucket+".");
         cosClient.putObject(bucket, key, new File(filePath));
@@ -155,5 +166,27 @@ public class IBMCOS {
             }
         }
     }
+
+    public InputStream get_object(String bucket, String key) {
+//        GetObjectRequest objectRequest = GetObjectRequest.builder().key(key).bucket(bucket).build();
+//        ResponseInputStream<GetObjectResponse> in = s3.getObject(objectRequest);
+
+        GetObjectRequest request = new GetObjectRequest(bucket, key);
+        S3Object s3o = cosClient.getObject(request);
+
+        return (InputStream)s3o.getObjectContent();
+    }
+
+    public String put_object(String bucket, String key, File file) {
+//        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
+//        PutObjectResponse res = s3.putObject(objectRequest, RequestBody.fromFile(file.toPath()));
+
+        PutObjectResult res = cosClient.putObject(bucket, key,  file);
+
+        return res.getETag();
+
+
+    }
+
 
 }
