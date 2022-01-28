@@ -1,6 +1,6 @@
 package com.ibm.trl.funqy.multimedia;
 
-import com.ibm.trl.funqy.cloudevent.IBMCOS;
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;

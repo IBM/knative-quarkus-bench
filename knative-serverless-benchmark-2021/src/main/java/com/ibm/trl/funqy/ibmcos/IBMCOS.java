@@ -1,4 +1,4 @@
-package com.ibm.trl.funqy.cloudevent;
+package com.ibm.trl.funqy.ibmcos;
 
 import org.jboss.logging.Logger;
 import java.io.BufferedReader;

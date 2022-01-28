@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.ibm.trl.funqy.cloudevent.IBMCOS;
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
 
 import java.io.FileWriter;
 import java.io.IOException;

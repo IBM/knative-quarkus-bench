@@ -18,12 +18,7 @@ import io.quarkus.funqy.Funq;
 import net.sf.jfasta.impl.FASTAElementIterator;
 import net.sf.jfasta.impl.FASTAFileReaderImpl;
 
-import com.ibm.trl.funqy.cloudevent.IBMCOS;
-import com.ibm.cloud.objectstorage.services.s3.model.GetObjectRequest;
-import com.ibm.cloud.objectstorage.services.s3.model.PutObjectRequest;
-import com.ibm.cloud.objectstorage.services.s3.AmazonS3;
-import com.ibm.cloud.objectstorage.services.s3.AmazonS3Client;
-
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
 
 public class DNA {
     static double nanosecInSec = 1_000_000_000.0;

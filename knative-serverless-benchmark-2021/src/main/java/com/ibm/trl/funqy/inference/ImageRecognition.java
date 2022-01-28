@@ -1,6 +1,6 @@
 package com.ibm.trl.funqy.inference;
 
-import com.ibm.trl.funqy.cloudevent.IBMCOS;
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
 
 import java.io.IOException;
 import java.nio.file.Paths;

@@ -1,6 +1,6 @@
 package com.ibm.trl.funqy.multimedia;
 
-import com.ibm.trl.funqy.cloudevent.IBMCOS;
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
 
 import java.io.File;
 import java.io.IOException;

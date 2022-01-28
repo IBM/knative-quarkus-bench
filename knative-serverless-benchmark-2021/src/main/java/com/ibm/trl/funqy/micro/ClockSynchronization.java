@@ -17,7 +17,7 @@ import java.net.SocketException;
 
 import io.quarkus.funqy.Funq;
 
-import com.ibm.trl.funqy.cloudevent.IBMCOS;
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
 
 public class ClockSynchronization {
     @Funq("Hello")

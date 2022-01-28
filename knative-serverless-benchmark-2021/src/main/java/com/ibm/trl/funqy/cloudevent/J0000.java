@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
+
 public class J0000 extends BenchmarkTest {
     private Logger log;
     private UUID uuid;

@@ -12,13 +12,12 @@ import javax.imageio.ImageIO;
 
 import org.jboss.logging.Logger;
 
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
 
 public class JThumbnailer extends BenchmarkTest {
     private IBMCOS client;
     private Logger log;
     private UUID uuid;
-    
-    
 
     public JThumbnailer() throws Exception {
         uuid = UUID.randomUUID();

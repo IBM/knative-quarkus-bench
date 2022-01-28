@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
 
+import com.ibm.trl.funqy.ibmcos.IBMCOS;
+
 public class J120 extends BenchmarkTest {
     private Logger log;
     private UUID uuid;
