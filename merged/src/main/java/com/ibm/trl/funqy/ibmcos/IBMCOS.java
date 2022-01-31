@@ -44,6 +44,7 @@ public class IBMCOS {
     private String COS_IN_BUCKET = "trl-knative-benchmark-bucket-1";
     private String COS_OUT_BUCKET = "trl-knative-benchmark-bucket-2";
     private String COS_MODEL_BUCKET = "trl-knative-benchmark-bucket";
+    private String COS_BUCKET = "trl-knative-benchmark-bucket";
     private AmazonS3 cosClient = null;
 
     public IBMCOS() throws Exception {
@@ -66,6 +67,9 @@ public class IBMCOS {
 
         if ((value = System.getenv("COS_MODEL_BUCKET")) != null)
             COS_MODEL_BUCKET = value;
+
+        if ((value = System.getenv("COS_BUCKET")) != null)
+            COS_BUCKET = value;
 
         if ((value = System.getenv("COS_BUCKET_LOCATION")) != null)
             COS_BUCKET_LOCATION = value;
