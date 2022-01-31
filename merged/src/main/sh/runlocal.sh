@@ -21,23 +21,6 @@ echo wait for 30 seconds...
 
 sleep 30
 
-export URL=http://localhost:8080/cloudeventbenchmark
-for TEST in j120 
-  do 
-  echo $TEST
-  export TEST
-  curl ${URL} -s -X POST -H "Ce-Id: 1234" -H "Ce-Specversion: 1.0" -H "Ce-Type: cloudeventbenchmark" -H "Ce-Source: curl" -H "Content-Type: application/json" -d '"'${TEST}'"'
-  echo
-  echo
-  done
- 
-
-# try to clean up
-kill -9 $JPID
-
-
-exit
-
 # micro benchmarks
 echo
 echo microbenchmarks
@@ -80,23 +63,24 @@ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "tmp_key", "heigh
 echo
 echo pagerank benchmarks
 
-curl -s -d '"test"' -X POST http://localhost:8080/pagerank | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST http://localhost:8080/pagerank | jq
 
 echo
 
-curl -s -d '"test"' -X POST http://localhost:8080/mst | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST http://localhost:8080/mst | jq
 
 echo
 
- curl -s -d '"test"' -X POST http://localhost:8080/bfs | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST http://localhost:8080/bfs | jq
 
 
 # DNA
 echo
 echo DNA benchmarks
 
-# bucketname, inputkey,outputkey can be set by param. have defaults...
+# bucketname, inputkey,outputkey can be set by param. All have defaults...
 curl -s -X POST http://localhost:8080/dna | jq
+curl -s --w "\n" -H 'Content-Type:application/json' -d '""' -X POST http://localhost:8080/dna | jq
 
 # others
 echo
