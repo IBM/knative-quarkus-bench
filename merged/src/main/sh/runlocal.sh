@@ -3,6 +3,13 @@
 if [[ -f ${HOME}/.env ]]
 then
   . ${HOME}/.env
+  export COS_ENDPOINT
+  export COS_APIKEY
+  export COS_INSTANCE_CRN
+  export COS_IN_BUCKET
+  export COS_OUT_BUCKET
+  export NS
+  export IMAGESFX
 fi
 
 cd $(dirname $0)/../../..
@@ -14,6 +21,22 @@ echo wait for 30 seconds...
 
 sleep 30
 
+export URL=http://localhost:8080/cloudeventbenchmark
+for TEST in j120 
+  do 
+  echo $TEST
+  export TEST
+  curl ${URL} -s -X POST -H "Ce-Id: 1234" -H "Ce-Specversion: 1.0" -H "Ce-Type: cloudeventbenchmark" -H "Ce-Source: curl" -H "Content-Type: application/json" -d '"'${TEST}'"'
+  echo
+  echo
+  done
+ 
+
+# try to clean up
+kill -9 $JPID
+
+
+exit
 
 # micro benchmarks
 echo
@@ -65,7 +88,7 @@ curl -s -d '"test"' -X POST http://localhost:8080/mst | jq
 
 echo
 
-curl -s -d '"test"' -X POST http://localhost:8080/bfs | jq
+ curl -s -d '"test"' -X POST http://localhost:8080/bfs | jq
 
 
 # DNA
@@ -79,11 +102,12 @@ curl -s -X POST http://localhost:8080/dna | jq
 echo
 echo cloudevent stuff
 export URL=http://localhost:8080/cloudeventbenchmark
-for TEST in jcompress jdownload j110 j120 
+for TEST in jcompress jdownloadlong j110 j120 
   do 
   echo $TEST
   export TEST
   curl ${URL} -s -X POST -H "Ce-Id: 1234" -H "Ce-Specversion: 1.0" -H "Ce-Type: cloudeventbenchmark" -H "Ce-Source: curl" -H "Content-Type: application/json" -d '"'${TEST}'"'
+  echo
   echo
   done
  
