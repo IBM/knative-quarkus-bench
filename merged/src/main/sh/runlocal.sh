@@ -106,7 +106,7 @@ then
   echo ${out}
 fi
 
-out=$(curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input";"GCF_000772165.1_ASM77216v1_genomic.fna", "output":"dna-squiggle.json"}' -X POST http://localhost:8080/dna)
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input":"bacillus_subtilis.fasta", "output":"dna-squiggle.json"}' -X POST http://localhost:8080/dna)
 echo ${out} | jq
 if [[ $? -ne 0 ]]
 then

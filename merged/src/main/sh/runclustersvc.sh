@@ -120,7 +120,7 @@ echo DNA benchmarks
 # curl -s -X POST ${URL}/dna | jq
 curl -s --w "\n" -H 'Content-Type:application/json' -X POST ${URL}/dna | jq
 
-curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input";"GCF_000772165.1_ASM77216v1_genomic.fna", "output":"dna-squiggle.json"}' -X POST ${URL}/dna | jq
+curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input":"bacillus_subtilis.fasta", "output":"dna-squiggle.json"}' -X POST ${URL}/dna | jq
 
 
 # others
