@@ -122,49 +122,13 @@ public class ClockSynchronization {
             }
             socket.close();
             
-            if (consecutive_failures != 5) {
-                try {
-                    FileWriter writer = new FileWriter("data.csv");
-                    String header = String.join(",", "id", "client_send", "client_rcv");
-                    writer.append(header);
-                    for (Long[] row : times) {
-                        String[] strRow = Stream.of(row).map(r -> r.toString()).toArray(String[]::new);
-                        writer.append(String.join(",", strRow));
-                    }
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                // key = String.format("000/out/030'-results-%s.csv", request_id);
-                
-                // try {
-                //     final IBMCOS cos = new IBMCOS();
-                //     cos.uploadFile("trl-knative-benchmark-bucket", key, "data.csv");
-                // } catch (java.lang.Exception e) {
-                //     e.printStackTrace();
-                // }
-
-            } else {
-                key = "connection failure";
-            }
         } catch (SocketException e) {
-            e.printStackTrace();
-        }
-
-        key = String.format("000/out/030'-results-%s.csv", request_id);
-                
-        try {
-            final IBMCOS cos = new IBMCOS();
-            cos.uploadFile("trl-knative-benchmark-bucket", key, "data.csv");
-        } catch (java.lang.Exception e) {
             e.printStackTrace();
         }
 
         retVal.put(
             "result",
             Map.of(
-                "bucket-key", key,
                 "timestamp", s.getIncome_timestamp()
             )
         );
