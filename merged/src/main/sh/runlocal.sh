@@ -92,10 +92,26 @@ echo
 echo DNA benchmarks
 
 # bucketname, inputkey,outputkey can be set by param. All have defaults...
-curl -s -X POST http://localhost:8080/dna | jq
-curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/dna | jq
+out=$(curl -s -X POST http://localhost:8080/dna)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
 
-curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input";"GCF_000772165.1_ASM77216v1_genomic.fna", "output":"dna-squiggle.json"}' -X POST http://localhost:8080/dna | jq
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/dna)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input";"GCF_000772165.1_ASM77216v1_genomic.fna", "output":"dna-squiggle.json"}' -X POST http://localhost:8080/dna)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
 
 
 # others
