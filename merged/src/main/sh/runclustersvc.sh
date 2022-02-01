@@ -12,9 +12,12 @@ then
   export IMAGESFX
 fi
 
-cd $(dirname $0)/../../..
+# cd $(dirname $0)/../../..
 
 URL=$(oc get ksvc -n ${NS} | grep " ${NS}-v" | tr -s " " | cut -d" " -f 2)
+
+# tip: try running the following command in a separate window for detailed info:
+#  stern knative-serverless-benchmark-v1-deployment -n ${NS} -c user-container --color never
 
 echo $URL
 
