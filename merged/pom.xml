@@ -82,18 +82,33 @@
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>api</artifactId>
+      <version>0.14.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.pytorch</groupId>
       <artifactId>pytorch-engine</artifactId>
+      <version>0.14.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>model-zoo</artifactId>
+      <version>0.14.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.pytorch</groupId>
       <artifactId>pytorch-model-zoo</artifactId>
+      <version>0.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.32</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.32</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>net.bramp.ffmpeg</groupId>
@@ -176,6 +191,10 @@
                 <fileSet>
                   <sourceFile>/opt/graalvm-ce-java11-20.3.4/lib/security/cacerts</sourceFile>
                   <destinationFile>target/cacerts</destinationFile>
+                </fileSet>
+                <fileSet>
+                  <sourceFile>src/main/resources/lib/SDL2-2.0.10-2.el8.x86_64.rpm</sourceFile>
+                  <destinationFile>target/classes/lib/SDL2-2.0.10-2.el8.x86_64.rpm</destinationFile>
                 </fileSet>
               </fileSets>
             </configuration>

@@ -123,7 +123,8 @@ You can specify a specific test to run with the make command: e.g., `make test=j
 - handle json output for both python and java.....
 - perform performance measurement
 - update this todo list
-
+- document ffpmeg requirements
+- document possible pytorch requirements
 
 
 
