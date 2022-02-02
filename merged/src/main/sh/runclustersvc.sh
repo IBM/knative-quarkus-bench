@@ -59,18 +59,36 @@ echo
 echo clock sync
 
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/clock_synchronization | jq
+out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/clock_synchronization)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
 
 echo
 echo net bench
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "0.0.0.0", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/network_benchmark | jq
+out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/network_benchmark)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
 
 echo
 echo serv rep 
 
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/server_reply | jq
+out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/server_reply)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
 
 # inference
 echo
@@ -80,21 +98,40 @@ echo
 echo imagerecognition
 # takes input and model as input
 # index.png is ok I think
-# QUESTION: model?
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": ""}' -X POST ${URL}/imagerecognition | jq
+out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "synset.txt"}' -X POST ${URL}/imagerecognition)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
 
 echo
 echo "thumbnailer 210"
 # objectkey, width, height
 # Question: is object key OK?
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "220/in/processed-city.gif", "height": "128", "width: "128"}' -X POST ${URL}/thumbnailer | jq
+out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST ${URL}/thumbnailer)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
 
 echo
 echo videoprocessing 220
 # height, width, , Key, duration, opt -- from param
 #  operations = { 'transcode' : transcode_mp3, 'extract-gif' : to_gif, 'watermark' : watermark }
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "220/in/processed-city.gif", "height": "128", "width: "128", "duration": "5", "op": "watermark"}' -X POST ${URL}/videoprocessing | jq
+out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST ${URL}/videoprocessing)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
+
+exit
 
 # pagerank
 echo
@@ -114,13 +151,14 @@ curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST ${URL}/bf
 
 # DNA
 echo
-echo DNA benchmarks
+echo DNA benchmark
 
-# bucketname, inputkey,outputkey can be set by param. All have defaults...
-# curl -s -X POST ${URL}/dna | jq
-curl -s --w "\n" -H 'Content-Type:application/json' -X POST ${URL}/dna | jq
-
-curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input":"bacillus_subtilis.fasta", "output":"dna-squiggle.json"}' -X POST ${URL}/dna | jq
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input_key":"bacillus_subtilis.fasta", "output_key":"dna-squiggle.json"}' -X POST ${URL}/dnavis)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
 
 
 # others

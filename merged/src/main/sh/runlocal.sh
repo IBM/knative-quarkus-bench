@@ -39,7 +39,7 @@ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key",
 echo
 echo net bench
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "0.0.0.0", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/network_benchmark | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/network_benchmark | jq
 
 echo
 echo serv rep 
@@ -55,21 +55,21 @@ echo
 echo imagerecognition
 # takes input and model as input
 # index.png is ok I think
-# QUESTION: model?
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": ""}' -X POST http://localhost:8080/imagerecognition | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "synset.txt"}' -X POST http://localhost:8080/imagerecognition | jq
 
 echo
 echo "thumbnailer 210"
+
 # objectkey, width, height
-# Question: is object key OK?
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "220/in/processed-city.gif", "height": "128", "width: "128"}' -X POST http://localhost:8080/thumbnailer | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST http://localhost:8080/thumbnailer | jq
 
 echo
 echo videoprocessing 220
+
 # height, width, , Key, duration, opt -- from param
 #  operations = { 'transcode' : transcode_mp3, 'extract-gif' : to_gif, 'watermark' : watermark }
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/videoprocessing | jq
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "220/in/processed-city.gif", "height": "128", "width: "128", "duration": "5", "op": "watermark"}' -X POST http://localhost:8080/videoprocessing | jq
 
 # pagerank
 echo
@@ -89,30 +89,14 @@ curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST http://lo
 
 # DNA
 echo
-echo DNA benchmarks
+echo DNA benchmark
 
-# bucketname, inputkey,outputkey can be set by param. All have defaults...
-out=$(curl -s -X POST http://localhost:8080/dna)
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input_key":"bacillus_subtilis.fasta", "output_key":"dna-squiggle.json"}' -X POST http://localhost:8080/dnavis)
 echo ${out} | jq
 if [[ $? -ne 0 ]]
 then
   echo ${out}
 fi
-
-out=$(curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/dna)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
-
-out=$(curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input":"bacillus_subtilis.fasta", "output":"dna-squiggle.json"}' -X POST http://localhost:8080/dna)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
-
 
 # others
 echo
