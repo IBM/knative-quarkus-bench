@@ -109,7 +109,6 @@ fi
 echo
 echo "thumbnailer 210"
 # objectkey, width, height
-# Question: is object key OK?
 out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST ${URL}/thumbnailer)
 echo ${out} | jq
 if [[ $? -ne 0 ]]
@@ -122,7 +121,6 @@ echo
 echo videoprocessing 220
 # height, width, , Key, duration, opt -- from param
 #  operations = { 'transcode' : transcode_mp3, 'extract-gif' : to_gif, 'watermark' : watermark }
-
 out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST ${URL}/videoprocessing)
 echo ${out} | jq
 if [[ $? -ne 0 ]]
@@ -130,8 +128,6 @@ then
   echo ${out}
 fi
 
-
-exit
 
 # pagerank
 echo
