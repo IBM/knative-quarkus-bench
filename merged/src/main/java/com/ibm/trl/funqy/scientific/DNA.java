@@ -138,7 +138,7 @@ public class DNA {
         retVal.measurement.put("download_time",  (download_end - download_begin)/nanosecInSec); 
         retVal.measurement.put("compute_time",   (process_end - process_begin)/nanosecInSec); 
         retVal.measurement.put("serialize_time", (json_end - json_begin)/nanosecInSec); 
-        retVal.measurement.put("upnload_time",   (upload_end - upload_begin)/nanosecInSec); 
+        retVal.measurement.put("upload_time",   (upload_end - upload_begin)/nanosecInSec); 
         
         return retVal;
     }
