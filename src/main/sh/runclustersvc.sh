@@ -1,5 +1,58 @@
 #!/bin/bash
 
+
+runsimple() {
+  url=${1}
+  value=$(curl -s -w '\n' -H 'Content-Type:application/json'  -X POST ${url})
+  problem=$(echo $value | grep -ci "connect error")
+  seconds=1
+  while [[ "${problem}" -gt 0 ]]
+  do
+    echo "Trying again in ${seconds} second(s) because output was: ${value}" >&2
+    sleep ${seconds}
+    value=$(curl -s -w '\n' -H 'Content-Type:application/json'  -X POST ${url})
+    problem=$(echo $value | grep -ci "connect error")
+    seconds=$((seconds*2))
+  done
+  attempt=$(echo ${value} | jq  2>/dev/null)
+  if [[ $? -eq 0 ]]
+  then
+    echo ${value} | jq
+    # yes, that was ugly
+  else
+    echo ${value}
+  fi
+}
+
+
+runone() {
+  url=${1}
+  p=${2}
+
+  value=$(curl -s -w '\n' -H 'Content-Type:application/json' --data-binary ${p} -X POST ${url})
+  problem=$(echo $value | grep -ci "connect error")
+  seconds=1
+  while [[ "${problem}" -gt 0 || "${value}z" == "z" ]]
+  do
+    echo "Trying again in ${seconds} second(s) because output was: ${value}" >&2
+    sleep ${seconds}
+    value=$(curl -s -w '\n' -H 'Content-Type:application/json' --data-binary ${p}  -X POST ${url})
+    problem=$(echo $value | grep -ci "connect error")
+    seconds=$((seconds*2))
+  done
+  echo p = $p
+
+  attempt=$(echo ${value} | jq  2>/dev/null)
+  if [[ $? -eq 0 ]]
+  then
+    echo ${value} | jq
+    # yes, that was ugly
+  else
+    echo ${value}
+  fi
+}
+
+
 if [[ -f ${HOME}/.env ]]
 then
   . ${HOME}/.env
@@ -16,9 +69,10 @@ fi
 
 URL=$(oc get ksvc -n ${NS} | grep " ${NS}-v" | tr -s " " | cut -d" " -f 2)
 
-# tip: try running the following command in a separate window for detailed info:
+# tip: try running the following command in a separate window for detailed troubleshooting info:
 #  stern knative-serverless-benchmark-v1-deployment -n ${NS} -c user-container --color never
 
+echo "Base URL:"
 echo $URL
 
 ### THIS WORKS!! (but sometimes randomly fails)
@@ -49,45 +103,57 @@ echo $URL
 echo
 echo microbenchmarks
 
-curl -s -w "\n" -H 'Content-Type:application/json'  -X POST ${URL}/Hello | jq
+# curl -s -w '\n' -H 'Content-Type:application/json'  -X POST ${URL}/Hello
 
-echo
+runsimple ${URL}/Hello
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '"Samantha"' -X POST ${URL}/hello | jq
+echo samantha
+
+# curl -s -w '\n' -H 'Content-Type:application/json' -d '\"Samantha\"' -X POST ${URL}/hello
+# runone ${URL}/hello Samantha
+
+# curl -s -w '\n' -H 'Content-Type:application/json' -d '\"Samantha\"' -X POST ${URL}/hello
+# runone ${URL}/hello 'Samantha'
+
+# curl -s -w '\n' -H 'Content-Type:application/json' -d '\"Samantha\"' -X POST ${URL}/hello
+runone ${URL}/hello '"Samantha"'
 
 echo
 echo clock sync
+runone ${URL}/clock_synchronization '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"8080","repetitions":"1","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
 
-
-out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/clock_synchronization)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
+# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/clock_synchronization)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 
 echo
 echo net bench
 
-out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/network_benchmark)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
+runone ${URL}/network_benchmark '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"8080","repetitions":"1","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
+# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/network_benchmark)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 
 echo
 echo serv rep 
 
 
-out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/server_reply)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
+runone ${URL}/server_reply '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"8080","repetitions":"1","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
+
+# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/server_reply)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 
 # inference
@@ -96,37 +162,39 @@ echo inference benchmarks
 
 echo
 echo imagerecognition
-# takes input and model as input
-# index.png is ok I think
-out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "synset.txt"}' -X POST ${URL}/imagerecognition)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
+# takes input and model and synset as input
+runone ${URL}/imagerecognition '{"input":"index.png","model":"synset.txt","synset":"synset.txt"}'
+# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "synset.txt", "synset":"synset.txt"}' -X POST ${URL}/imagerecognition)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 
 echo
 echo "thumbnailer 210"
 # objectkey, width, height
-out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST ${URL}/thumbnailer)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
+runone ${URL}/thumbnailer '{"objectkey":"index.png","height":"128","width":"128"}'
+# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST ${URL}/thumbnailer)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 
 echo
 echo videoprocessing 220
 # height, width, , Key, duration, opt -- from param
 #  operations = { 'transcode' : transcode_mp3, 'extract-gif' : to_gif, 'watermark' : watermark }
-out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST ${URL}/videoprocessing)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
+runone ${URL}/videoprocessing '{"key":"Anthem-30-16x9-lowres.mp4","height":"128","width":"128","duration":"1","op":"extract-gif"}'
+# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST ${URL}/videoprocessing)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 
 # pagerank
@@ -135,38 +203,65 @@ echo pagerank benchmarks
 
 echo
 echo pagerank
-curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST ${URL}/pagerank | jq
+runone ${URL}/pagerank '"test"'
+# curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST ${URL}/pagerank | jq
 
 echo
 echo mst
-curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST ${URL}/mst | jq
+runone ${URL}/mst '"test"'
+# curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST ${URL}/mst | jq
 
 echo
 echo bfs
-curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST ${URL}/bfs | jq
+runone ${URL}/bfs '"test"'
+# curl -s -w "\n" -H 'Content-Type:application/json' -d '"test"' -X POST ${URL}/bfs | jq
 
 # DNA
 echo
 echo DNA benchmark
 
-out=$(curl -s --w "\n" -H 'Content-Type:application/json' -d '{"input_key":"bacillus_subtilis.fasta", "output_key":"dna-squiggle.json"}' -X POST ${URL}/dnavis)
-echo ${out} | jq
-if [[ $? -ne 0 ]]
-then
-  echo ${out}
-fi
+runone ${URL}/dnavis '{"input_key":"bacillus_subtilis.fasta","output_key":"dna-squiggle.json"}'
+
+# pout=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input_key":"bacillus_subtilis.fasta", "output_key":"dna-squiggle.json"}' -X POST ${URL}/dnavis)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 
 # others
-echo
-echo cloudevent stuff
-for TEST in jcompress j110 j120 
-do 
-  echo $TEST
-  export TEST
-  curl ${URL}/cloudeventbenchmark -s -X POST -H "Ce-Id: 1234" -H "Ce-Specversion: 1.0" -H "Ce-Type: cloudeventbenchmark" -H "Ce-Source: curl" -H "Content-Type: application/json" -d '"'${TEST}'"'
-  echo
-  echo
-done
+# echo
+# echo cloudevent stuff
+# for TEST in jcompress j110 j120
+# do 
+#   echo $TEST
+#   export TEST
+#   runce ${URL}/cloudeventbenchmark ${TEST}
+# #   curl ${URL}/cloudeventbenchmark -s -X POST -H "Ce-Id: 1234" -H "Ce-Specversion: 1.0" -H "Ce-Type: cloudeventbenchmark" -H "Ce-Source: curl" -H "Content-Type: application/json" -d '"'${TEST}'"'
+#   echo
+#   echo
+# done
  
+
+
+echo dynamicHtml
+echo
+
+runsimple ${URL}/dynamicHtml
+
+echo upload
+echo
+
+runsimple ${URL}/upload
+ 
+echo compress
+echo
+
+runsimple ${URL}/compress
+ 
+echo download
+echo
+
+runsimple ${URL}/download
 

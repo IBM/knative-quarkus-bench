@@ -53,9 +53,8 @@ echo inference benchmarks
 
 echo
 echo imagerecognition
-# takes input and model as input
-# index.png is ok I think
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "synset.txt"}' -X POST http://localhost:8080/imagerecognition | jq
+# takes input and model and synset as input
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "synset.txt", "synset":"synset.txt"}' -X POST http://localhost:8080/imagerecognition | jq
 
 echo
 echo "thumbnailer 210"
@@ -98,19 +97,47 @@ then
   echo ${out}
 fi
 
-# others
+echo dynamicHtml
 echo
-echo cloudevent stuff
-export URL=http://localhost:8080/cloudeventbenchmark
-for TEST in jcompress j110 j120 
-do 
-  echo $TEST
-  export TEST
-  curl ${URL} -s -X POST -H "Ce-Id: 1234" -H "Ce-Specversion: 1.0" -H "Ce-Type: cloudeventbenchmark" -H "Ce-Source: curl" -H "Content-Type: application/json" -d '"'${TEST}'"'
-  echo
-  echo
-done
+
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/dynamicHtml)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+
+echo upload
+echo
  
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/upload)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+ 
+echo compress
+echo
+
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/compress)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+ 
+echo download
+echo
+
+out=$(curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/download)
+echo ${out} | jq
+if [[ $? -ne 0 ]]
+then
+  echo ${out}
+fi
+ 
+
 
 # try to clean up
 kill -9 $JPID
