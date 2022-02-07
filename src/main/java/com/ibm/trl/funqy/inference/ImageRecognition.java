@@ -57,6 +57,11 @@ public class ImageRecognition {
         String key = param.getInput();
         String model_key = param.getModel();
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
+        String synset = param.getSynset();
+        String synset_dpath = String.format("/tmp/%s-%s", synset, UUID.randomUUID());
+
+        String synset_path = synset_dpath;
+        client.downloadFile(model_bucket, synset, synset_dpath);
 
         /*
          * image_download_begin = datetime.datetime.now()
@@ -127,7 +132,7 @@ public class ImageRecognition {
                         new float[] {0.485f, 0.456f, 0.406f}, /*mean*/
                         new float[] {0.229f, 0.224f, 0.225f}) /*std*/)
                 .optApplySoftmax(true)
-                .optSynsetUrl("file:./src/main/resources/synset.txt")
+                .optSynsetUrl("file:"+synset_dpath)
                 .build();
 
             Criteria<Image, Classifications> criteria = builder
