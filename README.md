@@ -3,9 +3,10 @@
 # TRL knative-serverless-benchmark instructions
 
 ## First Time Cluster Installation Tips
-- Assuming local machine has access to IBM Cloud cluster, ibmcloud cli, oc command, mvn, docker, python3, and stern. (Developed on CentOS 7. Functionality not yet verified on other environments.)
+- Assuming local machine has access to IBM Cloud cluster, ibmcloud cli, oc command, mvn, docker, python3, and stern. (Developed on CentOS 7.)
   - Use yum to install glib-static and libstdc++-static.
   - Install GraalVM. Be sure to install native-image: ``gu install native-image``
+    - For CentOS 7, GraalVM CE Version 20 is recommended.
   - Install python cloud object storage library: `pip3 install ibm-cos-sdk`
 - Create IBM Cloud storage. See notes below.
 - Install knative support on cluster
