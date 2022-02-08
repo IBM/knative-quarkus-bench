@@ -21,13 +21,13 @@ builddebug:
 # build the graalvm images
 buildnative:
 	mvn clean install -Pnative -Djavax.net.ssl.trustStore=/opt/graalvm-ce-java11-20.3.4/lib/security/cacerts && \
-	cp /opt/graalvm-ce-java11-20.3.4/lib/security/cacerts target
+	cp /opt/graalvm-ce-java11-21.3.0/lib/security/cacerts target
 
 
 # build the graalvm images with verbose debug output
 buildnativedebug:
 	mvn clean install -Pnative -X -e && \
-	cp /opt/graalvm-ce-java11-20.3.4/lib/security/cacerts target
+	cp /opt/graalvm-ce-java11-21.3.0/lib/security/cacerts target
 
 # for jvm images
 image:
