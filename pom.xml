@@ -189,12 +189,8 @@
                   <destinationFile>target/scripts/120.py</destinationFile>
                 </fileSet>
                 <fileSet>
-                  <sourceFile>/opt/graalvm-ce-java11-20.3.4/lib/security/cacerts</sourceFile>
+                  <sourceFile>/opt/graalvm-ce-java11-21.3.0/lib/security/cacerts</sourceFile>
                   <destinationFile>target/cacerts</destinationFile>
-                </fileSet>
-                <fileSet>
-                  <sourceFile>src/main/resources/lib/SDL2-2.0.10-2.el8.x86_64.rpm</sourceFile>
-                  <destinationFile>target/classes/lib/SDL2-2.0.10-2.el8.x86_64.rpm</destinationFile>
                 </fileSet>
               </fileSets>
             </configuration>

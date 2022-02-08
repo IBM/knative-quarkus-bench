@@ -31,16 +31,19 @@ buildnativedebug:
 
 # for jvm images
 image:
-	docker build -f src/main/docker/Dockerfile.jvm -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
+	podman build -f src/main/docker/Dockerfile.jvm -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
 
 # for native images
 imagenative:
-	docker build -f src/main/docker/Dockerfile.native -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
+	podman build -f src/main/docker/Dockerfile.native -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
 
 # works for both jvm and native
+# use below if using docker
+# 	ibmcloud cr login | && 
+
 push:
-	ibmcloud cr login && \
-	docker push us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX}
+	ibmcloud iam oauth-tokens | sed -ne '/IAM token/s/.* //p' | podman login -u iambearer --password-stdin us.icr.io && \
+	podman push us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX}
 
 # works for both jvm and native
 delete:
