@@ -14,7 +14,7 @@
 # docker run -i --rm -p 8080:8080 quarkus/knative-serverless-benchmark
 #
 ###
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.5
 WORKDIR /work/
 RUN microdnf install python3 python3-requests \
     && pip3 install ibm-cos-sdk jinja2 \
