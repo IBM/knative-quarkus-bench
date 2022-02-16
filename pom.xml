@@ -14,7 +14,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>2.4.0.Final</quarkus.platform.version>
+    <quarkus.platform.version>2.7.1.Final</quarkus.platform.version>
     <rest-assured.version>3.3.0</rest-assured.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
   </properties>
@@ -30,7 +30,7 @@
       <dependency>
         <groupId>ai.djl</groupId>
         <artifactId>bom</artifactId>
-        <version>0.14.0</version>
+        <version>0.15.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -82,22 +82,22 @@
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>api</artifactId>
-      <version>0.14.0</version>
+      <version>0.15.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.pytorch</groupId>
       <artifactId>pytorch-engine</artifactId>
-      <version>0.14.0</version>
+      <version>0.15.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>model-zoo</artifactId>
-      <version>0.14.0</version>
+      <version>0.15.0</version>
     </dependency>
     <dependency>
       <groupId>ai.djl.pytorch</groupId>
       <artifactId>pytorch-model-zoo</artifactId>
-      <version>0.14.0</version>
+      <version>0.15.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -189,7 +189,7 @@
                   <destinationFile>target/scripts/120.py</destinationFile>
                 </fileSet>
                 <fileSet>
-                  <sourceFile>/opt/graalvm-ce-java11-21.3.0/lib/security/cacerts</sourceFile>
+                  <sourceFile>/opt/graalvm-ce-java11-21.3.1/lib/security/cacerts</sourceFile>
                   <destinationFile>target/cacerts</destinationFile>
                 </fileSet>
               </fileSets>

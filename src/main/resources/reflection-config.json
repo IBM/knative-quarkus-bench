@@ -1,8 +1,5 @@
 [
   {
-  "name":"org.apache.http.impl.auth.NTLMEngineImpl",
-  "methods":[{"name":"getType3Message","parameterTypes":["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "byte[]", "int", "java.lang.String", "byte[]"] }]},
-  {
     "name" : "java.security.SecureRandom",
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,
@@ -15,50 +12,6 @@
   },
   {
     "name" : "com.oracle.svm.hosted.image.DisallowedImageHeapObjectFeature",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
-    "name" : "org.apache.http.impl.auth.NTLMEngineImpl",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
-    "name" : "org.apache.http.impl.auth",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
-    "name" : "org.apache.http.impl.auth",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
-    "name" : "com.ibm.cloud.objectstorage.retry",
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,
     "allDeclaredMethods" : true,
@@ -2296,66 +2249,6 @@
 {
   "name":"org.jboss.threads.Messages_$logger",
   "methods":[{"name":"<init>","parameterTypes":["org.jboss.logging.Logger"] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.AsyncChecksumValidationInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.CopySourceInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.CreateBucketInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.CreateMultipartUploadRequestInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.DecodeUrlEncodedResponseInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.DisableDoubleUrlEncodingInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.EnableChunkedEncodingInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.EnableTrailingChecksumInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.EndpointAddressInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.ExceptionTranslationInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.GetBucketPolicyInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.GetObjectInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.PutObjectInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.SignerOverrideInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-{
-  "name":"software.amazon.awssdk.services.s3.internal.handlers.SyncChecksumValidationInterceptor",
-  "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
 {
   "name":"sun.misc.Unsafe",
