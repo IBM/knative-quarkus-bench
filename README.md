@@ -102,27 +102,12 @@ You can specify a specific test to run with the make command: e.g., `make test=j
 - src/main/sh/runner.sh -- Runs tests on cluster.
 - src/main/sh/slayer.sh -- Terminates stern command as necessary.
 
-## Other local documentation
-- [Porting Guide](porting.md)
-- [Porting/test Status file](teststatus.md)
 
 ## ongoing todo items include
 - much better documentation
 - scafolding for easier collabvoration
-- make paths in teststatus.md clickable...
-- replace massive switch statement in CloudEventBenchmark.java with
-  individual functions that use @Funq("Testname") specification. Replace
-    string argument with a test modifier?
-- write/convert other benchmarks
-- efficient output and visualziation of results -- thoughts...
-  - (Actually looks like this is being replaced with json...)
-  - tests return single line of csv. harness outputs "###<<<CSVLINE>>>"
-  - When tests over outputs a single line: "%%%OVERANDOUT%%%"
-  - include test name? header...
+- efficient output and visualziation of results
 - much better isolation to allow multiple developers at same time
-- eliminate the massive switch statement
-- allow for an optional argument with "testname:argument" parameter syntax in addition to "testname".
-- handle json output for both python and java.....
 - perform performance measurement
 - update this todo list
 - document ffpmeg requirements
