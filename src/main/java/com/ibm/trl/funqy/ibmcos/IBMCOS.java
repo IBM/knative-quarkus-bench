@@ -141,7 +141,7 @@ public class IBMCOS {
             theDir.mkdirs();
         GetObjectRequest request = new GetObjectRequest(bucket, key);
         if (cosClient.getObject(request, theFile)==null) {
-		log.warn("getObject returned null. Object not found.");
+		log.warn("  ########  getObject returned null. Object not found.  ########");
 	}
         return;
     }
