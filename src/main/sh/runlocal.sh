@@ -54,7 +54,7 @@ echo inference benchmarks
 echo
 echo imagerecognition
 # takes input and model and synset as input
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "synset.txt", "synset":"synset.txt"}' -X POST http://localhost:8080/imagerecognition | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "resnet50-19c8e357.pth", "synset":"synset.txt"}' -X POST http://localhost:8080/imagerecognition | jq
 
 echo
 echo "thumbnailer 210"
