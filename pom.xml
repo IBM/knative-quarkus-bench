@@ -39,6 +39,10 @@
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-awt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
       <artifactId>quarkus-funqy-knative-events</artifactId>
     </dependency>
     <dependency>
@@ -172,22 +176,6 @@
             </goals>
             <configuration>
               <fileSets>
-                <fileSet>
-                  <sourceFile>src/main/py/compresstest.py</sourceFile>
-                  <destinationFile>target/scripts/compresstest.py</destinationFile>
-                </fileSet>
-                <fileSet>
-                  <sourceFile>src/main/py/110/110.py</sourceFile>
-                  <destinationFile>target/scripts/110.py</destinationFile>
-                </fileSet>
-                <fileSet>
-                  <sourceFile>src/main/py/110/110template.html</sourceFile>
-                  <destinationFile>target/scripts/110template.html</destinationFile>
-                </fileSet>
-                <fileSet>
-                  <sourceFile>src/main/py/120/120.py</sourceFile>
-                  <destinationFile>target/scripts/120.py</destinationFile>
-                </fileSet>
                 <fileSet>
                   <sourceFile>/opt/graalvm-ce-java11-21.3.1/lib/security/cacerts</sourceFile>
                   <destinationFile>target/cacerts</destinationFile>
