@@ -143,6 +143,7 @@ public class IBMCOS {
         if (cosClient.getObject(request, theFile)==null) {
 		log.warn("  ########  getObject returned null. Object not found.  ########");
 	}
+//	log.info("Actual downloaded file size of "+filePath+" = "+theFile.length());
         return;
     }
 
