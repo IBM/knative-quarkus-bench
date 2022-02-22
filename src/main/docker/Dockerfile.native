@@ -25,13 +25,8 @@ RUN microdnf install python3 python3-requests freetype fontconfig \
     && mkdir /work/lib \
     && chown 1001 /work/lib \
     && chmod "g+rwX" /work/lib \
-    && chown 1001:root /work/lib \
-    && mkdir /work/scripts \
-    && chown 1001 /work/scripts \
-    && chmod "g+rwX" /work/scripts \
-    && chown 1001:root /work/scripts
+    && chown 1001:root /work/lib
 
-COPY --chown=1001:root target/scripts /work/scripts
 COPY --chown=1001:root target/*-runner /work/application
 COPY --chown=1001:root target/cacerts /work/
 

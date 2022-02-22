@@ -49,7 +49,6 @@ COPY --chown=1001 target/quarkus-app/lib/ /deployments/lib/
 COPY --chown=1001 target/quarkus-app/*.jar /deployments/
 COPY --chown=1001 target/quarkus-app/app/ /deployments/app/
 COPY --chown=1001 target/quarkus-app/quarkus/ /deployments/quarkus/
-COPY --chown=1001 target/scripts/ /deployments/scripts/
 
 EXPOSE 8080
 USER 1001
