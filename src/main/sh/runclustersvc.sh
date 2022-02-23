@@ -163,7 +163,7 @@ echo inference benchmarks
 echo
 echo imagerecognition
 # takes input and model and synset as input
-runone ${URL}/imagerecognition '{"input":"index.png","model":"synset.txt","synset":"synset.txt"}'
+runone ${URL}/imagerecognition '{"input": "0.png", "model": "mlp-0002.params"}'
 # out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "resnet50-19c8e357.pth", "synset":"synset.txt"}' -X POST ${URL}/imagerecognition)
 # echo ${out} | jq
 # if [[ $? -ne 0 ]]

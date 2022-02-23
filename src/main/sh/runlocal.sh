@@ -17,8 +17,8 @@ cd $(dirname $0)/../../..
 echo start quarkus
 java -jar target/quarkus-app/quarkus-run.jar &
 JPID=$!
-echo wait for 30 seconds...
-sleep 30
+echo wait for 15 seconds...
+sleep 15
 
 # micro benchmarks
 echo
@@ -31,30 +31,34 @@ echo
 curl -s -w "\n" -H 'Content-Type:application/json' -d '"Samantha"' -X POST http://localhost:8080/hello | jq
 
 echo
-echo clock sync
+echo clock synsetsync
 
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/clock_synchronization | jq
+## curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/clock_synchronization | jq
 
 echo
 echo net bench
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/network_benchmark | jq
+## curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/network_benchmark | jq
 
 echo
 echo serv rep 
 
 
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/server_reply | jq
+## curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/server_reply | jq
 
 # inference
 echo
 echo inference benchmarks
 
 echo
+echo
+echo
 echo imagerecognition
-# takes input and model and synset as input
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "resnet50-19c8e357.pth", "synset":"synset.txt"}' -X POST http://localhost:8080/imagerecognition | jq
+# takes input and model as input
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "0.png", "model": "mlp-0002.params"}' -X POST http://localhost:8080/imagerecognition | jq
+sleep 5
+
 
 echo
 echo "thumbnailer 210"
