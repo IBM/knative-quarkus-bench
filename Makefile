@@ -32,10 +32,12 @@ buildnativedebug:
 # for jvm images
 image:
 	podman build -f src/main/docker/Dockerfile.jvm -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
+	
+#	podman build -f src/main/docker/DockerfileUbuntu.jvm -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
 
 # for native images
 imagenative:
-	podman build -f src/main/docker/Dockerfile.native -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
+	podman build -f src/main/docker/DockerfileUbuntu.native -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
 
 # works for both jvm and native
 # use below if using docker
