@@ -8,6 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import ai.djl.Model;
+import ai.djl.basicmodelzoo.basic.Mlp;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
@@ -57,11 +63,11 @@ public class ImageRecognition {
         String key = param.getInput();
         String model_key = param.getModel();
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
-        String synset = param.getSynset();
-        String synset_dpath = String.format("/tmp/%s-%s", synset, UUID.randomUUID());
+//        String synset = param.getSynset();
+//        String synset_dpath = String.format("/tmp/%s-%s", synset, UUID.randomUUID());
 
-        String synset_path = synset_dpath;
-        client.downloadFile(model_bucket, synset, synset_dpath);
+//        String synset_path = synset_dpath;
+//        client.downloadFile(model_bucket, synset, synset_dpath);
 
         /*
          * image_download_begin = datetime.datetime.now()
@@ -93,10 +99,18 @@ public class ImageRecognition {
          * model_process_end = datetime.datetime.now()
          */
         long model_process_begin = System.nanoTime();
-        Builder<Image, Classifications> builder = Criteria.builder()
-                .setTypes(Image.class, Classifications.class)
-                .optModelPath(Paths.get(model_path));
+//        Builder<Image, Classifications> builder = Criteria.builder()
+//                .setTypes(Image.class, Classifications.class)
+//                .optModelPath(Paths.get(model_path));
+        Model model = Model.newInstance("mlp");
+        try {
+            model.setBlock(new Mlp(28 * 28, 10, new int[] {128, 64}));
+            model.load(Paths.get("/tmp"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         long model_process_end = System.nanoTime();
+
 
         /*
          * process_begin = datetime.datetime.now()
@@ -118,6 +132,10 @@ public class ImageRecognition {
          * process_end = datetime.datetime.now()
          */
         long process_begin = System.nanoTime();
+
+        List<String> classes =
+            IntStream.range(0, 10).mapToObj(String::valueOf).collect(Collectors.toList());
+
         Image img = ImageFactory.getInstance().fromFile(Paths.get(image_path));
         img.getWrappedImage();
 
@@ -132,24 +150,13 @@ public class ImageRecognition {
                         new float[] {0.485f, 0.456f, 0.406f}, /*mean*/
                         new float[] {0.229f, 0.224f, 0.225f}) /*std*/)
                 .optApplySoftmax(true)
-                .optSynsetUrl("file:"+synset_dpath)
+                .optSynset(classes)
                 .build();
 
-            Criteria<Image, Classifications> criteria = builder
-                    .optTranslator(translator)
-                    .build();
-
-            ZooModel<Image, Classifications> model = criteria.loadModel();
-            Predictor<Image, Classifications> predictor = model.newPredictor();
+            Predictor<Image, Classifications> predictor = model.newPredictor(translator);
             String tokens = predictor.predict(img).best().getClassName();
             ret = tokens.substring(tokens.indexOf(' ') + 1);
-        } catch (ModelNotFoundException e) {
-            e.printStackTrace();
-        } catch (MalformedModelException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TranslateException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         long process_end = System.nanoTime();
