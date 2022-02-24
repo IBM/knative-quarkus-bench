@@ -30,6 +30,8 @@ runsimple() {
 }
 
 
+# pro-tip: spaces in the parameter json are problematic. remove them.
+
 runone() {
   url=${1}
   p=${2}
@@ -171,18 +173,15 @@ echo
 echo inference benchmarks
 
 echo
-echo imagerecognition
+echo imagerecognition 1
 # takes input and model and synset as input
-runone ${URL}/imagerecognition '{"input": "0.png", "model": "mlp-0002.params"}'
+runone ${URL}/imagerecognition '{"input":"0.png","model":"mlp-0002.params"}'
 # out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "resnet50-19c8e357.pth", "synset":"synset.txt"}' -X POST ${URL}/imagerecognition)
 # echo ${out} | jq
 # if [[ $? -ne 0 ]]
 # then
 #   echo ${out}
 # fi
-
-
-exit
 
 echo
 echo "thumbnailer 210"
