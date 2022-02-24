@@ -8,6 +8,11 @@ runsimple() {
   seconds=1
   while [[ "${problem}" -gt 0 ]]
   do
+    if [[ ${seconds} -gt 16 ]]
+    then
+      echo "Too many failures. Skipping to next test."
+      return
+    fi
     echo "Trying again in ${seconds} second(s) because output was: ${value}" >&2
     sleep ${seconds}
     value=$(curl -s -w '\n' -H 'Content-Type:application/json'  -X POST ${url})
@@ -34,6 +39,11 @@ runone() {
   seconds=1
   while [[ "${problem}" -gt 0 || "${value}z" == "z" ]]
   do
+    if [[ ${seconds} -gt 16 ]]
+    then
+      echo "Too many failures. Skipping to next test."
+      return
+    fi
     echo "Trying again in ${seconds} second(s) because output was: ${value}" >&2
     sleep ${seconds}
     value=$(curl -s -w '\n' -H 'Content-Type:application/json' --data-binary ${p}  -X POST ${url})
@@ -171,6 +181,8 @@ runone ${URL}/imagerecognition '{"input": "0.png", "model": "mlp-0002.params"}'
 #   echo ${out}
 # fi
 
+
+exit
 
 echo
 echo "thumbnailer 210"
