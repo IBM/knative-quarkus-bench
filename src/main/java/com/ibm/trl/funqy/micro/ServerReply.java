@@ -1,7 +1,11 @@
 package com.ibm.trl.funqy.micro;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Arrays;
+
+import java.lang.Integer;
+import java.lang.String;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,19 +27,22 @@ public class ServerReply {
     }
 
     @Funq
-    public HashMap<String, String> server_reply(MySocket s) {
-        HashMap<String, String> retVal = new HashMap<String, String>();
-        
+    public RetVal server_reply(MySocket s) {
+
+        long processTimeBegin = System.nanoTime();
+
+
         String address = s.getServer_address();
         int port = s.getServer_port();
 
         byte[] msg = {};
+        int readSize = 0;
         try {
             Socket socket = new Socket(address, port);
             socket.setSoTimeout(1);
 
             InputStream in = socket.getInputStream();
-            int readSize = in.read(msg);
+            readSize = in.read(msg);
             msg = Arrays.copyOf(msg, readSize);
 
             in.close();
@@ -48,7 +55,42 @@ public class ServerReply {
             e.printStackTrace();
         }
 
-        retVal.put( "result", new String(msg, java.nio.charset.StandardCharsets.UTF_8));
+        long processTimeEnd = System.nanoTime();
+
+	Integer rs = readSize;
+
+        RetVal retVal = new RetVal();
+        retVal.result = Map.of(     "result", new String(msg, java.nio.charset.StandardCharsets.UTF_8),
+			            "size", rs.toString());
+        retVal.measurement = Map.of("process_time", processTimeEnd - processTimeBegin);
+
         return retVal;
     }
+
+    public static class RetVal {
+        Map<String, String> result;
+        Map<String, Long> measurement;
+
+        public Map<String, String> getResult() {
+            return result;
+        }
+
+        public void setResult(Map<String, String> result) {
+            this.result = result;
+        }
+
+        public Map<String, Long> getMeasurement() {
+            return measurement;
+        }
+
+        public void setMeasurement(Map<String, Long> measurement) {
+            this.measurement = measurement;
+        }
+
+        RetVal() {
+            measurement = new HashMap<String, Long>();
+        }
+    }
+
+
 }
