@@ -12,6 +12,8 @@ import java.io.InputStream;
 
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.TimeUnit;
+
 
 import io.quarkus.funqy.Funq;
 
@@ -32,8 +34,21 @@ public class ServerReply {
         long processTimeBegin = System.nanoTime();
 
 
+
         String address = s.getServer_address();
         int port = s.getServer_port();
+	Integer ip = port;
+
+
+        // start echo server: THIS DEPENDS ON NCAT BEING INSTALLED!!!
+        Process proc = null;
+        try {
+            String [] cmd = {"/usr/bin/sh","-c", "/usr/bin/yes chargenchargenchargen | /usr/bin/ncat -l "+ip.toString()+" --keep-open --send-only"};
+            proc = Runtime.getRuntime().exec(cmd);
+            TimeUnit.SECONDS.sleep(5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         byte[] msg = {};
         int readSize = 0;
@@ -56,6 +71,8 @@ public class ServerReply {
         }
 
         long processTimeEnd = System.nanoTime();
+
+        proc.destroy();
 
 	Integer rs = readSize;
 

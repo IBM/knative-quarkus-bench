@@ -130,9 +130,9 @@ echo samantha
 # curl -s -w '\n' -H 'Content-Type:application/json' -d '\"Samantha\"' -X POST ${URL}/hello
 runone ${URL}/hello '"Samantha"'
 
-echo
-echo clock sync
-runone ${URL}/clock_synchronization '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"8080","repetitions":"1","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
+# echo
+# echo clock sync
+# runone ${URL}/clock_synchronization '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"8080","repetitions":"1","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
 
 # out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/clock_synchronization)
 # echo ${out} | jq
@@ -141,11 +141,23 @@ runone ${URL}/clock_synchronization '{"request_id":"tmp_key","server_address":"1
 #   echo ${out}
 # fi
 
+echo
+echo serv rep 
+
+
+runone ${URL}/server_reply '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"20202","repetitions":"10","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
+
+# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/server_reply)
+# echo ${out} | jq
+# if [[ $? -ne 0 ]]
+# then
+#   echo ${out}
+# fi
 
 echo
 echo net bench
 
-runone ${URL}/network_benchmark '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"8080","repetitions":"1","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
+runone ${URL}/network_benchmark '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"20202","repetitions":"10","request_id":"IpsumLoremomethingSayunnySay","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
 # out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/network_benchmark)
 # echo ${out} | jq
 # if [[ $? -ne 0 ]]
@@ -154,18 +166,6 @@ runone ${URL}/network_benchmark '{"request_id":"tmp_key","server_address":"127.0
 # fi
 
 
-echo
-echo serv rep 
-
-
-runone ${URL}/server_reply '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"8080","repetitions":"1","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
-
-# out=$(curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "8080", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST ${URL}/server_reply)
-# echo ${out} | jq
-# if [[ $? -ne 0 ]]
-# then
-#   echo ${out}
-# fi
 
 
 # inference
