@@ -14,9 +14,12 @@ fi
 
 cd $(dirname $0)/../../..
 
+# java -jar line below is for jvm version
+# target/*-runner line below is for native version
 echo start quarkus
 java -jar target/quarkus-app/quarkus-run.jar &
-JPID=$!
+# target/*-runner &
+QPID=$!
 echo wait for 15 seconds...
 sleep 15
 
@@ -136,5 +139,5 @@ fi
 
 
 # try to clean up
-kill -9 $JPID
+kill -9 $QPID
 
