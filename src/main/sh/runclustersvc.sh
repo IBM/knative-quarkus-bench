@@ -102,12 +102,12 @@ runone ${URL}/hello '"Samantha"'
 echo
 echo serv rep 
 
-runone ${URL}/server_reply '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"20202","repetitions":"10","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
+runone ${URL}/server_reply '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"20202","repetitions":"5","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
 
 echo
 echo net bench
 
-runone ${URL}/network_benchmark '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"20202","repetitions":"10","request_id":"IpsumLoremomethingSayunnySay","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
+runone ${URL}/network_benchmark '{"request_id":"tmp_key","server_address":"127.0.0.1","server_port":"30303","repetitions":"5","request_id":"IpsumLoremomethingSayunnySay","output_bucket":"trl-knative-benchmark-bucket","income_timestamp":"test"}'
 
 
 
