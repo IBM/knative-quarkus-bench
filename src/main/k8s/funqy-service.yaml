@@ -12,13 +12,23 @@ spec:
       imagePullSecrets:
       - name: all-icr-io
       containers:
-        - image: us.icr.io/trl-quarkus/knative-serverless-benchmark
+        - image: us.icr.io/trl-quarkus/knative-serverless-benchmark-dal
           env:
             - name: COS_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: cos-secrets
                   key: endpoint
+            - name: COS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cos-secrets
+                  key: accesskeyid
+            - name: COS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cos-secrets
+                  key: secretaccesskey
             - name: COS_APIKEY
               valueFrom:
                 secretKeyRef:
