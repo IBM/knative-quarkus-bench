@@ -18,14 +18,14 @@ import io.quarkus.funqy.Funq;
 import net.sf.jfasta.impl.FASTAElementIterator;
 import net.sf.jfasta.impl.FASTAFileReaderImpl;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 public class DNA {
     static double nanosecInSec = 1_000_000_000.0;
 
-    private IBMCOS client;
+    private COSUtils client;
     public DNA() throws Exception {
-        client = new IBMCOS();
+        client = new COSUtils();
     }
 
 //    @Inject

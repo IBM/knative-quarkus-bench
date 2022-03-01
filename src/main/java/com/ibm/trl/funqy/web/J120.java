@@ -24,16 +24,16 @@ import java.util.List;
 
 import io.quarkus.funqy.Funq;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 public class J120 {
     private Logger log;
     private UUID uuid;
-    private IBMCOS cos;
+    private COSUtils cos;
 
     public J120() throws Exception {
         uuid = UUID.randomUUID();
-        cos = new IBMCOS();
+        cos = new COSUtils();
         log = Logger.getLogger(J120.class);
     }
 
@@ -43,7 +43,7 @@ public class J120 {
         String key = "large";
 
         if (!cos.available()) {
-            retVal.result.put("message", "ERROR: J120.runTest() unable to run since IBMCOS unavailable.");
+            retVal.result.put("message", "ERROR: J120.runTest() unable to run since COSUtils unavailable.");
             return retVal;
 
 	}

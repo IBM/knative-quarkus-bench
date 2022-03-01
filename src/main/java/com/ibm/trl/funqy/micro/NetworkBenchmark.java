@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import java.lang.Integer;
 import java.lang.String;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package com.ibm.trl.funqy.multimedia;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +17,10 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
 
 public class VideoProcessing {
-    private IBMCOS client;
+    private COSUtils client;
 
     public VideoProcessing() throws Exception {
-        client = new IBMCOS();
+        client = new COSUtils();
     }
     
     /*
@@ -230,7 +230,7 @@ public class VideoProcessing {
         this.client.uploadFile(output_bucket, filename, upload_path);
     }
 
-    private void download(String input_bucket, String key, String download_path) {
+    private void download(String input_bucket, String key, String download_path) throws Exception {
         this.client.downloadFile(input_bucket, key, download_path);
     }
 

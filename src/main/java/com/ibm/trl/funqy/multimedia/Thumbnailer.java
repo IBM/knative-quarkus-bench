@@ -1,6 +1,6 @@
 package com.ibm.trl.funqy.multimedia;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -18,10 +18,10 @@ import io.quarkus.funqy.Funq;
 
 
 public class Thumbnailer {
-    private IBMCOS client;
+    private COSUtils client;
 
     public Thumbnailer() throws Exception {
-        client = new IBMCOS();
+        client = new COSUtils();
     }
     
     /*

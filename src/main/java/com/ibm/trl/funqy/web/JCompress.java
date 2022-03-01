@@ -26,16 +26,16 @@ import java.util.zip.ZipOutputStream;
 
 import io.quarkus.funqy.Funq;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 public class JCompress {
     private Logger log;
     private UUID uuid;
-    private IBMCOS cos;
+    private COSUtils cos;
 
     public JCompress() throws Exception {
         uuid = UUID.randomUUID();
-        cos = new IBMCOS();
+        cos = new COSUtils();
         log = Logger.getLogger(JCompress.class);
     }
 
@@ -45,7 +45,7 @@ public class JCompress {
         String key = "large";
 
         if (!cos.available()) {
-            retVal.result.put("message", "ERROR: JCompress.runTest() unable to run since IBMCOS unavailable.");
+            retVal.result.put("message", "ERROR: JCompress.runTest() unable to run since COSUtils unavailable.");
             return retVal;
 	}
 

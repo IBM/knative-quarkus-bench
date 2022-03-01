@@ -24,16 +24,16 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 public class JDownload{
     private Logger log;
     private UUID uuid;
-    private IBMCOS cos;
+    private COSUtils cos;
 
     public JDownload() throws Exception {
         uuid = UUID.randomUUID();
-        cos = new IBMCOS();
+        cos = new COSUtils();
         log = Logger.getLogger(JDownload.class);
     }
 
@@ -43,7 +43,7 @@ public class JDownload{
         String key = "large";
 
         if (!cos.available()) {
-            retVal.result.put("message", "ERROR: JDownload.runTest() unable to run since IBMCOS unavailable.");
+            retVal.result.put("message", "ERROR: JDownload.runTest() unable to run since COSUtils unavailable.");
 	}
 
         if (input != null) {

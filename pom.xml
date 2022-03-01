@@ -38,8 +38,17 @@
   </dependencyManagement>
   <dependencies>
     <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>url-connection-client</artifactId>
+      <version>2.17.130</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-awt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-amazon-s3</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>

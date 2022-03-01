@@ -1,6 +1,6 @@
 package com.ibm.trl.funqy.inference;
 
-import com.ibm.trl.funqy.ibmcos.IBMCOS;
+import com.ibm.trl.funqy.cosutils.COSUtils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -35,10 +35,10 @@ import ai.djl.translate.Translator;
 import io.quarkus.funqy.Funq;
 
 public class ImageRecognition {
-    private IBMCOS client;
+    private COSUtils client;
 
     public ImageRecognition() throws Exception {
-        client = new IBMCOS();
+        client = new COSUtils();
     }
 
     /*
@@ -77,7 +77,11 @@ public class ImageRecognition {
          */
         long image_download_begin = System.nanoTime();
         String image_path = download_path;
-        client.downloadFile(input_bucket, key, download_path);
+	try {
+            client.downloadFile(input_bucket, key, download_path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         long image_download_end = System.nanoTime();
 
         /*
@@ -88,7 +92,11 @@ public class ImageRecognition {
          */
         long model_download_begin = System.nanoTime();
         String model_path = String.join("/", "/tmp", model_key);
-        client.downloadFile(model_bucket, model_key, model_path);
+	try {
+            client.downloadFile(model_bucket, model_key, model_path);
+        } catch (Exception e) {
+            e.printStackTrace();
+	}
         long model_download_end = System.nanoTime();
 
         /*
