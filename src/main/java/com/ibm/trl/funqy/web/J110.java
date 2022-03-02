@@ -85,7 +85,8 @@ public class J110 {
 
 	List<Integer> integers = new ArrayList<>();
 	for (int i = 0; i < 1000; i++) {
-		integers.add(new Integer(rand.nextInt(1000000)));
+//		integers.add(new Integer(rand.nextInt(1000000)));
+		integers.add(Integer.valueOf(rand.nextInt(1000000)));
 	}
 
 	context.put("username", "testname");
