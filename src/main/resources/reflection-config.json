@@ -22,39 +22,6 @@
     "allPublicClasses" : true
   },
   {
-    "name" : "com.ibm.cloud.objectstorage.ClientConfiguration",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
-    "name" : "com.ibm.cloud.objectstorage.oauth.Token",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
-    "name" : "com.ibm.cloud.objectstorage.services.s3.internal.AWSS3V4Signer",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
     "name" : "org.apache.http.conn.HttpClientConnectionManager",
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,
@@ -67,17 +34,6 @@
   },
   {
     "name" : "org.apache.http.pool.ConnPoolControl",
-    "allDeclaredConstructors" : true,
-    "allPublicConstructors" : true,
-    "allDeclaredMethods" : true,
-    "allPublicMethods" : true,
-    "allDeclaredFields" : true,
-    "allPublicFields" : true,
-    "allDeclaredClasses" : true,
-    "allPublicClasses" : true
-  },
-  {
-    "name" : "com.ibm.cloud.objectstorage.http.conn.Wrapped",
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,
     "allDeclaredMethods" : true,
