@@ -15,28 +15,39 @@ native: buildnative imagenative push delete apply
 #
 # build the jvm images
 build:
-	mvn clean install
+	mvn clean install && \
+	cp src/main/sh/tempentrypoint.sh target
+
 
 # build the jvm images with verbose debug output
 builddebug:
-	mvn clean install -X -e
+	mvn clean install -X -e && \
+	cp src/main/sh/tempentrypoint.sh target
+
 
 # build the graalvm images
 buildnative:
 	mvn clean install -Pnative -Djavax.net.ssl.trustStore=/opt/graalvm-ce-java11-21.3.1/lib/security/cacerts && \
-	cp /opt/graalvm-ce-java11-21.3.1/lib/security/cacerts target
+	cp /opt/graalvm-ce-java11-21.3.1/lib/security/cacerts target && \
+	cp src/main/sh/tempentrypoint.sh target
+
 
 
 # build the graalvm images with verbose debug output
 buildnativedebug:
 	mvn clean install -Pnative -X -e && \
-	cp /opt/graalvm-ce-java11-21.3.1/lib/security/cacerts target
+	cp /opt/graalvm-ce-java11-21.3.1/lib/security/cacerts target && \
+	cp src/main/sh/tempentrypoint.sh target
+
 
 # for jvm images
 image:
 	podman build -f src/main/docker/Dockerfile$(OS).jvm -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
 	
-#	podman build -f src/main/docker/DockerfileUbuntu.jvm -t us.icr.io/trl-quarkus/knative-serverless-benchmark${IMAGESFX} .
+# for local jvm image e.g., for debugging
+imagelocal:
+	podman build -f src/main/docker/Dockerfile$(OS).jvm -t benchlocal .
+
 
 # for native images
 imagenative:

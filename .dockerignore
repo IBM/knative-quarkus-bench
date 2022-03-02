@@ -4,5 +4,5 @@
 !target/lib/*
 !target/quarkus-app/**
 !target/cacerts
-!target/scripts
-!target/scripts/*
+!target/tempentrypoint.sh
+!target/*.sh
