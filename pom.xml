@@ -47,8 +47,9 @@
       <artifactId>quarkus-awt</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.quarkus</groupId>
+      <groupId>io.quarkiverse.amazonservices</groupId>
       <artifactId>quarkus-amazon-s3</artifactId>
+      <version>1.0.5</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
