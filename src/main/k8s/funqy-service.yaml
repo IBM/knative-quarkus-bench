@@ -29,16 +29,6 @@ spec:
                 secretKeyRef:
                   name: cos-secrets
                   key: secretaccesskey
-            - name: COS_APIKEY
-              valueFrom:
-                secretKeyRef:
-                  name: cos-secrets
-                  key: apikey
-            - name: COS_INSTANCE_CRN
-              valueFrom:
-                secretKeyRef:
-                  name: cos-secrets
-                  key: instancecrn
             - name: COS_IN_BUCKET
               valueFrom:
                 secretKeyRef:
