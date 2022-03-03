@@ -53,6 +53,7 @@ public class COSUtils {
     private String secret_access_key = null;
     private StaticCredentialsProvider credential = null;
     private S3Client s3 = null;
+    private boolean debug = false;
 
 
     public COSUtils() throws Exception {
@@ -81,6 +82,17 @@ public class COSUtils {
 
         if ((value = System.getenv("COS_BUCKET_LOCATION")) != null)
             COS_BUCKET_LOCATION = value;
+
+	if (debug == true) {
+	    System.out.println("COS_ENDPOINT="+endpointOverride.toString());
+	    System.out.println("COS_ACCESS_KEY_ID="+access_key_id);
+	    System.out.println("COS_SECRET_ACCESS_KEY="+secret_access_key);
+	    System.out.println("COS_IN_BUCKET="+COS_IN_BUCKET);
+	    System.out.println("COS_OUT_BUCKET="+COS_OUT_BUCKET);
+	    System.out.println("COS_MODEL_BUCKET="+COS_MODEL_BUCKET);
+	    System.out.println("COS_BUCKET="+COS_BUCKET);
+	    System.out.println("COS_BUCKET_LOCATION="+COS_BUCKET_LOCATION);
+	}
 
         credential = StaticCredentialsProvider
             .create(AwsBasicCredentials.create(access_key_id, secret_access_key));
