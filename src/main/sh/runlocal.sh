@@ -14,12 +14,17 @@ then
   export IMAGESFX
 fi
 
+if [ -z ${JAVA_HOME} ]
+then
+  JAVA_HOME=$(dirname $(dirname $(which java)))
+fi
+
 cd $(dirname $0)/../../..
 
 # java -jar line below is for jvm version
 # target/*-runner line below is for native version
 echo start quarkus
-java -jar target/quarkus-app/quarkus-run.jar &
+${JAVA_HOME}/bin/java -jar target/quarkus-app/quarkus-run.jar &
 # target/*-runner &
 QPID=$!
 echo wait for 15 seconds...
