@@ -1728,9 +1728,6 @@
   },
   {
     "name" : "com.hubspot.jinjava.lib.fn.Functions",
-    "methods": [
-      {"name" : "dateTimeFormat", "parameterTypes" : []}
-    ], 
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,
     "allDeclaredMethods" : true,
