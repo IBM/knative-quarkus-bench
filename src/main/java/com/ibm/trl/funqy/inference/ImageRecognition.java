@@ -31,118 +31,55 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 
-
 import io.quarkus.funqy.Funq;
+import javax.inject.Inject;
+
+import software.amazon.awssdk.services.s3.S3Client;
+
 
 public class ImageRecognition {
     private COSUtils client;
+
+    @Inject
+    S3Client s3;
 
     public ImageRecognition() throws Exception {
         client = new COSUtils();
     }
 
-    /*
-     * SCRIPT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-     * class_idx = json.load(open(os.path.join(SCRIPT_DIR, "imagenet_class_index.json"), 'r'))
-     * idx2label = [class_idx[str(k)][1] for k in range(len(class_idx))]
-     * model = None
-     */
-    /* Currently use synset.txt and no need to create idx2label */
-
     @Funq
     public RetVal imagerecognition(Param param) throws IOException {
-        /*
-         * model_bucket = event.get('bucket').get('model')
-         * input_bucket = event.get('bucket').get('input')
-         * key = event.get('object').get('input')
-         * model_key = event.get('object').get('model')
-         * download_path = '/tmp/{}-{}'.format(key, uuid.uuid4())
-         */
         String model_bucket = client.getModelBucket();
         String input_bucket = client.getInBucket();
         String key = param.getInput();
         String model_key = param.getModel();
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
-//        String synset = param.getSynset();
-//        String synset_dpath = String.format("/tmp/%s-%s", synset, UUID.randomUUID());
 
-//        String synset_path = synset_dpath;
-//        client.downloadFile(model_bucket, synset, synset_dpath);
-
-        /*
-         * image_download_begin = datetime.datetime.now()
-         * image_path = download_path
-         * client.download(input_bucket, key, download_path)
-         * image_download_end = datetime.datetime.now()
-         */
         long image_download_begin = System.nanoTime();
         String image_path = download_path;
 	try {
-            client.downloadFile(input_bucket, key, download_path);
+            client.downloadFile(s3, input_bucket, key, download_path);
         } catch (Exception e) {
             e.printStackTrace();
         }
         long image_download_end = System.nanoTime();
 
-        /*
-         * model_download_begin = datetime.datetime.now()
-         * model_path = os.path.join('/tmp', model_key)
-         * client.download(model_bucket, model_key, model_path)
-         * model_download_end = datetime.datetime.now()
-         */
         long model_download_begin = System.nanoTime();
         String model_path = String.join("/", "/tmp", model_key);
 	try {
-            client.downloadFile(model_bucket, model_key, model_path);
+            client.downloadFile(s3, model_bucket, model_key, model_path);
         } catch (Exception e) {
             e.printStackTrace();
 	}
         long model_download_end = System.nanoTime();
 
-        /*
-         * model_process_begin = datetime.datetime.now()
-         * model = resnet50(pretrained=False)
-         * model.load_state_dict(torch.load(model_path))
-         * model.eval()
-         * model_process_end = datetime.datetime.now()
-         */
         long model_process_begin = System.nanoTime();
-//        Builder<Image, Classifications> builder = Criteria.builder()
-//                .setTypes(Image.class, Classifications.class)
-//                .optModelPath(Paths.get(model_path));
-        Model model = Model.newInstance("mlp");
-        try {
-            model.setBlock(new Mlp(28 * 28, 10, new int[] {128, 64}));
-            model.load(Paths.get("/tmp"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Builder<Image, Classifications> builder = Criteria.builder()
+                .setTypes(Image.class, Classifications.class)
+                .optModelPath(Paths.get(model_path));
         long model_process_end = System.nanoTime();
 
-
-        /*
-         * process_begin = datetime.datetime.now()
-         * input_image = Image.open(image_path)
-         * preprocess = transforms.Compose([
-         *     transforms.Resize(256),
-         *     transforms.CenterCrop(224),
-         *     transforms.ToTensor(),
-         *     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-         * ])
-         * input_tensor = preprocess(input_image)
-         * input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model 
-         * output = model(input_batch)
-         * _, index = torch.max(output, 1)
-         * # The output has unnormalized scores. To get probabilities, you can run a softmax on it.
-         * prob = torch.nn.functional.softmax(output[0], dim=0)
-         * _, indices = torch.sort(output, descending = True)
-         * ret = idx2label[index]
-         * process_end = datetime.datetime.now()
-         */
         long process_begin = System.nanoTime();
-
-        List<String> classes =
-            IntStream.range(0, 10).mapToObj(String::valueOf).collect(Collectors.toList());
 
         Image img = ImageFactory.getInstance().fromFile(Paths.get(image_path));
         img.getWrappedImage();
@@ -158,38 +95,30 @@ public class ImageRecognition {
                         new float[] {0.485f, 0.456f, 0.406f}, /*mean*/
                         new float[] {0.229f, 0.224f, 0.225f}) /*std*/)
                 .optApplySoftmax(true)
-                .optSynset(classes)
+                .optSynsetUrl("file:./src/main/resources/synset.txt")
                 .build();
 
-            Predictor<Image, Classifications> predictor = model.newPredictor(translator);
+            Criteria<Image, Classifications> criteria = builder.optTranslator(translator).build();
+            ZooModel<Image, Classifications> model = criteria.loadModel();
+            Predictor<Image, Classifications> predictor = model.newPredictor();
             String tokens = predictor.predict(img).best().getClassName();
             ret = tokens.substring(tokens.indexOf(' ') + 1);
-        } catch (Exception e) {
+        } catch (ModelNotFoundException e) {
+            e.printStackTrace();
+        } catch (MalformedModelException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TranslateException e) {
             e.printStackTrace();
         }
         long process_end = System.nanoTime();
 
-        /*
-         * download_time = (image_download_end- image_download_begin) / datetime.timedelta(microseconds=1)
-         * model_download_time = (model_download_end - model_download_begin) / datetime.timedelta(microseconds=1)
-         * model_process_time = (model_process_end - model_process_begin) / datetime.timedelta(microseconds=1)
-         * process_time = (process_end - process_begin) / datetime.timedelta(microseconds=1)
-         */
         long download_time = (image_download_end - image_download_begin)/1000;
         long model_download_time = (model_download_end - model_download_begin) / 1000;
         long model_process_time = (model_process_end - model_process_begin)/1000;
         long process_time = (process_end - process_begin)/1000;
 
-        /*
-         * return {
-         *   'result': {'idx': index.item(), 'class': ret},
-         *   'measurement': {
-         *       'download_time': download_time + model_download_time,
-         *       'compute_time': process_time + model_process_time,
-         *       'model_time': model_process_time,
-         *       'model_download_time': model_download_time
-         *   }
-         */
         RetVal retVal = new RetVal();
         retVal.result = Map.of(     "idx", index,
                                     "class", ret);

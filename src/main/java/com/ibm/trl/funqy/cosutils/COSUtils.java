@@ -45,7 +45,7 @@ public class COSUtils {
     private String AWS_ENDPOINT = "needstobeset";
     private String COS_IN_BUCKET = "trl-knative-benchmark-bucket-1";
     private String COS_OUT_BUCKET = "trl-knative-benchmark-bucket-2";
-    private String COS_MODEL_BUCKET = "trl-knative-benchmark-bucket";
+    private String COS_MODEL_BUCKET = "trl-knative-benchmark-bucket-1";
     private String COS_BUCKET = "trl-knative-benchmark-bucket";
 
     private Region region = Region.AP_SOUTH_1; // any region is OK
