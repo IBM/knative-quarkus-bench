@@ -32,10 +32,10 @@ runsimple() {
 if [[ -f ${HOME}/.env ]]
 then
   . ${HOME}/.env
-  export COS_ENDPOINT
-  export COS_APIKEY
-  export COS_ACCESS_KEY_ID
-  export COS_SECRET_ACCESS_KEY
+  export AWS_REGION
+  export AWS_ENDPOINT
+  export AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY
   export COS_INSTANCE_CRN
   export COS_IN_BUCKET
   export COS_OUT_BUCKET

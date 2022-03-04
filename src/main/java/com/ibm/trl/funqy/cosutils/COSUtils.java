@@ -41,13 +41,14 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class COSUtils {
     private static final Logger log = Logger.getLogger(COSUtils.class);
-    private String COS_BUCKET_LOCATION = "us-south";
+    private String AWS_REGION = "ap-south-1";
+    private String AWS_ENDPOINT = "needstobeset";
     private String COS_IN_BUCKET = "trl-knative-benchmark-bucket-1";
     private String COS_OUT_BUCKET = "trl-knative-benchmark-bucket-2";
     private String COS_MODEL_BUCKET = "trl-knative-benchmark-bucket";
     private String COS_BUCKET = "trl-knative-benchmark-bucket";
 
-    private Region region = Region.US_WEST_2; // any region is OK ... todo: get from env...
+    private Region region = Region.AP_SOUTH_1; // any region is OK
     private URI endpointOverride = null;
     private String access_key_id = null;
     private String secret_access_key = null;
@@ -59,14 +60,16 @@ public class COSUtils {
     public COSUtils() throws Exception {
         String value;
 
-        if ((value = System.getenv("COS_ENDPOINT")) != null)
-            endpointOverride = URI.create(value);
+        if ((value = System.getenv("AWS_ENDPOINT")) != null) {
+	    AWS_ENDPOINT = value;
+            endpointOverride = URI.create(AWS_ENDPOINT);
+	}
 
-        if ((value = System.getenv("COS_ACCESS_KEY_ID")) != null)
-            access_key_id = System.getenv("COS_ACCESS_KEY_ID");
+        if ((value = System.getenv("AWS_ACCESS_KEY_ID")) != null)
+            access_key_id = System.getenv("AWS_ACCESS_KEY_ID");
 
-        if ((value = System.getenv("COS_SECRET_ACCESS_KEY")) != null)
-            secret_access_key = System.getenv("COS_SECRET_ACCESS_KEY");
+        if ((value = System.getenv("AWS_SECRET_ACCESS_KEY")) != null)
+            secret_access_key = System.getenv("AWS_SECRET_ACCESS_KEY");
 
         if ((value = System.getenv("COS_IN_BUCKET")) != null)
             COS_IN_BUCKET = value;
@@ -80,18 +83,22 @@ public class COSUtils {
         if ((value = System.getenv("COS_BUCKET")) != null)
             COS_BUCKET = value;
 
-        if ((value = System.getenv("COS_BUCKET_LOCATION")) != null)
-            COS_BUCKET_LOCATION = value;
+        if ((value = System.getenv("AWS_REGION")) != null) {
+            AWS_REGION = value;
+	    region = Region.of(AWS_REGION); // right method?!?!?!
+	    } 
 
 	if (debug == true) {
-	    System.out.println("COS_ENDPOINT="+endpointOverride.toString());
-	    System.out.println("COS_ACCESS_KEY_ID="+access_key_id);
-	    System.out.println("COS_SECRET_ACCESS_KEY="+secret_access_key);
+	    System.out.println("AWS_ENDPOINT="+AWS_ENDPOINT);
+	    System.out.println("effective endpoint="+endpointOverride.toString());
+	    System.out.println("AWS_ACCESS_KEY_ID="+access_key_id);
+	    System.out.println("AWS_SECRET_ACCESS_KEY="+secret_access_key);
 	    System.out.println("COS_IN_BUCKET="+COS_IN_BUCKET);
 	    System.out.println("COS_OUT_BUCKET="+COS_OUT_BUCKET);
 	    System.out.println("COS_MODEL_BUCKET="+COS_MODEL_BUCKET);
 	    System.out.println("COS_BUCKET="+COS_BUCKET);
-	    System.out.println("COS_BUCKET_LOCATION="+COS_BUCKET_LOCATION);
+	    System.out.println("AWS_REGION="+AWS_REGION);
+	    System.out.println("effective region="+region.toString());
 	}
 
         credential = StaticCredentialsProvider

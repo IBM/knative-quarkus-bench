@@ -3,11 +3,10 @@
 if [[ -f ${HOME}/.env ]]
 then
   . ${HOME}/.env
-  export COS_ENDPOINT
-  export COS_APIKEY
-  export COS_INSTANCE_CRN
-  export COS_ACCESS_KEY_ID
-  export COS_SECRET_ACCESS_KEY
+  export AWS_REGION
+  export AWS_ENDPOINT
+  export AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY
   export COS_IN_BUCKET
   export COS_OUT_BUCKET
   export NS
@@ -60,7 +59,6 @@ echo imagerecognition
 # takes input and model as input
 curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "index.png", "model": "resnet50-19c8e357.pth"}' -X POST http://localhost:8080/imagerecognition | jq
 # curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input": "0.png", "model": "mlp-0002.params"}' -X POST http://localhost:8080/imagerecognition | jq
-
 
 echo
 echo "thumbnailer 210"
