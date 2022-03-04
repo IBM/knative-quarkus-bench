@@ -151,7 +151,34 @@ public class COSUtils {
         return;
     }
 
+    public void uploadFile(S3Client s3, String bucket, String key, String filePath) {
+        log.info("Uploading "+filePath+" as "+key+" to bucket "+bucket+".");
+//        s3.putObject(bucket, key, new File(filePath));
+        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
+        s3.putObject(objectRequest, RequestBody.fromFile(new File(filePath).toPath()));
+
+        return;
+    }
+
     public void downloadFile(String bucket, String key, String filePath) throws Exception {
+        log.info("Downloading "+filePath+" as "+key+" from bucket "+bucket+".");
+        File theFile = new File(filePath);
+        File theDir = theFile.getParentFile();
+        if (!theDir.exists())
+            theDir.mkdirs();
+        GetObjectRequest request = GetObjectRequest.builder().bucket(bucket).key(key).build();
+        ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
+        byte[] data = objectBytes.asByteArray();
+        OutputStream os = new FileOutputStream(theFile);
+        os.write(data);
+        os.close();
+
+//      s3.getObject(request, theFile);
+//	log.info("Actual downloaded file size of "+filePath+" = "+theFile.length());
+        return;
+    }
+
+    public void downloadFile(S3Client s3, String bucket, String key, String filePath) throws Exception {
         log.info("Downloading "+filePath+" as "+key+" from bucket "+bucket+".");
         File theFile = new File(filePath);
         File theDir = theFile.getParentFile();
