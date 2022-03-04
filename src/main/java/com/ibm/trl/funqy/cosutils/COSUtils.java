@@ -206,6 +206,16 @@ public class COSUtils {
 //        return (InputStream)s3o.getObjectContent();
     }
 
+    public InputStream get_object(S3Client s3, String bucket, String key) {
+        GetObjectRequest objectRequest = GetObjectRequest.builder().key(key).bucket(bucket).build();
+        ResponseInputStream<GetObjectResponse> in = s3.getObject(objectRequest);
+	return in;
+
+//        GetObjectRequest request = new GetObjectRequest(bucket, key);
+//        S3Object s3o = cosClient.getObject(request);
+//        return (InputStream)s3o.getObjectContent();
+    }
+
     public String put_object(String bucket, String key, File file) {
         PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
         PutObjectResponse res = s3.putObject(objectRequest, RequestBody.fromFile(file.toPath()));
@@ -216,5 +226,13 @@ public class COSUtils {
 
     }
 
+    public String put_object(S3Client s3, String bucket, String key, File file) {
+        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
+        PutObjectResponse res = s3.putObject(objectRequest, RequestBody.fromFile(file.toPath()));
+	return res.eTag();
 
+//        PutObjectResult res = cosClient.putObject(bucket, key,  file);
+//        return res.getETag();
+
+    }
 }
