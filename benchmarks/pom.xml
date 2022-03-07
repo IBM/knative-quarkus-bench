@@ -3,12 +3,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ibm.trl</groupId>
-  <artifactId>knative-serverless-benchmark</artifactId>
+  <artifactId>benchmarks</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <parent>
+    <groupId>com.ibm.trl</groupId>
+    <artifactId>knative-serverless-benchmark</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
   <modules>
-    <module>base</module>
-    <module>benchmarks</module>
+    <module>graph-pagerank</module>
   </modules>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
