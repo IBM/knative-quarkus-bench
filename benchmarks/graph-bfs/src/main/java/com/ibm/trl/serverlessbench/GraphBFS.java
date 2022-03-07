@@ -18,7 +18,7 @@ import org.jgrapht.util.SupplierUtil;
 
 import io.quarkus.funqy.Funq;
 
-public class GraphPageRank {
+public class GraphBFS {
     static double nanosecInSec = 1_000_000_000.0;
 
     static Map<String, Integer> size_generators = Map.of("test",  10,
@@ -58,18 +58,42 @@ public class GraphPageRank {
     }
     
     @Funq
-    public RetValType<Integer, Double> pagerank(String size) {
-        RetValType<Integer, Double> retVal = new RetValType<>();
+    public RetValType<String, ArrayList<Integer>> bfs(String size) {
+        RetValType<String, ArrayList<Integer>> retVal = new RetValType<>();
 
-        Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize(size), retVal);
+        int graphSize = graphSize(size);
 
-        PageRank<Integer, DefaultEdge> algo = new PageRank<>(inputGraph);
+        Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize, retVal);
+
+        var verticies = new ArrayList<Integer>(graphSize);
+        var layers    = new ArrayList<Integer>(graphSize);
+        var parents   = new Integer[graphSize];
 
         long process_begin = System.nanoTime();
-        Map<Integer, Double> score = algo.getScores();
+        BreadthFirstIterator<Integer, DefaultEdge> it = new BreadthFirstIterator<>(inputGraph);
+
+        int numVisited = 0;
+        int lastDepth = -1;
+        
+        for( ; it.hasNext(); numVisited++) {
+            Integer v = it.next();
+            int depth = it.getDepth(v);
+
+            verticies.add(v);
+            parents[v.intValue()] = it.getParent(v);
+
+            if(depth != lastDepth) {
+                layers.add(numVisited);
+            }
+            lastDepth = depth;
+        }
+        layers.add(numVisited);
+        
         long process_end= System.nanoTime();
 
-        retVal.result = score;
+        layers.removeIf((i) -> i == null);
+        
+        retVal.result = Map.of("verticies", verticies, "layers", layers, "parents", new ArrayList<Integer>(Arrays.asList(parents)));
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
 
         return retVal;

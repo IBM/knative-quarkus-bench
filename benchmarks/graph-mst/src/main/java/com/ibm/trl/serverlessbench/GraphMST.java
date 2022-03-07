@@ -18,7 +18,7 @@ import org.jgrapht.util.SupplierUtil;
 
 import io.quarkus.funqy.Funq;
 
-public class GraphPageRank {
+public class GraphMST {
     static double nanosecInSec = 1_000_000_000.0;
 
     static Map<String, Integer> size_generators = Map.of("test",  10,
@@ -58,18 +58,22 @@ public class GraphPageRank {
     }
     
     @Funq
-    public RetValType<Integer, Double> pagerank(String size) {
-        RetValType<Integer, Double> retVal = new RetValType<>();
+    public RetValType<String, ArrayList<String>> mst(String size) {
+        RetValType<String, ArrayList<String>> retVal = new RetValType<>();
 
-        Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize(size), retVal);
+        int graphSize = graphSize(size);
 
-        PageRank<Integer, DefaultEdge> algo = new PageRank<>(inputGraph);
+        Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize, retVal);
+
+        SpanningTreeAlgorithm<DefaultEdge> algo = new PrimMinimumSpanningTree<>(inputGraph);
 
         long process_begin = System.nanoTime();
-        Map<Integer, Double> score = algo.getScores();
+        SpanningTreeAlgorithm.SpanningTree<DefaultEdge> mst = algo.getSpanningTree();
         long process_end= System.nanoTime();
 
-        retVal.result = score;
+        ArrayList<String> mstList = new ArrayList<>(graphSize);
+        for(Iterator<DefaultEdge> it = mst.iterator(); it.hasNext(); mstList.add(it.next().toString()));
+        retVal.result = Map.of("mst", mstList);
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
 
         return retVal;

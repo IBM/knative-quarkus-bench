@@ -13,6 +13,8 @@
   </parent>
   <modules>
     <module>graph-pagerank</module>
+    <module>graph-mst</module>
+    <module>graph-bfs</module>
   </modules>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
