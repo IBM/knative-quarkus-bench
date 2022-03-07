@@ -1,0 +1,41 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: knative-serverless-benchmark
+spec:
+  template:
+    metadata:
+      name: knative-serverless-benchmark-v1
+      annotations:
+        autoscaling.knative.dev/target: "1"
+    spec:
+      imagePullSecrets:
+      - name: all-icr-io
+      containers:
+        - image: us.icr.io/trl-quarkus/knative-serverless-benchmark-osaka
+          env:
+            - name: COS_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: cos-secrets
+                  key: endpoint
+            - name: COS_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: cos-secrets
+                  key: apikey
+            - name: COS_INSTANCE_CRN
+              valueFrom:
+                secretKeyRef:
+                  name: cos-secrets
+                  key: instancecrn
+            - name: COS_IN_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: cos-secrets
+                  key: inbucket
+            - name: COS_OUT_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: cos-secrets
+                  key: outbucket
