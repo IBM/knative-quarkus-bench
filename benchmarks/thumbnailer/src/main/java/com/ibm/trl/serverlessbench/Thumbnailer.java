@@ -13,21 +13,28 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import io.quarkus.funqy.Funq;
 
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 
 
 public class Thumbnailer {
-    private COSUtils client;
-
     @Inject
     S3Client s3;
 
-    public Thumbnailer() throws Exception {
-        client = new COSUtils();
-    }
-    
+    @ConfigProperty(name = "serverlessbench.thumbnailer.input_bucket")
+    String input_bucket;
+
+    @ConfigProperty(name = "serverlessbench.thumbnailer.output_bucket")
+    String output_bucket;
+
     public BufferedImage resize_image(BufferedImage bimg, int w, int h) throws IOException {
         Image thumbnail = bimg.getScaledInstance(w, h, Image.SCALE_DEFAULT);
         BufferedImage ret_image = new BufferedImage(thumbnail.getWidth(null), thumbnail.getHeight(null), BufferedImage.TYPE_INT_RGB);
@@ -38,8 +45,6 @@ public class Thumbnailer {
     public RetVal thumbnailer(Param param) throws Exception {
         int object_height = param.getHeight();
         int object_width = param.getWidth();
-        String input_bucket = client.getInBucket();
-        String output_bucket = client.getOutBucket();
         String key = param.getObjectKey().replaceAll(" ", "+");
         int width = object_width;
         int height = object_height;
@@ -88,17 +93,38 @@ public class Thumbnailer {
     }
 
     private InputStream download_stream(String bucket, String file) throws FileNotFoundException {
-        InputStream data = this.client.get_object(s3, bucket, file);
-        return data;
+        GetObjectRequest objectRequest = GetObjectRequest.builder().key(file).bucket(bucket).build();
+        ResponseInputStream<GetObjectResponse> in = s3.getObject(objectRequest);
+        return in;
     }
     
     private String upload_stream(String bucket, String[] file, BufferedImage bytes_data) throws IOException {
         File upload_file = new File("/tmp/" + file[1]);
         ImageIO.write(bytes_data, "png", upload_file);
         String key = String.join("/", file);
-        this.client.put_object(s3, bucket, key, upload_file);
+        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
+        s3.putObject(objectRequest, RequestBody.fromFile(upload_file.toPath()));
+
         return key;
     }
+
+    public static class Param {
+        private int height;
+        private int width;
+        private String objectKey;
+
+        public Param() {}
+
+        public int getHeight() { return height; }
+        public void setHeight(int h) { this.height = h; }
+
+        public int getWidth() { return width; }
+        public void setWidth(int w) { this.width = w; }
+
+        public String getObjectKey() { return objectKey; }
+        public void setObjectKey(String o) { this.objectKey = o; }
+    }
+
     
     public static class RetVal {
         Map<String, String> result;
