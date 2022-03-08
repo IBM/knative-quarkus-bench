@@ -1,6 +1,9 @@
 package com.ibm.trl.serverlessbench;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,26 +32,31 @@ import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import io.quarkus.funqy.Funq;
 import javax.inject.Inject;
 
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 
 public class ImageRecognition {
-    private COSUtils client;
-
     @Inject
     S3Client s3;
 
-    public ImageRecognition() throws Exception {
-        client = new COSUtils();
-    }
+    @ConfigProperty(name = "serverlessbench.imagerecognition.input_bucket")
+    String input_bucket;
+
+    @ConfigProperty(name = "serverlessbench.imagerecognition.model_bucket")
+    String model_bucket;
 
     @Funq
     public RetVal imagerecognition(Param param) throws IOException {
-        String model_bucket = client.getModelBucket();
-        String input_bucket = client.getInBucket();
         String key = param.getInput();
         String model_key = param.getModel();
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
@@ -56,7 +64,7 @@ public class ImageRecognition {
         long image_download_begin = System.nanoTime();
         String image_path = download_path;
 	try {
-            client.downloadFile(s3, input_bucket, key, download_path);
+            downloadFile(input_bucket, key, download_path);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,7 +73,7 @@ public class ImageRecognition {
         long model_download_begin = System.nanoTime();
         String model_path = String.join("/", "/tmp", model_key);
 	try {
-            client.downloadFile(s3, model_bucket, model_key, model_path);
+            downloadFile(model_bucket, model_key, model_path);
         } catch (Exception e) {
             e.printStackTrace();
 	}
@@ -126,6 +134,32 @@ public class ImageRecognition {
                                     "model_download_time", model_download_time);
 
         return retVal; 
+    }
+
+    public void downloadFile(String bucket, String key, String filePath) throws Exception {
+        File theFile = new File(filePath);
+        File theDir = theFile.getParentFile();
+        if (!theDir.exists())
+            theDir.mkdirs();
+        GetObjectRequest request = GetObjectRequest.builder().bucket(bucket).key(key).build();
+        ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
+        byte[] data = objectBytes.asByteArray();
+        OutputStream os = new FileOutputStream(theFile);
+        os.write(data);
+        os.close();
+    }
+
+    public static class Param {
+        private String input;
+        private String model;
+
+        public Param() {}
+
+        public String getInput() { return input; }
+        public void setInput(String i) { this.input = i; }
+
+        public String getModel() { return model; }
+        public void setModel(String m) { this.model = m; }
     }
 
     public static class RetVal {

@@ -14,9 +14,6 @@
       "pattern":"\\QMETA-INF/services/org.eclipse.microprofile.config.spi.Converter\\E"
     }, 
     {
-      "pattern":"\\QMETA-INF/services/software.amazon.awssdk.http.SdkHttpService\\E"
-    }, 
-    {
       "pattern":"\\Qapplication.properties\\E"
     }, 
     {
