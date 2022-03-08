@@ -26,9 +26,9 @@ $ java -jar target/quarkus-app/quarkus-run.jar
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
 The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
 
-The `/pagerank` function receives a test data size as a string, and returns result in JSON format:
+The `/videoprocessing` function receives a test data size as a string, and returns result in JSON format:
 ```
-$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/videoprocessing jq
+$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/videoprocessing | jq
 {
   "result": {
     "key": "processed-Anthem-30-16x9-lowres.gif",

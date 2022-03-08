@@ -1,7 +1,9 @@
 package com.ibm.trl.serverlessbench;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.function.BiFunction;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,18 +17,26 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+
 
 public class VideoProcessing {
-    private COSUtils client;
-
     @Inject
     S3Client s3;
 
-    public VideoProcessing() throws Exception {
-        client = new COSUtils();
-    }
-    
+    @ConfigProperty(name = "serverlessbench.videoprocessing.input_bucket")
+    String input_bucket;
+
+    @ConfigProperty(name = "serverlessbench.videoprocessing.output_bucket")
+    String output_bucket;
+
     private void call_ffmpeg(String[] args) {
     }
 
@@ -88,8 +98,6 @@ public class VideoProcessing {
     
     @Funq
     public RetVal videoprocessing(Param param) throws Exception {
-        String input_bucket = client.getInBucket();
-        String output_bucket = client.getOutBucket();
         String key = param.getKey();
         int duration = param.getDuration();
         String op = param.getOp();
@@ -128,12 +136,48 @@ public class VideoProcessing {
     }
     
     private void upload(String output_bucket, String filename, String upload_path) throws Exception {        
-        this.client.uploadFile(s3, output_bucket, filename, upload_path);
+        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(output_bucket).key(filename).build();
+        s3.putObject(objectRequest, RequestBody.fromFile(new File(upload_path).toPath()));
     }
 
     private void download(String input_bucket, String key, String download_path) throws Exception {
-        this.client.downloadFile(s3, input_bucket, key, download_path);
+        File theFile = new File(download_path);
+        File theDir = theFile.getParentFile();
+        if (!theDir.exists())
+            theDir.mkdirs();
+        GetObjectRequest request = GetObjectRequest.builder().bucket(input_bucket).key(key).build();
+        ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
+        byte[] data = objectBytes.asByteArray();
+        OutputStream os = new FileOutputStream(theFile);
+        os.write(data);
+        os.close();
     }
+
+    public static class Param {
+        private int height;
+        private int width;
+        private String key;
+        private int duration;
+        private String op;
+
+        public Param() {}
+
+        public int getHeight() { return height; }
+        public void setHeight(int h) { this.height = h; }
+
+        public int getWidth() { return width; }
+        public void setWidth(int w) { this.width = w; }
+
+        public String getKey() { return key; }
+        public void setKey(String k) { this.key = k; }
+
+        public int getDuration() { return duration; }
+        public void setDuration(int d) { this.duration = d; }
+
+        public String getOp() { return op; }
+        public void setOp(String o) { this.op = o; }
+    }
+
 
     public static class RetVal {
         Map<String, String> result;
