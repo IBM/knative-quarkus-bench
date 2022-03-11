@@ -12,12 +12,19 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modules>
+    <module>sleep</module>
+    <module>network</module>
+    <module>clock-synchronization</module>
+    <module>server-reply</module>
+    <module>dynamic-html</module>
+    <module>uploader</module>
+    <module>thumbnailer</module>
+    <module>video-processing</module>
+    <module>image-recognition</module>
     <module>graph-pagerank</module>
     <module>graph-mst</module>
     <module>graph-bfs</module>
     <module>dna-visualization</module>
-    <module>dynamic-html</module>
-    <module>uploader</module>
   </modules>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
