@@ -1,18 +1,19 @@
-package com.ibm.trl.funqy.micro;
+package com.ibm.trl.serverlessbench;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.SocketTimeoutException;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -25,31 +26,30 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.core.sync.RequestBody;
 
 
-public class ClockSynchronization {
+public class Network {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.clock-synchronization.output_bucket")
+    @ConfigProperty(name = "serverlessbench.network.output_bucket")
     String output_bucket;
 
     @Funq
-    public HashMap<String, String> clock_synchronization(Param s) {
+    public HashMap<String, String> network(Param s) {
         HashMap<String, String> retVal = new HashMap<String, String>();
         String key = "filename_tmp";
-
+    
         String request_id = s.getRequest_id();
         String address = s.getServer_address();
-        Integer port = Integer.valueOf(s.getServer_port());
-        Integer repetitions = Integer.valueOf(s.getRepetitions());
-        boolean skipUploading = s.getSkipUploading();
+        int port = Integer.valueOf(s.getServer_port());
+        int repetitions = Integer.valueOf(s.getRepetitions());
+	boolean skipUploading = s.getSkipUploading();
 
         List<Long[]> times = new ArrayList<Long[]>();
-        System.out.printf("Starting communication with %s:%s\n", address, String.valueOf(port));
         int i = 0;
 
         try {
             DatagramSocket sendSocket = new DatagramSocket(null);
-            sendSocket.setSoTimeout(4);
+            sendSocket.setSoTimeout(3000);
             sendSocket.setReuseAddress(true);
             sendSocket.bind(new InetSocketAddress("", 0));
 
@@ -66,12 +66,10 @@ public class ClockSynchronization {
             DatagramPacket packet2 = new DatagramPacket(message, message.length);
 
             int consecutive_failures = 0;
-            int measurements_not_smaller = 0;
-            long cur_min = 0;
-
             long send_begin = 0;
             long recv_end = 0;
-            while (i < 1000) {
+
+            while (i < repetitions + 1) {
                 try {
                     send_begin = System.nanoTime();
                     sendSocket.send(packet);
@@ -88,38 +86,18 @@ public class ClockSynchronization {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (i > 0) {
-                    times.add( new Long[] {Long.valueOf(i), send_begin, recv_end} );
-                }
-                long cur_time = recv_end - send_begin;
-                if (cur_time > cur_min && cur_min > 0) {
-                    measurements_not_smaller += 1;
-                    if (measurements_not_smaller == repetitions) {
-                        try {
-                            message = "stop".getBytes("UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                        DatagramPacket packet_ = new DatagramPacket(message, message.length, new InetSocketAddress(address, port));
-                        try {
-                            sendSocket.send(packet_);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    }
-                } else {
-                    cur_min = cur_time;
-                    measurements_not_smaller = 0;
-                }
+                if (i > 0)
+                    times.add( new Long[] { Long.valueOf(i), send_begin, recv_end } );
+
                 ++i;
                 consecutive_failures = 0;
-                sendSocket.setSoTimeout(4000);
+                sendSocket.setSoTimeout(2000);
             }
             sendSocket.close();
             recvSocket.close();
 
             if (consecutive_failures != 5 && !skipUploading) {
+                File upload_file = new File("/tmp/data.csv");
                 try {
                     FileWriter writer = new FileWriter("/tmp/data.csv");
                     String header = String.join(",", "id", "client_send", "client_rcv");
@@ -133,7 +111,7 @@ public class ClockSynchronization {
                     e.printStackTrace();
                 }
 
-                key = String.format("clock-synchronization-benchmark-results-%s.csv", request_id);
+                key = String.format("network-benchmark-results-%s.csv", request_id);
 
                 try {
                     PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(output_bucket).key(key).build();
@@ -144,7 +122,7 @@ public class ClockSynchronization {
             }
         } catch (SocketException e) {
             e.printStackTrace();
-        }
+	}
 
         retVal.put( "result", key );
         return retVal;
@@ -157,7 +135,7 @@ public class ClockSynchronization {
         int repetitions;
         String output_bucket;
         String income_timestamp;
-        boolean skipUploading;
+	boolean skipUploading;
 
         public String getRequest_id() { return request_id; }
         public void setRequest_id(String request_id) { this.request_id = request_id; }
@@ -171,7 +149,7 @@ public class ClockSynchronization {
         public void setOutput_bucket(String output_bucket) { this.output_bucket = output_bucket; }
         public String getIncome_timestamp() { return income_timestamp; }
         public void setIncome_timestamp(String income_timestamp) { this.income_timestamp = income_timestamp; }
-        public boolean getSkipUploading() { return skipUploading; }
-        public void setSkipUploading(boolean skipUploading) { this.skipUploading = skipUploading; }
+	public boolean getSkipUploading() { return skipUploading; }
+	public void setSkipUploading(boolean skipUploading) { this.skipUploading = skipUploading; }
     }
 }

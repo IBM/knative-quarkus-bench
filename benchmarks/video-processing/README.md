@@ -26,9 +26,9 @@ $ java -jar target/quarkus-app/quarkus-run.jar
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
 The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
 
-The `/videoprocessing` function receives a test data size as a string, and returns result in JSON format:
+The `/video_processing` function receives a test data size as a string, and returns result in JSON format:
 ```
-$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/videoprocessing | jq
+$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/video_processing | jq
 {
   "result": {
     "key": "processed-Anthem-30-16x9-lowres.gif",
@@ -67,6 +67,6 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/knative-serverless-benchmark-videoprocessing-1.0.0-SNAPSHOT.jar`
+You can then execute your native executable with: `./target/knative-serverless-benchmark-video-processing-1.0.0-SNAPSHOT.jar`
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.

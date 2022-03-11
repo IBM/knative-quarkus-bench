@@ -10,7 +10,7 @@
 ,
 {
   "name":"com.ibm.trl.serverlessbench.VideoProcessing",
-  "methods":[{"name":"videoprocessing","parameterTypes":["com.ibm.trl.serverlessbench.VideoProcessing$Param"] }]}
+  "methods":[{"name":"video_processing","parameterTypes":["com.ibm.trl.serverlessbench.VideoProcessing$Param"] }]}
 ,
 {
   "name":"com.ibm.trl.serverlessbench.VideoProcessing$Param",

@@ -31,10 +31,10 @@ public class VideoProcessing {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.videoprocessing.input_bucket")
+    @ConfigProperty(name = "serverlessbench.video-processing.input_bucket")
     String input_bucket;
 
-    @ConfigProperty(name = "serverlessbench.videoprocessing.output_bucket")
+    @ConfigProperty(name = "serverlessbench.video-processing.output_bucket")
     String output_bucket;
 
     private void call_ffmpeg(String[] args) {
@@ -97,7 +97,7 @@ public class VideoProcessing {
                                                                                  "watermark", watermark);
     
     @Funq
-    public RetVal videoprocessing(Param param) throws Exception {
+    public RetVal video_processing(Param param) throws Exception {
         String key = param.getKey();
         int duration = param.getDuration();
         String op = param.getOp();
