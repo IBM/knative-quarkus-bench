@@ -1,15 +1,9 @@
 package com.ibm.trl.serverlessbench;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.DatagramSocket;
@@ -17,6 +11,10 @@ import java.net.DatagramPacket;
 import java.net.SocketTimeoutException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -36,7 +34,7 @@ public class Network {
     String output_bucket;
 
     @Funq
-    public HashMap<String, String> network_benchmark(Param s) {
+    public HashMap<String, String> network(Param s) {
         HashMap<String, String> retVal = new HashMap<String, String>();
         String key = "filename_tmp";
     
@@ -44,7 +42,7 @@ public class Network {
         String address = s.getServer_address();
         int port = Integer.valueOf(s.getServer_port());
         int repetitions = Integer.valueOf(s.getRepetitions());
-        String output_bucket = s.getOutput_bucket();
+	boolean skipUploading = s.getSkipUploading();
 
         List<Long[]> times = new ArrayList<Long[]>();
         int i = 0;
@@ -98,8 +96,8 @@ public class Network {
             sendSocket.close();
             recvSocket.close();
 
-            if (consecutive_failures != 5) {
-	        /*
+            if (consecutive_failures != 5 && !skipUploading) {
+                File upload_file = new File("/tmp/data.csv");
                 try {
                     FileWriter writer = new FileWriter("/tmp/data.csv");
                     String header = String.join(",", "id", "client_send", "client_rcv");
@@ -114,13 +112,13 @@ public class Network {
                 }
 
                 key = String.format("network-benchmark-results-%s.csv", request_id);
+
                 try {
                     PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(output_bucket).key(key).build();
                     s3.putObject(objectRequest, RequestBody.fromFile(new File("/tmp/data.csv").toPath()));
                 } catch (java.lang.Exception e) {
                     e.printStackTrace();
                 }
-		*/
             }
         } catch (SocketException e) {
             e.printStackTrace();
@@ -137,6 +135,7 @@ public class Network {
         int repetitions;
         String output_bucket;
         String income_timestamp;
+	boolean skipUploading;
 
         public String getRequest_id() { return request_id; }
         public void setRequest_id(String request_id) { this.request_id = request_id; }
@@ -150,5 +149,7 @@ public class Network {
         public void setOutput_bucket(String output_bucket) { this.output_bucket = output_bucket; }
         public String getIncome_timestamp() { return income_timestamp; }
         public void setIncome_timestamp(String income_timestamp) { this.income_timestamp = income_timestamp; }
+	public boolean getSkipUploading() { return skipUploading; }
+	public void setSkipUploading(boolean skipUploading) { this.skipUploading = skipUploading; }
     }
 }

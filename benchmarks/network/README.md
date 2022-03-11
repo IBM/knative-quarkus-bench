@@ -67,5 +67,5 @@ If you want to learn more about building native executables, please consult http
 
 ### Sample curl commands for testing
 ```
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "30303", "repetitions": "5", "request_id":"IpsumLoremomethingSayunnySay","output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/network_benchmark | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "0.0.0.0", "server_port": "20202", "repetitions": "5", "request_id":"IpsumLoremomethingSayunnySay", "income_timestamp": "test", "skipUploading":"false"}' -X POST http://localhost:8080/network | jq
 ```
