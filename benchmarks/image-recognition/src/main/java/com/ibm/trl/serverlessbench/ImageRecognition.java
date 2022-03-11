@@ -56,10 +56,16 @@ public class ImageRecognition {
     String model_bucket;
 
     @Funq
-    public RetVal image_recognition(Param param) throws IOException {
-        String key = param.getInput();
-        String model_key = param.getModel();
+    public RetValType image_recognition(FunInput input) throws IOException {
+        String key = input.getInput();
+        String model_key = input.getModel();
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
+        if (input.getInput_bucket() != null) {
+            input_bucket = input.getInput_bucket();
+        }
+        if (input.getModel_bucket() != null) {
+            model_bucket = input.getModel_bucket();
+        }
 
         long image_download_begin = System.nanoTime();
         String image_path = download_path;
@@ -125,7 +131,7 @@ public class ImageRecognition {
         long model_process_time = (model_process_end - model_process_begin)/1000;
         long process_time = (process_end - process_begin)/1000;
 
-        RetVal retVal = new RetVal();
+        RetValType retVal = new RetValType();
         retVal.result = Map.of(     "idx", index,
                                     "class", ret);
         retVal.measurement = Map.of("download_time", download_time + model_download_time,
@@ -149,20 +155,46 @@ public class ImageRecognition {
         os.close();
     }
 
-    public static class Param {
+    public static class FunInput {
         private String input;
         private String model;
+        private String input_bucket;
+        private String model_bucket;
 
-        public Param() {}
+        public String getInput() {
+            return input;
+        }
 
-        public String getInput() { return input; }
-        public void setInput(String i) { this.input = i; }
+        public void setInput(String input) {
+            this.input = input;
+        }
 
-        public String getModel() { return model; }
-        public void setModel(String m) { this.model = m; }
+        public String getModel() {
+            return model;
+        }
+
+        public void setModel(String model) {
+            this.model = model;
+        }
+
+        public String getInput_bucket() {
+            return input_bucket;
+        }
+
+        public void setInput_bucket(String input_bucket) {
+            this.input_bucket = input_bucket;
+        }
+
+        public String getModel_bucket() {
+            return model_bucket;
+        }
+
+        public void setModel_bucket(String model_bucket) {
+            this.model_bucket = model_bucket;
+        }
     }
 
-    public static class RetVal {
+    public static class RetValType {
         Map<String, String> result;
         Map<String, Long> measurement;
 
@@ -182,7 +214,7 @@ public class ImageRecognition {
             this.measurement = measurement;
         }
 
-        RetVal() {
+        RetValType() {
             measurement = new HashMap<String, Long>();
         }
     }

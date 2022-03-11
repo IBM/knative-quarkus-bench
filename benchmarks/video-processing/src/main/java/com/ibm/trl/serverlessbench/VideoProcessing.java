@@ -9,13 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.nio.file.Files;
 
+import javax.inject.Inject;
+
 import io.quarkus.funqy.Funq;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
-
-import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -97,11 +97,17 @@ public class VideoProcessing {
                                                                                  "watermark", watermark);
     
     @Funq
-    public RetVal video_processing(Param param) throws Exception {
-        String key = param.getKey();
-        int duration = param.getDuration();
-        String op = param.getOp();
+    public RetValType video_processing(FunInput input) throws Exception {
+        String key = input.getKey();
+        int duration = input.getDuration();
+        String op = input.getOp();
         String download_path = String.format("/tmp/%s", key);
+	if (input.getInput_bucket() != null) {
+            input_bucket = input.getInput_bucket();
+	}
+	if (input.getOutput_bucket() != null) {
+            output_bucket = input.getOutput_bucket();
+	}
 
         long download_begin = System.nanoTime();
         download(input_bucket, key, download_path);
@@ -124,7 +130,7 @@ public class VideoProcessing {
         long upload_time = (upload_stop - upload_begin)/1000;
         long process_time = (process_end - process_begin)/1000;
 
-        RetVal retVal = new RetVal();
+        RetValType retVal = new RetValType();
         retVal.result = Map.of(     "bucket", output_bucket,
                                     "key", out_key);
         retVal.measurement = Map.of("download_time", download_time,
@@ -153,33 +159,73 @@ public class VideoProcessing {
         os.close();
     }
 
-    public static class Param {
+    public static class FunInput {
         private int height;
         private int width;
         private String key;
         private int duration;
         private String op;
+	private String input_bucket;
+	private String output_bucket;
 
-        public Param() {}
+        public int getHeight() {
+            return height;
+        }
 
-        public int getHeight() { return height; }
-        public void setHeight(int h) { this.height = h; }
+        public void setHeight(int height) {
+            this.height = height;
+        }
 
-        public int getWidth() { return width; }
-        public void setWidth(int w) { this.width = w; }
+        public int getWidth() {
+            return width;
+        }
 
-        public String getKey() { return key; }
-        public void setKey(String k) { this.key = k; }
+        public void setWidth(int width) {
+            this.width = width;
+        }
 
-        public int getDuration() { return duration; }
-        public void setDuration(int d) { this.duration = d; }
+        public String getKey() {
+            return key;
+        }
 
-        public String getOp() { return op; }
-        public void setOp(String o) { this.op = o; }
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public int getDuration() {
+            return duration;
+        }
+
+        public void setDuration(int duration) {
+            this.duration = duration;
+        }
+
+        public String getOp() {
+            return op;
+        }
+
+        public void setOp(String op) {
+            this.op = op;
+        }
+
+        public String getInput_bucket() {
+            return input_bucket;
+        }
+
+        public void setInput_bucket(String input_bucket) {
+            this.input_bucket = input_bucket;
+        }
+
+        public String getOutput_bucket() {
+            return output_bucket;
+        }
+
+        public void setOutput_bucket(String output_bucket) {
+            this.output_bucket = output_bucket;
+        }
     }
 
-
-    public static class RetVal {
+    public static class RetValType {
         Map<String, String> result;
         Map<String, Long> measurement;
 
@@ -197,10 +243,6 @@ public class VideoProcessing {
 
         public void setMeasurement(Map<String, Long> measurement) {
             this.measurement = measurement;
-        }
-
-        RetVal() {
-            measurement = new HashMap<String, Long>();
         }
     }
 }

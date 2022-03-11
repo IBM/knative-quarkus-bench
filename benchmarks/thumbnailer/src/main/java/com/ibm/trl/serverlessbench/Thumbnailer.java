@@ -42,12 +42,18 @@ public class Thumbnailer {
     }
     
     @Funq
-    public RetVal thumbnailer(Param param) throws Exception {
-        int object_height = param.getHeight();
-        int object_width = param.getWidth();
-        String key = param.getObjectKey().replaceAll(" ", "+");
+    public RetValType thumbnailer(FunInput input) throws Exception {
+        int object_height = input.getHeight();
+        int object_width = input.getWidth();
+        String key = input.getObjectKey().replaceAll(" ", "+");
         int width = object_width;
         int height = object_height;
+        if (input.getInput_bucket() != null) {
+            input_bucket = input.getInput_bucket();
+        }
+        if (input.getOutput_bucket() != null) {
+            output_bucket = input.getOutput_bucket();
+        }
 
         long download_begin = System.nanoTime();
         InputStream img = download_stream(input_bucket, key);
@@ -70,7 +76,7 @@ public class Thumbnailer {
         long upload_time = (upload_end - upload_begin)/1000;
         long process_time = (process_end - process_begin)/1000;
 
-        RetVal retVal = new RetVal();
+        RetValType retVal = new RetValType();
         retVal.result = Map.of(     "bucket", output_bucket,
                                     "key", key_name);
         retVal.measurement = Map.of("download_time", download_time,
@@ -108,25 +114,56 @@ public class Thumbnailer {
         return key;
     }
 
-    public static class Param {
+    public static class FunInput {
         private int height;
         private int width;
         private String objectKey;
+        private String input_bucket;
+        private String output_bucket;
 
-        public Param() {}
+        public int getHeight() {
+            return height;
+	}
 
-        public int getHeight() { return height; }
-        public void setHeight(int h) { this.height = h; }
+        public void setHeight(int h) {
+            this.height = h;
+        }
 
-        public int getWidth() { return width; }
-        public void setWidth(int w) { this.width = w; }
+        public int getWidth() {
+            return width;
+        }
 
-        public String getObjectKey() { return objectKey; }
-        public void setObjectKey(String o) { this.objectKey = o; }
+        public void setWidth(int w) {
+            this.width = w;
+        }
+
+        public String getObjectKey() {
+            return objectKey;
+        }
+
+        public void setObjectKey(String objectKey) {
+            this.objectKey = objectKey;
+        }
+
+        public String getInput_bucket() {
+            return input_bucket;
+        }
+
+        public void setInput_bucket(String input_bucket) {
+            this.input_bucket = input_bucket;
+        }
+
+        public String getOutput_bucket() {
+            return output_bucket;
+        }
+
+        public void setOutput_bucket(String output_bucket) {
+            this.output_bucket = output_bucket;
+        }
     }
 
     
-    public static class RetVal {
+    public static class RetValType {
         Map<String, String> result;
         Map<String, Long> measurement;
 
@@ -144,10 +181,6 @@ public class Thumbnailer {
 
         public void setMeasurement(Map<String, Long> measurement) {
             this.measurement = measurement;
-        }
-
-        RetVal() {
-            measurement = new HashMap<String, Long>();
         }
     }
 }

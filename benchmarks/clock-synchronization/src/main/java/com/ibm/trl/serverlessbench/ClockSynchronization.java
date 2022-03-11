@@ -33,15 +33,18 @@ public class ClockSynchronization {
     String output_bucket;
 
     @Funq
-    public HashMap<String, String> clock_synchronization(Param s) {
+    public HashMap<String, String> clock_synchronization(FunInput input) {
         HashMap<String, String> retVal = new HashMap<String, String>();
         String key = "filename_tmp";
 
-        String request_id = s.getRequest_id();
-        String address = s.getServer_address();
-        Integer port = Integer.valueOf(s.getServer_port());
-        Integer repetitions = Integer.valueOf(s.getRepetitions());
-        boolean skipUploading = s.getSkipUploading();
+        String request_id = input.getRequest_id();
+        String address = input.getServer_address();
+        Integer port = Integer.valueOf(input.getServer_port());
+        Integer repetitions = Integer.valueOf(input.getRepetitions());
+        if (input.getOutput_bucket() != null) {
+            output_bucket = input.getOutput_bucket();
+        }
+        boolean skipUploading = input.getSkipUploading();
 
         List<Long[]> times = new ArrayList<Long[]>();
         System.out.printf("Starting communication with %s:%s\n", address, String.valueOf(port));
@@ -150,28 +153,60 @@ public class ClockSynchronization {
         return retVal;
     }
 
-    public static class Param {
+    public static class FunInput {
         String request_id;
         String server_address;
         int server_port;
         int repetitions;
         String output_bucket;
-        String income_timestamp;
         boolean skipUploading;
 
-        public String getRequest_id() { return request_id; }
-        public void setRequest_id(String request_id) { this.request_id = request_id; }
-        public String getServer_address() { return server_address; }
-        public void setServer_address(String server_address) { this.server_address = server_address; }
-        public int getServer_port() { return server_port; }
-        public void setServer_port(int server_port) { this.server_port = server_port; }
-        public int getRepetitions() { return repetitions; }
-        public void setRepetitions(int repetitions) { this.repetitions = repetitions; }
-        public String getOutput_bucket() { return output_bucket; }
-        public void setOutput_bucket(String output_bucket) { this.output_bucket = output_bucket; }
-        public String getIncome_timestamp() { return income_timestamp; }
-        public void setIncome_timestamp(String income_timestamp) { this.income_timestamp = income_timestamp; }
-        public boolean getSkipUploading() { return skipUploading; }
-        public void setSkipUploading(boolean skipUploading) { this.skipUploading = skipUploading; }
+        public String getRequest_id() {
+            return request_id;
+        }
+
+        public void setRequest_id(String request_id) {
+            this.request_id = request_id;
+        }
+
+        public String getServer_address() {
+            return server_address;
+        }
+
+        public void setServer_address(String server_address) {
+            this.server_address = server_address;
+        }
+
+        public int getServer_port() {
+            return server_port;
+        }
+
+        public void setServer_port(int server_port) {
+            this.server_port = server_port;
+        }
+
+        public int getRepetitions() {
+            return repetitions;
+        }
+
+        public void setRepetitions(int repetitions) {
+            this.repetitions = repetitions;
+        }
+
+        public String getOutput_bucket() {
+            return output_bucket;
+        }
+
+        public void setOutput_bucket(String output_bucket) {
+            this.output_bucket = output_bucket;
+        }
+
+        public boolean getSkipUploading() {
+            return skipUploading;
+        }
+
+        public void setSkipUploading(boolean skipUploading) {
+            this.skipUploading = skipUploading;
+        }
     }
 }
