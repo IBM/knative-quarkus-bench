@@ -14,10 +14,10 @@
 ,
 {
   "name":"com.ibm.trl.serverlessbench.ImageRecognition",
-  "methods":[{"name":"image_recognition","parameterTypes":["com.ibm.trl.serverlessbench.ImageRecognition$Param"] }]}
+  "methods":[{"name":"image_recognition","parameterTypes":["com.ibm.trl.serverlessbench.ImageRecognition$FunInput"] }]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.ImageRecognition$Param",
+  "name":"com.ibm.trl.serverlessbench.ImageRecognition$FunInput",
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"setInput","parameterTypes":["java.lang.String"] }, 
@@ -25,7 +25,7 @@
   ]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.ImageRecognition$RetVal",
+  "name":"com.ibm.trl.serverlessbench.ImageRecognition$RetValType",
   "methods":[
     {"name":"getMeasurement","parameterTypes":[] }, 
     {"name":"getResult","parameterTypes":[] }

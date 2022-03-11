@@ -10,10 +10,10 @@
 ,
 {
   "name":"com.ibm.trl.serverlessbench.Thumbnailer",
-  "methods":[{"name":"thumbnailer","parameterTypes":["com.ibm.trl.serverlessbench.Thumbnailer$Param"] }]}
+  "methods":[{"name":"thumbnailer","parameterTypes":["com.ibm.trl.serverlessbench.Thumbnailer$FunInput"] }]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.Thumbnailer$Param",
+  "name":"com.ibm.trl.serverlessbench.Thumbnailer$FunInput",
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"setHeight","parameterTypes":["int"] }, 
@@ -22,7 +22,7 @@
   ]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.Thumbnailer$RetVal",
+  "name":"com.ibm.trl.serverlessbench.Thumbnailer$RetValType",
   "methods":[
     {"name":"getMeasurement","parameterTypes":[] }, 
     {"name":"getResult","parameterTypes":[] }
