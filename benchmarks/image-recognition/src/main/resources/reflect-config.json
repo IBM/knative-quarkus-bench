@@ -14,7 +14,7 @@
 ,
 {
   "name":"com.ibm.trl.serverlessbench.ImageRecognition",
-  "methods":[{"name":"imagerecognition","parameterTypes":["com.ibm.trl.serverlessbench.ImageRecognition$Param"] }]}
+  "methods":[{"name":"image_recognition","parameterTypes":["com.ibm.trl.serverlessbench.ImageRecognition$Param"] }]}
 ,
 {
   "name":"com.ibm.trl.serverlessbench.ImageRecognition$Param",

@@ -27,9 +27,9 @@ The application is now runnable using `java -jar target/quarkus-app/quarkus-run.
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path.
 The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
 
-The `/imagerecognition` function receives a test data size as a string, and returns result in JSON format:
+The `/image_recognition` function receives a test data size as a string, and returns result in JSON format:
 ```
-$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input":"782px-Pumiforme.JPG","model":"resnet50.pt"}' -X POST http://localhost:8080/imagerecognition | jq
+$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input":"782px-Pumiforme.JPG","model":"resnet50.pt"}' -X POST http://localhost:8080/image_recognition | jq
 
 {
   "result": {

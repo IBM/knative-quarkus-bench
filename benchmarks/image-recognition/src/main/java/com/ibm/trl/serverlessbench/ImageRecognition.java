@@ -49,14 +49,14 @@ public class ImageRecognition {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.imagerecognition.input_bucket")
+    @ConfigProperty(name = "serverlessbench.image-recognition.input_bucket")
     String input_bucket;
 
-    @ConfigProperty(name = "serverlessbench.imagerecognition.model_bucket")
+    @ConfigProperty(name = "serverlessbench.image-recognition.model_bucket")
     String model_bucket;
 
     @Funq
-    public RetVal imagerecognition(Param param) throws IOException {
+    public RetVal image_recognition(Param param) throws IOException {
         String key = param.getInput();
         String model_key = param.getModel();
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
