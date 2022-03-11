@@ -1,45 +1,59 @@
 package com.ibm.trl.funqy.micro;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.net.InetSocketAddress;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.SocketTimeoutException;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.quarkus.funqy.Funq;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.core.sync.RequestBody;
 
 
 public class ClockSynchronization {
+    @Inject
+    S3Client s3;
+
+    @ConfigProperty(name = "serverlessbench.clock-synchronization.output_bucket")
+    String output_bucket;
 
     @Funq
-    public HashMap<String, Map<String,String>> clock_synchronization(Param s) {
-        HashMap<String, Map<String,String>> retVal = new HashMap<String, Map<String,String>>();
+    public HashMap<String, String> clock_synchronization(Param s) {
+        HashMap<String, String> retVal = new HashMap<String, String>();
         String key = "filename_tmp";
 
         String request_id = s.getRequest_id();
         String address = s.getServer_address();
         Integer port = Integer.valueOf(s.getServer_port());
         Integer repetitions = Integer.valueOf(s.getRepetitions());
-        String output_bucket = s.getOutput_bucket();
+        boolean skipUploading = s.getSkipUploading();
 
-        List<Long[]> times = List.of();
-        System.out.printf("Starting communication with %s:%s", address, String.valueOf(port));
+        List<Long[]> times = new ArrayList<Long[]>();
+        System.out.printf("Starting communication with %s:%s\n", address, String.valueOf(port));
         int i = 0;
 
         try {
-            DatagramSocket socket = new DatagramSocket();
-            socket.setSoTimeout(4);
-            socket.setReuseAddress(true);
-            socket.bind(new InetSocketAddress("", 0));
+            DatagramSocket sendSocket = new DatagramSocket(null);
+            sendSocket.setSoTimeout(4);
+            sendSocket.setReuseAddress(true);
+            sendSocket.bind(new InetSocketAddress("", 0));
+
+            DatagramSocket recvSocket = new DatagramSocket(port);
 
             byte[] message = new byte[0];
             try {
@@ -48,11 +62,8 @@ public class ClockSynchronization {
                 e.printStackTrace();
             }
 
-            DatagramPacket packet = new DatagramPacket(
-                message,
-                message.length,
-                new InetSocketAddress(address, port)
-            );
+            DatagramPacket packet = new DatagramPacket(message, message.length, new InetSocketAddress(address, port));
+            DatagramPacket packet2 = new DatagramPacket(message, message.length);
 
             int consecutive_failures = 0;
             int measurements_not_smaller = 0;
@@ -63,13 +74,13 @@ public class ClockSynchronization {
             while (i < 1000) {
                 try {
                     send_begin = System.nanoTime();
-                    socket.send(packet);
-                    socket.receive(packet);
+                    sendSocket.send(packet);
+                    recvSocket.receive(packet2);
                     recv_end = System.nanoTime();
                 } catch (SocketTimeoutException e) {
-                    i += 1;
-                    consecutive_failures += 1;
-                    if (consecutive_failures == 7) {
+                    ++i;
+                    ++consecutive_failures;
+                    if (consecutive_failures == 5) {
                         System.out.println("Can't setup the connection");
                         break;
                     }
@@ -81,7 +92,6 @@ public class ClockSynchronization {
                     times.add( new Long[] {Long.valueOf(i), send_begin, recv_end} );
                 }
                 long cur_time = recv_end - send_begin;
-                System.out.printf("Time {} Min Time {} NotSmaller {}", cur_time, cur_min, measurements_not_smaller);
                 if (cur_time > cur_min && cur_min > 0) {
                     measurements_not_smaller += 1;
                     if (measurements_not_smaller == repetitions) {
@@ -90,13 +100,9 @@ public class ClockSynchronization {
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        DatagramPacket packet_ = new DatagramPacket(
-                            message,
-                            message.length,
-                            new InetSocketAddress(address, port)
-                        );
+                        DatagramPacket packet_ = new DatagramPacket(message, message.length, new InetSocketAddress(address, port));
                         try {
-                            socket.send(packet_);
+                            sendSocket.send(packet_);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -106,22 +112,41 @@ public class ClockSynchronization {
                     cur_min = cur_time;
                     measurements_not_smaller = 0;
                 }
-                i += 1;
+                ++i;
                 consecutive_failures = 0;
-                socket.setSoTimeout(4000);
+                sendSocket.setSoTimeout(4000);
             }
-            socket.close();
-            
+            sendSocket.close();
+            recvSocket.close();
+
+            if (consecutive_failures != 5 && !skipUploading) {
+                try {
+                    FileWriter writer = new FileWriter("/tmp/data.csv");
+                    String header = String.join(",", "id", "client_send", "client_rcv");
+                    writer.append(header);
+                    for (Long[] row : times) {
+                        String[] strRow = Stream.of(row).map(r -> r.toString()).toArray(String[]::new);
+                        writer.append(String.join(",", strRow));
+                    }
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                key = String.format("clock-synchronization-benchmark-results-%s.csv", request_id);
+
+                try {
+                    PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(output_bucket).key(key).build();
+                    s3.putObject(objectRequest, RequestBody.fromFile(new File("/tmp/data.csv").toPath()));
+                } catch (java.lang.Exception e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (SocketException e) {
             e.printStackTrace();
         }
 
-        retVal.put(
-            "result",
-            Map.of(
-                "timestamp", s.getIncome_timestamp()
-            )
-        );
+        retVal.put( "result", key );
         return retVal;
     }
 
@@ -132,6 +157,7 @@ public class ClockSynchronization {
         int repetitions;
         String output_bucket;
         String income_timestamp;
+        boolean skipUploading;
 
         public String getRequest_id() { return request_id; }
         public void setRequest_id(String request_id) { this.request_id = request_id; }
@@ -145,5 +171,7 @@ public class ClockSynchronization {
         public void setOutput_bucket(String output_bucket) { this.output_bucket = output_bucket; }
         public String getIncome_timestamp() { return income_timestamp; }
         public void setIncome_timestamp(String income_timestamp) { this.income_timestamp = income_timestamp; }
+        public boolean getSkipUploading() { return skipUploading; }
+        public void setSkipUploading(boolean skipUploading) { this.skipUploading = skipUploading; }
     }
 }
