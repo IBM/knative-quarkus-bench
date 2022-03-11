@@ -17,6 +17,7 @@
     <module>graph-bfs</module>
     <module>dna-visualization</module>
     <module>dynamic-html</module>
+    <module>uploader</module>
   </modules>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
