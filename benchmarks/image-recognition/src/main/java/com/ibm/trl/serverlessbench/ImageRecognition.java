@@ -96,7 +96,6 @@ public class ImageRecognition {
         Image img = ImageFactory.getInstance().fromFile(Paths.get(image_path));
         img.getWrappedImage();
 
-        String index = "";
         String ret = "";
         try {
             Translator<Image, Classifications> translator = ImageClassificationTranslator.builder()
@@ -132,8 +131,7 @@ public class ImageRecognition {
         long process_time = (process_end - process_begin)/1000;
 
         RetValType retVal = new RetValType();
-        retVal.result = Map.of(     "idx", index,
-                                    "class", ret);
+        retVal.result = Map.of(     "class", ret);
         retVal.measurement = Map.of("download_time", download_time + model_download_time,
                                     "compute_time", process_time + model_process_time,
                                     "model_time", model_process_time,
