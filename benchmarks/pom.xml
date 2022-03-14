@@ -18,6 +18,7 @@
     <module>server-reply</module>
     <module>dynamic-html</module>
     <module>uploader</module>
+    <module>compress</module>
     <module>thumbnailer</module>
     <module>video-processing</module>
     <module>image-recognition</module>
