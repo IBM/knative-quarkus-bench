@@ -45,3 +45,18 @@ imagelocal:
 push:
 	ibmcloud iam oauth-tokens | sed -ne '/IAM token/s/.* //p' | podman login -u iambearer --password-stdin us.icr.io && \
 	podman push us.icr.io/trl-quarkus/knative-serverless-benchmark-${TEST}-${TYPE}
+
+runjvm:
+	java -jar target/quarkus-app/quarkus-run.jar & echo $$! > .qapp.PID;
+	sleep 10
+	- curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/${TEST}
+	@- kill `cat .qapp.PID`
+	@rm .qapp.PID
+
+runnative:
+	target/compress-1.0.0-SNAPSHOT-${TEST} & echo $$! > .qapp.PID
+	sleep 10
+	- curl -s --w "\n" -H 'Content-Type:application/json' -X POST http://localhost:8080/${TEST}
+	@- kill `cat .qapp.PID`
+	@rm .qapp.PID
+
