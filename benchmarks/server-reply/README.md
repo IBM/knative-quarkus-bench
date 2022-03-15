@@ -1,4 +1,4 @@
-# microbenchmark-funqy Project
+# Server-reply Project
 
 This is a project to port and test [serverless-benchmarks](https://github.com/spcl/serverless-benchmarks) using Quarkus
 [Funqy HTTP Binding](https://quarkus.io/guides/funqy-http), which creates a stand-alone application using serverless functions.
@@ -15,25 +15,22 @@ If you want to learn more about Quarkus, please visit its website: https://quark
 
 The application can be packaged using:
 ```shell script
-$ mvn -Dskiptests clean package
+mvn -Dskiptests clean package
 ```
 It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
 
 The application is now runnable using:
 ```shell script
-$ java -jar target/quarkus-app/quarkus-run.jar
+java -jar target/quarkus-app/quarkus-run.jar
 ```
 
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
 The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
 
-The `/sleep` function receives a test data size as a string, and returns result in JSON format:
+The `/server-reply` function receives a test data size as a string, and returns result in JSON format:
 ```
-$ curl -s -d '"test"' -X POST http://localhost:8080/[method-name] | jq
-{
-  "result": ...
-}
+
 ```
 Valid choices of the test data size are `test`, `small`, and `large`, where the graph sizes are set to `1`, `100`, and `1,000`, respectively.
 
@@ -43,7 +40,7 @@ aroud the data. You may also need another quartation marks or back-quote (`\`) t
 ### Building an über-jar
 If you want to build an _über-jar_, execute the following command:
 ```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+mvn package -Dquarkus.package.type=uber-jar
 ```
 
 The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
