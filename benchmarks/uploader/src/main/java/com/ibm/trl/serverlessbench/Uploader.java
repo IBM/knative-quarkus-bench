@@ -24,15 +24,118 @@ import java.util.List;
 
 import io.quarkus.funqy.Funq;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import java.net.URI;
+
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Object;
+
+
+
 
 public class Uploader {
+
+
     private Logger log;
     private UUID uuid;
-    private COSUtils cos;
+    private String AWS_REGION = "ap-south-1";
+    private String AWS_ENDPOINT = "needstobeset";
+    private String COS_IN_BUCKET = "trl-knative-benchmark-bucket-1";
+    private String COS_OUT_BUCKET = "trl-knative-benchmark-bucket-2";
+    private Region region = Region.AP_SOUTH_1; // any region is OK
+    private URI endpointOverride = null;
+    private String access_key_id = null;
+    private String secret_access_key = null;
+    private StaticCredentialsProvider credential = null;
+    private S3Client s3 = null;
+
+
+    private void StorageSetup() throws Exception {
+        String value;
+
+        if ((value = System.getenv("AWS_ENDPOINT")) != null) {
+            AWS_ENDPOINT = value;
+            endpointOverride = URI.create(AWS_ENDPOINT);
+        }
+
+        if ((value = System.getenv("AWS_ACCESS_KEY_ID")) != null)
+            access_key_id = System.getenv("AWS_ACCESS_KEY_ID");
+
+        if ((value = System.getenv("AWS_SECRET_ACCESS_KEY")) != null)
+            secret_access_key = System.getenv("AWS_SECRET_ACCESS_KEY");
+
+        if ((value = System.getenv("COS_IN_BUCKET")) != null)
+            COS_IN_BUCKET = value;
+
+        if ((value = System.getenv("COS_OUT_BUCKET")) != null)
+            COS_OUT_BUCKET = value;
+
+        if ((value = System.getenv("AWS_REGION")) != null) {
+            AWS_REGION = value;
+            region = Region.of(AWS_REGION); // right method?!?!?!
+        } 
+
+        credential = StaticCredentialsProvider
+            .create(AwsBasicCredentials.create(access_key_id, secret_access_key));
+
+        s3 = S3Client.builder().region(region).endpointOverride(endpointOverride)
+            .credentialsProvider(credential).build();
+    }
+
+    private void deleteFile(String bucket, String key) {
+        log.info("Deleting "+key+" from bucket "+bucket+".");
+        DeleteObjectRequest deleteObjectRequest =
+            DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+        s3.deleteObject(deleteObjectRequest);
+        return;
+    }
+
+    private void uploadFile(String bucket, String key, String filePath) {
+        log.info("Uploading "+filePath+" as "+key+" to bucket "+bucket+".");
+        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
+        s3.putObject(objectRequest, RequestBody.fromFile(new File(filePath).toPath()));
+        return;
+    }
+
+    private void downloadFile(String bucket, String key, String filePath) throws Exception {
+        log.info("Downloading "+filePath+" as "+key+" from bucket "+bucket+".");
+        File theFile = new File(filePath);
+        File theDir = theFile.getParentFile();
+        if (!theDir.exists())
+            theDir.mkdirs();
+        GetObjectRequest request = GetObjectRequest.builder().bucket(bucket).key(key).build();
+        ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
+        byte[] data = objectBytes.asByteArray();
+        OutputStream os = new FileOutputStream(theFile);
+        os.write(data);
+        os.close();
+
+        return;
+    }
+
 
     public Uploader() throws Exception {
         uuid = UUID.randomUUID();
-        cos = new COSUtils();
+        StorageSetup();
         log = Logger.getLogger(Uploader.class);
     }
 
@@ -41,10 +144,9 @@ public class Uploader {
         var retVal = new RetValType();
         String key = "large";
 
-        if (!cos.available()) {
-            retVal.result.put("message", "ERROR: Uploader.runTest() unable to run since COSUtils unavailable.");
+        if (s3 == null) {
+            retVal.result.put("message", "ERROR: Uploader unable to run since s3 null.");
             return retVal;
-
 	}
 
         if (input != null) {
@@ -54,24 +156,23 @@ public class Uploader {
 
         File filePath=new File(String.format("/tmp/120-%s.txt",key,uuid));
         long downloadStartTime = System.nanoTime();
-        cos.downloadFile(cos.getInBucket(), key+"/yes.txt", filePath.toString());
+        downloadFile(COS_IN_BUCKET, key+"/yes.txt", filePath.toString());
         long downloadStopTime = System.nanoTime();
         long downloadSize = filePath.length();
 
         long uploadStartTime = System.nanoTime();
-        cos.uploadFile(cos.getOutBucket(), filePath.toString(), filePath.toString());
+        uploadFile(COS_OUT_BUCKET, filePath.toString(), filePath.toString());
         long uploadStopTime = System.nanoTime();
 
         double downloadTime = (downloadStopTime - downloadStartTime)/1000000000.0;
         double uploadTime = (uploadStopTime - uploadStartTime)/1000000000.0;
         
-//        retVal.result.put("bucket", bucket_name);
         retVal.result.put("input_size",   key);
         retVal.result.put("download_size",    Long.toString(downloadSize));
         retVal.measurement.put("download_time",  (double)downloadTime);
         retVal.measurement.put("upload_time",   (double)uploadTime);
 
-        cos.deleteFile(cos.getOutBucket(), filePath.toString());
+        deleteFile(COS_IN_BUCKET, filePath.toString());
 
         return (retVal);
     }
@@ -92,6 +193,5 @@ public class Uploader {
             measurement = new HashMap<String, Double>();
         }
     }
-
 
 }
