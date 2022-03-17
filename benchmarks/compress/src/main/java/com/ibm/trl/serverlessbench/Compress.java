@@ -24,16 +24,147 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.net.URI;
+
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Object;
+
 import io.quarkus.funqy.Funq;
 
 public class Compress {
     private Logger log;
     private UUID uuid;
-    private COSUtils cos;
+
+    private String AWS_REGION = "ap-south-1";
+    private String AWS_ENDPOINT = "defaultvalue";
+    private String IN_BUCKET = "trl-knative-benchmark-bucket-1";
+    private String OUT_BUCKET = "trl-knative-benchmark-bucket-2";
+
+    private Region region = Region.AP_SOUTH_1; // any region is OK
+    private URI endpointOverride = null;
+    private String access_key_id = null;
+    private String secret_access_key = null;
+    private StaticCredentialsProvider credential = null;
+    private S3Client s3 = null;
+
+    public void StorageSetup() throws Exception {
+        String value;
+
+        if ((value = System.getenv("AWS_ENDPOINT")) != null) {
+	    AWS_ENDPOINT = value;
+            endpointOverride = URI.create(AWS_ENDPOINT);
+	}
+
+        if ((value = System.getenv("AWS_ACCESS_KEY_ID")) != null)
+            access_key_id = System.getenv("AWS_ACCESS_KEY_ID");
+
+        if ((value = System.getenv("AWS_SECRET_ACCESS_KEY")) != null)
+            secret_access_key = System.getenv("AWS_SECRET_ACCESS_KEY");
+
+        if ((value = System.getenv("IN_BUCKET")) != null)
+            IN_BUCKET = value;
+
+        if ((value = System.getenv("OUT_BUCKET")) != null)
+            OUT_BUCKET = value;
+
+        if ((value = System.getenv("AWS_REGION")) != null) {
+            AWS_REGION = value;
+	    region = Region.of(AWS_REGION); // right method?!?!?!
+	    } 
+
+        credential = StaticCredentialsProvider
+            .create(AwsBasicCredentials.create(access_key_id, secret_access_key));
+
+        s3 = S3Client.builder().region(region).endpointOverride(endpointOverride)
+            .credentialsProvider(credential).build();
+
+    } // initialization
+
+
+    private void deleteFile(String bucket, String key) {
+        log.info("Deleting "+key+" from bucket "+bucket+".");
+        DeleteObjectRequest deleteObjectRequest =
+            DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+        s3.deleteObject(deleteObjectRequest);
+        return;
+    }
+
+
+    private void uploadFile(String bucket, String key, String filePath) {
+        log.info("Uploading "+filePath+" as "+key+" to bucket "+bucket+".");
+        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
+        s3.putObject(objectRequest, RequestBody.fromFile(new File(filePath).toPath()));
+
+        return;
+    }
+
+
+    private void downloadFile(String bucket, String key, String filePath) throws Exception {
+        log.info("Downloading "+filePath+" as "+key+" from bucket "+bucket+".");
+        File theFile = new File(filePath);
+        File theDir = theFile.getParentFile();
+        if (!theDir.exists())
+            theDir.mkdirs();
+        GetObjectRequest request = GetObjectRequest.builder().bucket(bucket).key(key).build();
+        ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
+        byte[] data = objectBytes.asByteArray();
+        OutputStream os = new FileOutputStream(theFile);
+        os.write(data);
+        os.close();
+        return;
+    }
+
+
+    private void downloadDirectory(String bucket, String key, String dirPath) throws Exception {
+        boolean moreResults = true;
+        String nextToken = "";
+        int maxKeys = 128;
+
+        log.info("Downloading "+dirPath+" with "+key+" from bucket "+bucket+".");
+        
+        while (moreResults) {
+            ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucket).maxKeys(maxKeys)
+                    .continuationToken(nextToken).build();
+
+            ListObjectsV2Response result = s3.listObjectsV2(request);
+            for (S3Object object : result.contents()) {
+                if (object.key().startsWith(key)) {
+                    downloadFile(bucket, object.key(), dirPath.concat("/").concat(object.key()));
+                }
+            }
+
+            if (result.isTruncated()) {
+                nextToken = result.nextContinuationToken();
+            } else {
+                nextToken = "";
+                moreResults = false;
+            }
+        }
+    }
+
 
     public Compress() throws Exception {
         uuid = UUID.randomUUID();
-        cos = new COSUtils();
+        StorageSetup();
         log = Logger.getLogger(Compress.class);
     }
 
@@ -42,8 +173,8 @@ public class Compress {
         var retVal = new RetValType();
         String key = "large";
 
-        if (!cos.available()) {
-            retVal.result.put("message", "ERROR: Compress.runTest() unable to run since COSUtils unavailable.");
+        if (s3 == null) {
+            retVal.result.put("message", "ERROR: Compress unable to run due to storage initialization.");
             return retVal;
 	}
 
@@ -56,22 +187,18 @@ public class Compress {
         File downloadPath=new File(String.format("/tmp/%s-%s",key,uuid));
         downloadPath.mkdirs();
         long downloadStartTime = System.nanoTime();
-        cos.downloadDirectory(cos.getInBucket(), key, downloadPath.toString());
+        downloadDirectory(IN_BUCKET, key, downloadPath.toString());
         long downloadStopTime = System.nanoTime();
         long downloadSize = parseDirectory(new File(downloadPath.getPath()+"/"+key));
 
         long compressStartTime = System.nanoTime();
         File destinationFile = new File(String.format("%s/%s-%s.zip",downloadPath.toString(),key,uuid));
-//        try {
             zipDir(destinationFile, new File(downloadPath.getPath()+"/"+key));
-//        } catch (Exception e) {
-//            System.out.println("Error creating zip file: "+e);
-//        }
         long compressStopTime = System.nanoTime();
 
         long uploadStartTime = System.nanoTime();
         String archiveName = String.format("%s-%s.zip",key,uuid);
-        cos.uploadFile(cos.getOutBucket(), archiveName, destinationFile.toString());
+        uploadFile(IN_BUCKET, archiveName, destinationFile.toString());
         long uploadStopTime = System.nanoTime();
         long compressSize = destinationFile.length();
 
@@ -79,27 +206,14 @@ public class Compress {
         double compressTime = (compressStopTime - compressStartTime)/1000000000.0;
         double uploadTime = (uploadStopTime - uploadStartTime)/1000000000.0;
         
-//        System.out.println("downloadTime (s): "+String.format("%.03f",downloadTime));
-//        System.out.println("download size: "+Long.toString(downloadSize));
-//        System.out.println("compressTime (s): "+String.format("%.03f",compressTime));
-//        System.out.println("compress size: "+Long.toString(compressSize));
-//        System.out.println("uploadTime (s): "+String.format("%.03f",uploadTime));
+        deleteFile(OUT_BUCKET, archiveName);
 
-//        String retval = "jcompress, "+String.format("%.03f",downloadTime)+", "+
-//                Long.toString(downloadSize)+", "+String.format("%.03f",compressTime)+", "+
-//                Long.toString(compressSize)+", "+String.format("%.03f",uploadTime);
-
-        cos.deleteFile(cos.getOutBucket(), archiveName);
-
-//        retVal.result.put("bucket", bucket_name);
         retVal.result.put("download_size",    Long.toString(downloadSize));
         retVal.result.put("compress_size",    Long.toString(compressSize));
         retVal.result.put("input_size",    key);
         retVal.measurement.put("download_time",  downloadTime);
         retVal.measurement.put("compress_time",   compressTime);
         retVal.measurement.put("upload_time",   uploadTime);
-
-
 
         return (retVal);
     }
