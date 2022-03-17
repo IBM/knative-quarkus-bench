@@ -55,9 +55,9 @@ public class Uploader {
     private Logger log;
     private UUID uuid;
     private String AWS_REGION = "ap-south-1";
-    private String AWS_ENDPOINT = "needstobeset";
-    private String COS_IN_BUCKET = "trl-knative-benchmark-bucket-1";
-    private String COS_OUT_BUCKET = "trl-knative-benchmark-bucket-2";
+    private String AWS_ENDPOINT = "defaultvalue";
+    private String IN_BUCKET = "trl-knative-benchmark-bucket-1";
+    private String OUT_BUCKET = "trl-knative-benchmark-bucket-2";
     private Region region = Region.AP_SOUTH_1; // any region is OK
     private URI endpointOverride = null;
     private String access_key_id = null;
@@ -80,11 +80,11 @@ public class Uploader {
         if ((value = System.getenv("AWS_SECRET_ACCESS_KEY")) != null)
             secret_access_key = System.getenv("AWS_SECRET_ACCESS_KEY");
 
-        if ((value = System.getenv("COS_IN_BUCKET")) != null)
-            COS_IN_BUCKET = value;
+        if ((value = System.getenv("IN_BUCKET")) != null)
+            IN_BUCKET = value;
 
-        if ((value = System.getenv("COS_OUT_BUCKET")) != null)
-            COS_OUT_BUCKET = value;
+        if ((value = System.getenv("OUT_BUCKET")) != null)
+            OUT_BUCKET = value;
 
         if ((value = System.getenv("AWS_REGION")) != null) {
             AWS_REGION = value;
@@ -156,12 +156,12 @@ public class Uploader {
 
         File filePath=new File(String.format("/tmp/120-%s.txt",key,uuid));
         long downloadStartTime = System.nanoTime();
-        downloadFile(COS_IN_BUCKET, key+"/yes.txt", filePath.toString());
+        downloadFile(IN_BUCKET, key+"/yes.txt", filePath.toString());
         long downloadStopTime = System.nanoTime();
         long downloadSize = filePath.length();
 
         long uploadStartTime = System.nanoTime();
-        uploadFile(COS_OUT_BUCKET, filePath.toString(), filePath.toString());
+        uploadFile(OUT_BUCKET, filePath.toString(), filePath.toString());
         long uploadStopTime = System.nanoTime();
 
         double downloadTime = (downloadStopTime - downloadStartTime)/1000000000.0;
@@ -172,7 +172,7 @@ public class Uploader {
         retVal.measurement.put("download_time",  (double)downloadTime);
         retVal.measurement.put("upload_time",   (double)uploadTime);
 
-        deleteFile(COS_IN_BUCKET, filePath.toString());
+        deleteFile(IN_BUCKET, filePath.toString());
 
         return (retVal);
     }
