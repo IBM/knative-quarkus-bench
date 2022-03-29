@@ -1,149 +1,186 @@
 # knative-serverless-benchmark Project
 
-# TRL knative-serverless-benchmark instructions
+This project contains a suite of quarkus programs runnable as both stand-alone
+HTTP applications and knative serverless services.
+We borrowed the set of programs from
+[SeBS: Serverless Benchmark Suite](https://github.com/spcl/serverless-benchmarks)
+developed by a team of ETH Z&uuml;rich.
 
-## First Time Cluster Installation Tips
-- Assuming local machine has access to IBM Cloud cluster, ibmcloud cli (including cr) , oc command, mvn, docker or podman, python3, and stern. (Developed on CentOS 7.)
-  - For centos 7 use yum to install glib-static and libstdc++-static.
-  - Install GraalVM. Be sure to install native-image: ``gu install native-image``
-    - For CentOS 7, GraalVM CE Version 20 is recommended.
-    - For RHEL 7, GraalVM CE Version 21 is recommended.
-  - Install python cloud object storage library: `pip3 install ibm-cos-sdk`
-- Create IBM Cloud storage. See notes below.
-- Install knative support on cluster
-    - Follow these instructions (if you are using openshift 4.8. Version 4.6 functionality verified at one point.)
-    - Install the serverless operator:
-      - https://docs.openshift.com/container-platform/4.8/serverless/admin_guide/install-serverless-operator.html
-    - Install knative serving
-      - https://docs.openshift.com/container-platform/4.8/serverless/admin_guide/installing-knative-serving.html#installing-knative-serving
-    - Install knative eventing
-      - https://docs.openshift.com/container-platform/4.8/serverless/admin_guide/installing-knative-eventing.html#installing-knative-eventing
+Quarkus is a cloud native Java framework based on modern standard APIs.
+More information about its fancy features are available at https://quarkus.io/.
 
-Cluster configuration
-```shell script
-export NS="yournamespace" # e.g., export NS=knative-serverless-benchmark
-ibmcloud login -sso
-(and oc cli login command to enable oc/kubectl cli)
-ibmcloud target -g hpc # or other group as necessary
-ibmcloud cr namespace-add trl-quarkus
-ibmcloud cr region # us south seems to work. DO NOT USE GLOBAL!!!
-ibmcloud cr login
-oc new-project ${NS}
-oc policy add-role-to-user system:image-builder $(oc whoami)
-oc policy add-role-to-user edit $(oc whoami)
-oc adm policy add-cluster-role-to-user cluster-admin $(oc whoami)
-oc get secret all-icr-io --namespace=default -o yaml | sed -e 's/namespace: .*/namespace: '${NS}'/' -e 's/"namespace":".*"/"namespace":"'${NS}'"/' | oc --namespace=${NS} apply -f -
+## Build Instructions
+
+### Clone git repo
+```shell
+git clone https://github.ibm.com/trl-quarkus/knative-serverless-benchmark.git
 ```
-First build and run the images for the base JVM version.
-```shell script
-cd git/knative-serverless-benchmark
-make jvm
-make run
+<!-- Replace with the following link when this project is published -->
+<!-- https://github.com/IBM/knative-serverless-benchmark.git -->
+
+### Building the application
+```shell
+cd knative-serverless-benchmark
+mvn package
 ```
-Control-c to terminate runner.sh.
- 
 
-## Repeat Build Tips
-First, perform login if not already done:
-```shell script
-ibmcloud login -sso
-(and oc cli login command to enable oc/kubectl)
-ibmcloud cr login
+This step builds all benchmark programs and creates docker iamges for each of them.
+Note that the version tag is set to `:jvm`, so that you can distinguish if an image
+is for a Java implementation or a native implementation, described bellow.
+
+This project uses quarkus
+[container-image-docker extension](https://quarkus.io/guides/container-image#docker)
+to build docker image.  This extension has several configuration parameters to build
+images with appropriate tags and to push the image to a container repository.
+The configuration parameters can be specified as system parameters of maven.
+
+To create an image that will be pushed to quay.io repository,
+```shell
+mvn package -Dquarkus.container-image.resistry=quay.io -Dquarkus.container-image.group=mygroup
 ```
-Then just use `make jvm` and `make run`.
+Then you will get container images with tags like: `quay.io/mygroup/thumbnailer:jvm`.
 
-Note that when images are changed, cluster objects using those images need to be deleted and recreated to reflect changes.
-This is done automatically in the Makefile.
+If you use `podman` instead of `docker`,
+```shell
+mvn package -Dquarkus.docker.executable=podman
+```
 
-## Using Native (GraalVM)
-Simply run `make native` and then use `make run` like with the base JVM case.
+If you don't need to build docker images, you can disable it by:
+```shell
+mvn package -Dquarkus.container-image.build=false
+```
 
-## Test Run Tip
-You can specify a specific test to run with the make command: e.g., `make test=jtestpagerank run`
-
-## IBM Cloud Storage
-- Getting started with IBM Cloud Object Storage -- https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-getting-started-cloud-object-storage
-  - Need to set up access to two buckets and obtain api key access information...
-  - Currently using trl-knative-benchmark-bucket-1 and trl-knative-benchmark-bucket-2.
-- IBM COS SDK for Python Documentation -- https://ibm.github.io/ibm-cos-sdk-python/index.html
-- IBM COS SDK Python code examples -- https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-python
-- IBM COS SDK Documentation for Java -- https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-java
-- Set up authentication secrets
-  - To run on local machine set environment variables in `/home/${USER}/.env` (Possibly good to also create `${HOME}/.bluemix/cos_credentials`...)
-  - Environment variables are:
-    - COS_ENDPOINT       Default is "https://s3.direct.us-south.cloud-object-storage.appdomain.cloud".
-    - COS_APIKEY	 "apikey" field from .bluemix/cos_credentials
-    - COS_INSTANCE_CRN   "resource_instance_id" field from .bluemix/cos_credentiuals
-    - COS_IN_BUCKET      Default is "trl-knative-benchmark-bucket-1".
-    - COS_OUT_BUCKET     Default is "trl-knative-benchmark-bucket-2".
-    - NS                 Desired namespace. (e.g., knative-serverless-benchmark)
-    - IMAGESFX           An optional suffix to add to image name. Used for parallel development/execution/etc.
-
-  - To run on cluster copy src/main/k8s/cos-secrets-template.yaml to src/main/k8s/cos-secrets-actual.yaml, edit it to contain actual values (encoded in base64!), then run "oc apply -f src/main/k8s/cos-secrets-actual.yaml"
-    - Tip: This is a good command to convert to base64: "echo -n somevalue | base64"
-- Sample data can be created with src/main/sh/makedata.sh, and then copied to cloud storage with src/main/sh/compressloaddata.py.
-
-- At the moment, it is easiest for each developer to use their own cluster.
-- Additionally, using unique containter images is required to develop and run multiple images simultaneously (e.g., multiple teammates working in parallel) set IMAGESFX in `/home/${USER}/.env` to some unique string such as `-osaka`, `-smith`, `-mytest123`, etc. Then edit `src/main/k8s/funqy-service.yaml` to point to the same image. e.g., `knative-serverless-benchmark-osaka`
+For other configuration parameters, refer to
+[the guide document](https://quarkus.io/guides/container-image#customizing).
 
 
-## Related Guides
+### Creating a native executable if interested
 
-- Funqy Knative Events Binding for Quarkus Funqy framework -- https://quarkus.io/guides/funqy-knative-events
-- knative tutorial --  https://redhat-developer-demos.github.io/knative-tutorial
-- Red Hat serverless documentation -- https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6/html-single/serverless/index#serverless-getting-started
-- GraalVM Documentation for native images work -- https://www.graalvm.org
+One of a major feature of Quarkus is native binary support.
+You can build the five microservices as native binaries
+by adding `-Pnative` in the Maven command line:
+```shell
+mvn package -Pnative
+```
 
-## Shell scripts
-- src/main/sh/entrypoint.sh -- Not used anymore. Used to be base case container entry point.
-- src/main/sh/ireport.sh -- Run on container. Displays perf report.
-- src/main/sh/makedata.sh -- Creates temporary data to load to cloud storage.
-- src/main/sh/measure.sh -- Performs perf record and perf report.
-- src/main/sh/runner.sh -- Runs tests on cluster.
-- src/main/sh/slayer.sh -- Terminates stern command as necessary.
+The version tag for native executable images is set to `:native`.
 
-
-## ongoing todo items include
-- much better documentation
-- scafolding for easier collabvoration
-- efficient output and visualziation of results
-- much better isolation to allow multiple developers at same time
-- perform performance measurement
-- update this todo list
-- document ffpmeg requirements
-- document possible pytorch requirements
+Building native executables uses
+[GraalVM Native Image](https://www.graalvm.org/22.0/reference-manual/native-image/).
+If `native-image` isn't set up in your machine, quarkus automatically downloads
+a container image of the latest GraalVM with Native Image and builds the project
+in the container.  We recommned this automated containerized build
+because it automatically uses the latest version of GraalVM, which is updated frequetly.
 
 
+## Usage Instructions
+
+### Setting up cloud object storage for storing benchmark data
+
+Some of the benchmark programs use cloud object storage to store input/output data.
+The object storage needs to support Amazon S3 compatible APIs because we use quarkus
+[Amazon S3 Client extension](https://quarkiverse.github.io/quarkiverse-docs/quarkus-amazon-services/dev/amazon-s3.html)
+to access object storage.
+
+The minimum required configurations are:
+1. Specify endpoint URL and region name in `src/main/resources/application.property`
+under each submodule,
+1. Specify credentials using two environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+
+For other configuration parameters, refer to
+[the guide document](https://quarkiverse.github.io/quarkiverse-docs/quarkus-amazon-services/dev/amazon-s3.html#_configuring_s3_clients).
+
+We tested our programs using sample input data that is published by the ETH Z&uuml;rich team
+in https://github.com/spcl/serverless-benchmarks-data.git.
 
 
-## Quarkus Boilerplate documentation:
+### Running as stand-alone programs
 
-This section written by Quarkus and included for historical purposes...
+Each submodule creates a runnable JAR file or an executable binary.
 
-This project uses Quarkus, website: https://quarkus.io/ .
+To run Java version:
+```shell
+java -jar benchmarks/<benchname>/target/quarkus-app/quarkus-run.jar
+```
+To run native version:
+```shell
+benchmarks/<benchname>/target/<benchname>-1.0.0-SNAPSHOT-runner
+```
 
-### Running the application in dev mode
+The program works as an HTTP server listning a port 8080 and receiving/replying a JSON object.
+You can use `curl` command to access the program, with specifying the input data as a POST data
+in JSON format. For example:
+```shell
+curl http://localhost:8080/thmbnailer \
+     -X POST \
+     -H 'Content-Type: application/json' \
+     -d '{ "input_bucket": "inBucket", "output_bucket": "outBucket", \
+           "width": 1920, "height", 1080 }'
+```
 
-You can run your application in dev mode that enables live coding: `./mvnw compile quarkus:dev`
 
-> Quarkus ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+For more detail about running and configuring a stand-alone program, refer to the guide of
+[quarkus Funqy HTTP extension](https://quarkus.io/guides/funqy-http).
 
-### Packaging and running the application
 
-The application can be packaged with: `./mvnw package`
+### Running in knative cloud environment
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-It is not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+#### Prerequisite
 
-To build an _über-jar_, execute: `./mvnw package -Dquarkus.package.type=uber-jar`
+Knative needs to be installed in your Kubernetes/OpenShift environment.
+If not, the easiest way to install Knative is to use Kubernetes Operator, as described in
+https://knative.dev/docs/install/operator/knative-with-operators/.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+A broker needs to be set up in your namespace if it hasn't.  The step is described in
+[the document](https://knative.dev/docs/eventing/getting-started/#adding-a-broker-to-the-namespace).
 
-### Creating a native executable
+Note that only a single broke is needed in a namespace regardless of the nubmer of
+knative events services.
 
-You can create a native executable using: `./mvnw package -Pnative`
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-`./mvnw package -Pnative -Dquarkus.native.container-build=true`
+#### Deploying Knative Services
 
-To learn more about building native executables, consult https://quarkus.io/guides/maven-tooling.html.
+As described in
+[the getting stated document](https://knative.dev/docs/eventing/getting-started/),
+you need to prepare "Service" and "Trigger" resources for each service.
+Although this decument configure "Deployment" manually, you can skip "Deployment"
+by utilizing helper feature of knative as described in the guide of
+[quarkus Funqy Knative Events extension](https://quarkus.io/guides/funqy-knative-events).
+
+Note that "apiVersion" is "serving.knative.dev/v1" in the funkey knative's guide, instead of
+"v1" in the knative's guide.
+
+
+#### Accessing Knative Services
+
+Knative services receives input as a [Cloud Event](https://cloudevents.io/) object
+from the broker and returns the result back to the broker as a newly created Cloud Event.
+
+The Cloud Event specification defines various HTTP headers starting with "Ce-".
+The following table describes the minumum required headers.
+|Header          |Description                     |
+|:--------------:|:-------------------------------|
+|Ce-Id           |An unique number                |
+|Ce-Source       |Source of the event (e.g., curl)|
+|Ce-Specification|Cloud Event Spec version (=1.0) |
+|Ce-Type         |Name of the service             |
+
+An example for posting a Cloud Event using curl command is:
+```shell
+curl http://<broker-endpoint>:<port>/ \
+     -v \
+     -X POST \
+     -H 'Ce-Id: 1234' \
+     -H 'Ce-Source: curl' \
+     -H 'Ce-Specification: 1.0' \
+     -H 'Ce-Type: thumbnailer' \
+     -H 'Content-Type: application/json' \
+     -d '{ "input_bucket": "inBucket", "output_bucket": "outBucket", \
+           "width": 1920, "height", 1080 }'
+```
+
+
+Note that the curl command just post a Cloud Event to the broker and exit, retruning
+HTTP status code `202 Accepted`. (`-v` option tell `curl` to show HTTP status code)
+You need to set up a listener of the event retruned
+from the service if you want to get the retruned value.
