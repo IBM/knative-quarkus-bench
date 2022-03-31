@@ -13,7 +13,7 @@ More information about these advanced features is available at https://quarkus.i
 
 ### Clone Git Repo
 ```shell
-https://github.com/IBM/knative-quarkus-bench.git -->
+https://github.com/IBM/knative-quarkus-bench.git
 ```
 
 ### Building the Application
