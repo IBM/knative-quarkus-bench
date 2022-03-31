@@ -1,4 +1,4 @@
-# knative-serverless-benchmark Project
+# knative-quarkus-bench Project
 
 This project contains a suite of Quarkus programs runnable as both stand-alone
 HTTP applications and Knative serverless services.
@@ -13,14 +13,12 @@ More information about these advanced features is available at https://quarkus.i
 
 ### Clone Git Repo
 ```shell
-git clone https://github.ibm.com/trl-quarkus/knative-serverless-benchmark.git
+https://github.com/IBM/knative-quarkus-bench.git -->
 ```
-<!-- Replace with the following link when this project is published -->
-<!-- https://github.com/IBM/knative-serverless-benchmark.git -->
 
 ### Building the Application
 ```shell
-cd knative-serverless-benchmark
+cd knative-quarkus-bench
 mvn package
 ```
 
