@@ -1,13 +1,6 @@
 # Server-reply Project
 
-This is a project to port and test [serverless-benchmarks](https://github.com/spcl/serverless-benchmarks) using Quarkus
-[Funqy HTTP Binding](https://quarkus.io/guides/funqy-http), which creates a stand-alone application using serverless functions.
-This interim step should be useful to port the benchmark suite to knative environment using [Quarkus Funqy](https://quarkus.io/guides/funqy).
-This project is also useful to verify if there is any problems to build into native images.
-
-This project currently focus on graph-based benchmarks in `000.microbenchmarks` group, but it should be usable for other groups of the benchmark suite. 
-We use [JGraphT graph library](https://github.com/jgrapht/jgrapht) as a replacement of [Python igraph library](https://igraph.org/), 
- nwhich is used in the original benchmark implementation.
+This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 

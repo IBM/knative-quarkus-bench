@@ -1,6 +1,11 @@
 # Image-recognition Project
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This is a project to port and test [serverless-benchmarks](https://github.com/spcl/serverless-benchmarks) using Quarkus
+[Funqy HTTP Binding](https://quarkus.io/guides/funqy-http), which creates a stand-alone application using serverless functions.
+This interim step should be useful to port the benchmark suite to knative environment using [Quarkus Funqy](https://quarkus.io/guides/funqy).
+This project is also useful to verify if there is any problems to build into native images.
+
+Image-recognition benchmark uses [Deep Java Library](https://djl.ai/).
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
@@ -27,13 +32,14 @@ The application is now runnable using `java -jar target/quarkus-app/quarkus-run.
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path.
 The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
 
-The `/image_recognition` function receives a test data size as a string, and returns result in JSON format:
+Sample curl command for testing the `/image_recognition` function:
 ```
 curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input":"782px-Pumiforme.JPG","model":"resnet50.pt"}' -X POST http://localhost:8080/image_recognition | jq
-
+```
+Result looks like:
+```
 {
   "result": {
-    "idx": "",
     "class": "Egyptian cat"
   },
   "measurement": {
@@ -65,14 +71,6 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 mvn package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/code-with-quarkus-1.0.0-SNAPSHOT-runner`
+You can then execute your native executable with: `./target/image-recognition-1.0.0-SNAPSHOT.jar`
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-
-## Provided Code
-
-### RESTEasy JAX-RS
-
-Easily start your RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)

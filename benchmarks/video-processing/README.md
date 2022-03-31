@@ -1,4 +1,4 @@
-# multimedia-funqy Project
+# Video-processing Project
 
 This is a project to port and test [serverless-benchmarks](https://github.com/spcl/serverless-benchmarks) using Quarkus
 [Funqy HTTP Binding](https://quarkus.io/guides/funqy-http), which creates a stand-alone application using serverless functions.
@@ -13,22 +13,27 @@ If you want to learn more about Quarkus, please visit its website: https://quark
 
 The application can be packaged using:
 ```shell script
-$ mvn clean package
+mvn clean package
 ```
 It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
 
 The application is now runnable using:
 ```shell script
-$ java -jar target/quarkus-app/quarkus-run.jar
+java -jar target/quarkus-app/quarkus-run.jar
 ```
 
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
 The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
 
-The `/video_processing` function receives a test data size as a string, and returns result in JSON format:
+Sample curl command for testing the `/video-processing` function:
+
+Sample curl command for testing the `/video_processing` function:
 ```
 $ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/video_processing | jq
+```
+Result looks like:
+```
 {
   "result": {
     "key": "processed-Anthem-30-16x9-lowres.gif",
@@ -50,7 +55,7 @@ aroud the data. You may also need another quartation marks or back-quote (`\`) t
 ### Building an über-jar
 If you want to build an _über-jar_, execute the following command:
 ```shell script
-$ mvn package -Dquarkus.package.type=uber-jar
+mvn package -Dquarkus.package.type=uber-jar
 ```
 
 The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
@@ -59,14 +64,14 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar ta
 
 You can create a native executable using: 
 ```shell script
-$ mvn package -Pnative
+mvn package -Pnative
 ```
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
 ```shell script
-$ mvn package -Pnative -Dquarkus.native.container-build=true
+mvn package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/knative-serverless-benchmark-video-processing-1.0.0-SNAPSHOT.jar`
+You can then execute your native executable with: `./target/video-processing-1.0.0-SNAPSHOT.jar`
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
