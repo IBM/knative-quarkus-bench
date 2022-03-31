@@ -9,11 +9,11 @@
   "name":"[Lsun.security.pkcs.SignerInfo;"}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.VideoProcessing",
-  "methods":[{"name":"video_processing","parameterTypes":["com.ibm.trl.serverlessbench.VideoProcessing$FunInput"] }]}
+  "name":"com.ibm.trl.knativebench.VideoProcessing",
+  "methods":[{"name":"video_processing","parameterTypes":["com.ibm.trl.knativebench.VideoProcessing$FunInput"] }]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.VideoProcessing$FunInput",
+  "name":"com.ibm.trl.knativebench.VideoProcessing$FunInput",
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"setDuration","parameterTypes":["int"] }, 
@@ -24,7 +24,7 @@
   ]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.VideoProcessing$RetValType",
+  "name":"com.ibm.trl.knativebench.VideoProcessing$RetValType",
   "methods":[
     {"name":"getMeasurement","parameterTypes":[] }, 
     {"name":"getResult","parameterTypes":[] }

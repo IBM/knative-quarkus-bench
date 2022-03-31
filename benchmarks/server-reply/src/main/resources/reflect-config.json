@@ -1,10 +1,10 @@
 [
 {
-  "name":"com.ibm.trl.serverlessbench.ServerReply",
-  "methods":[{"name":"server_reply","parameterTypes":["com.ibm.trl.serverlessbench.ServerReply$FunInput"] }]}
+  "name":"com.ibm.trl.knativebench.ServerReply",
+  "methods":[{"name":"server_reply","parameterTypes":["com.ibm.trl.knativebench.ServerReply$FunInput"] }]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.ServerReply$FunInput",
+  "name":"com.ibm.trl.knativebench.ServerReply$FunInput",
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"setServer_address","parameterTypes":["java.lang.String"] }, 
@@ -12,7 +12,7 @@
   ]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.ServerReply$RetValType",
+  "name":"com.ibm.trl.knativebench.ServerReply$RetValType",
   "methods":[
     {"name":"getMeasurement","parameterTypes":[] }, 
     {"name":"getResult","parameterTypes":[] }

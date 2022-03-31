@@ -1,4 +1,4 @@
-package com.ibm.trl.serverlessbench;
+package com.ibm.trl.knativebench;
 
 import org.jboss.logging.Logger;
 import java.io.BufferedReader;
@@ -21,11 +21,12 @@ import java.util.Map;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+
+import io.quarkus.funqy.Funq;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import java.net.URI;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -45,17 +46,16 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-import io.quarkus.funqy.Funq;
 
-public class Compress {
+public class Uploader {
+
+
     private Logger log;
     private UUID uuid;
-
     private String AWS_REGION = "ap-south-1";
     private String AWS_ENDPOINT = "defaultvalue";
-    private String input_bucket = "";
-    private String output_bucket = "";
-
+    private String input_bucket = null;
+    private String output_bucket = null;
     private Region region = Region.AP_SOUTH_1; // any region is OK
     private URI endpointOverride = null;
     private String access_key_id = null;
@@ -63,13 +63,14 @@ public class Compress {
     private StaticCredentialsProvider credential = null;
     private S3Client s3 = null;
 
-    public void StorageSetup() throws Exception {
+
+    private void StorageSetup() throws Exception {
         String value;
 
         if ((value = System.getenv("AWS_ENDPOINT")) != null) {
-	    AWS_ENDPOINT = value;
+            AWS_ENDPOINT = value;
             endpointOverride = URI.create(AWS_ENDPOINT);
-	}
+        }
 
         if ((value = System.getenv("AWS_ACCESS_KEY_ID")) != null)
             access_key_id = System.getenv("AWS_ACCESS_KEY_ID");
@@ -79,17 +80,15 @@ public class Compress {
 
         if ((value = System.getenv("AWS_REGION")) != null) {
             AWS_REGION = value;
-	    region = Region.of(AWS_REGION);
-	    } 
+            region = Region.of(AWS_REGION);
+        } 
 
         credential = StaticCredentialsProvider
             .create(AwsBasicCredentials.create(access_key_id, secret_access_key));
 
         s3 = S3Client.builder().region(region).endpointOverride(endpointOverride)
             .credentialsProvider(credential).build();
-
-    } // initialization
-
+    }
 
     private void deleteFile(String bucket, String key) {
         log.info("Deleting "+key+" from bucket "+bucket+".");
@@ -102,15 +101,12 @@ public class Compress {
         return;
     }
 
-
     private void uploadFile(String bucket, String key, String filePath) {
         log.info("Uploading "+filePath+" as "+key+" to bucket "+bucket+".");
         PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
         s3.putObject(objectRequest, RequestBody.fromFile(new File(filePath).toPath()));
-
         return;
     }
-
 
     private void downloadFile(String bucket, String key, String filePath) throws Exception {
         log.info("Downloading "+filePath+" as "+key+" from bucket "+bucket+".");
@@ -124,51 +120,24 @@ public class Compress {
         OutputStream os = new FileOutputStream(theFile);
         os.write(data);
         os.close();
+
         return;
     }
 
 
-    private void downloadDirectory(String bucket, String key, String dirPath) throws Exception {
-        boolean moreResults = true;
-        String nextToken = "";
-        int maxKeys = 128;
-
-        log.info("Downloading "+dirPath+" with "+key+" from bucket "+bucket+".");
-        
-        while (moreResults) {
-            ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucket).maxKeys(maxKeys)
-                    .continuationToken(nextToken).build();
-
-            ListObjectsV2Response result = s3.listObjectsV2(request);
-            for (S3Object object : result.contents()) {
-                if (object.key().startsWith(key)) {
-                    downloadFile(bucket, object.key(), dirPath.concat("/").concat(object.key()));
-                }
-            }
-
-            if (result.isTruncated()) {
-                nextToken = result.nextContinuationToken();
-            } else {
-                nextToken = "";
-                moreResults = false;
-            }
-        }
-    }
-
-
-    public Compress() throws Exception {
+    public Uploader() throws Exception {
         uuid = UUID.randomUUID();
         StorageSetup();
-        log = Logger.getLogger(Compress.class);
+        log = Logger.getLogger(Uploader.class);
     }
 
     @Funq
-    public RetValType compress(FunInput input) throws Exception {
+    public RetValType uploader(FunInput input) throws Exception {
         var retVal = new RetValType();
         String key = "large";
 
         if (s3 == null) {
-            retVal.result.put("message", "ERROR: Compress unable to run due to storage initialization.");
+            retVal.result.put("message", "ERROR: Uploader unable to run since s3 null.");
             return retVal;
 	}
 
@@ -181,81 +150,39 @@ public class Compress {
                 output_bucket = input.output_bucket;
         }
 
-	if (input_bucket == null || output_bucket == null) {
+        if (input_bucket == null || output_bucket == null) {
             retVal.result.put("message", "ERROR: Compress unable to run. input_bucket and output_bucket need to be set.");
             return (retVal);
-	}
+        }
 
-        File downloadPath=new File(String.format("/tmp/%s-%s",key,uuid));
-        downloadPath.mkdirs();
+
+        File filePath=new File(String.format("/tmp/120-%s.txt",key,uuid));
         long downloadStartTime = System.nanoTime();
-        downloadDirectory(input_bucket, key, downloadPath.toString());
+        downloadFile(input_bucket, key+"/yes.txt", filePath.toString());
         long downloadStopTime = System.nanoTime();
-        long downloadSize = parseDirectory(new File(downloadPath.getPath()+"/"+key));
-
-        long compressStartTime = System.nanoTime();
-        File destinationFile = new File(String.format("%s/%s-%s.zip",downloadPath.toString(),key,uuid));
-            zipDir(destinationFile, new File(downloadPath.getPath()+"/"+key));
-        long compressStopTime = System.nanoTime();
+        long downloadSize = filePath.length();
 
         long uploadStartTime = System.nanoTime();
-        String archiveName = String.format("%s-%s.zip",key,uuid);
-        uploadFile(input_bucket, archiveName, destinationFile.toString());
+        uploadFile(output_bucket, filePath.toString(), filePath.toString());
         long uploadStopTime = System.nanoTime();
-        long compressSize = destinationFile.length();
 
         double downloadTime = (downloadStopTime - downloadStartTime)/1000000000.0;
-        double compressTime = (compressStopTime - compressStartTime)/1000000000.0;
         double uploadTime = (uploadStopTime - uploadStartTime)/1000000000.0;
         
-        deleteFile(output_bucket, archiveName);
-
+        retVal.result.put("input_size",   key);
         retVal.result.put("download_size",    Long.toString(downloadSize));
-        retVal.result.put("compress_size",    Long.toString(compressSize));
-        retVal.result.put("input_size",    key);
-        retVal.measurement.put("download_time",  downloadTime);
-        retVal.measurement.put("compress_time",   compressTime);
-        retVal.measurement.put("upload_time",   uploadTime);
+        retVal.measurement.put("download_time",  (double)downloadTime);
+        retVal.measurement.put("upload_time",   (double)uploadTime);
+
+        deleteFile(input_bucket, filePath.toString());
 
         return (retVal);
     }
 
-    private long parseDirectory(File dir) {
-       // walk through directory totaling size of all files in it 
-       long size=0;
-       for (File f : dir.listFiles())
-           size += f.length();
-        return size;
-    }
-
-    private void zipDir(File dstFile, File srcDir) throws IOException {
-        int length;
-        byte[] bytes = new byte[16384];
-        log.info("in ZipDir(): source directory: "+srcDir+" destination file: "+dstFile);
-        FileOutputStream fos = new FileOutputStream(dstFile);
-        ZipOutputStream zipOut = new ZipOutputStream(fos);
-        
-         for (File f:srcDir.listFiles())
-            if (!f.getName().equals(dstFile.getName()))
-                {
-                    FileInputStream fis = new FileInputStream(f);
-                    ZipEntry zipEntry = new ZipEntry(f.getName());
-                    zipOut.putNextEntry(zipEntry);
-                    
-                    while ((length = fis.read(bytes)) >= 0) {
-                        zipOut.write(bytes, 0, length);
-                    }
-                    fis.close();
-                }
-        zipOut.close();
-        fos.close();
-    }
-
-
     public static class FunInput {
-        public String input_bucket;
+	public String input_bucket;
         public String output_bucket;
-        public String size;
+	public String size;
     }
 
     public static class RetValType {
@@ -267,6 +194,5 @@ public class Compress {
             measurement = new HashMap<String, Double>();
         }
     }
-
 
 }

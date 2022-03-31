@@ -9,11 +9,11 @@
   "name":"[Lsun.security.pkcs.SignerInfo;"}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.Thumbnailer",
-  "methods":[{"name":"thumbnailer","parameterTypes":["com.ibm.trl.serverlessbench.Thumbnailer$FunInput"] }]}
+  "name":"com.ibm.trl.knativebench.Thumbnailer",
+  "methods":[{"name":"thumbnailer","parameterTypes":["com.ibm.trl.knativebench.Thumbnailer$FunInput"] }]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.Thumbnailer$FunInput",
+  "name":"com.ibm.trl.knativebench.Thumbnailer$FunInput",
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"setHeight","parameterTypes":["int"] }, 
@@ -22,7 +22,7 @@
   ]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.Thumbnailer$RetValType",
+  "name":"com.ibm.trl.knativebench.Thumbnailer$RetValType",
   "methods":[
     {"name":"getMeasurement","parameterTypes":[] }, 
     {"name":"getResult","parameterTypes":[] }

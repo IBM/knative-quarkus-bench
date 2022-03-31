@@ -1,19 +1,18 @@
-package com.ibm.trl.serverlessbench;
+package com.ibm.trl.knativebench;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.SocketTimeoutException;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -26,33 +25,34 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.core.sync.RequestBody;
 
 
-public class Network {
+public class ClockSynchronization {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.network.output_bucket")
+    @ConfigProperty(name = "serverlessbench.clock-synchronization.output_bucket")
     String output_bucket;
 
     @Funq
-    public HashMap<String, String> network(FunInput input) {
+    public HashMap<String, String> clock_synchronization(FunInput input) {
         HashMap<String, String> retVal = new HashMap<String, String>();
         String key = "filename_tmp";
-    
+
         String request_id = input.getRequest_id();
         String address = input.getServer_address();
-        int port = Integer.valueOf(input.getServer_port());
-        int repetitions = Integer.valueOf(input.getRepetitions());
-	if (input.getOutput_bucket() != null) {
+        Integer port = Integer.valueOf(input.getServer_port());
+        Integer repetitions = Integer.valueOf(input.getRepetitions());
+        if (input.getOutput_bucket() != null) {
             output_bucket = input.getOutput_bucket();
         }
-	boolean skipUploading = input.getSkipUploading();
+        boolean skipUploading = input.getSkipUploading();
 
         List<Long[]> times = new ArrayList<Long[]>();
+        System.out.printf("Starting communication with %s:%s\n", address, String.valueOf(port));
         int i = 0;
 
         try {
             DatagramSocket sendSocket = new DatagramSocket(null);
-            sendSocket.setSoTimeout(3000);
+            sendSocket.setSoTimeout(4);
             sendSocket.setReuseAddress(true);
             sendSocket.bind(new InetSocketAddress("", 0));
 
@@ -69,10 +69,12 @@ public class Network {
             DatagramPacket packet2 = new DatagramPacket(message, message.length);
 
             int consecutive_failures = 0;
+            int measurements_not_smaller = 0;
+            long cur_min = 0;
+
             long send_begin = 0;
             long recv_end = 0;
-
-            while (i < repetitions + 1) {
+            while (i < 1000) {
                 try {
                     send_begin = System.nanoTime();
                     sendSocket.send(packet);
@@ -89,18 +91,38 @@ public class Network {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (i > 0)
-                    times.add( new Long[] { Long.valueOf(i), send_begin, recv_end } );
-
+                if (i > 0) {
+                    times.add( new Long[] {Long.valueOf(i), send_begin, recv_end} );
+                }
+                long cur_time = recv_end - send_begin;
+                if (cur_time > cur_min && cur_min > 0) {
+                    measurements_not_smaller += 1;
+                    if (measurements_not_smaller == repetitions) {
+                        try {
+                            message = "stop".getBytes("UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        DatagramPacket packet_ = new DatagramPacket(message, message.length, new InetSocketAddress(address, port));
+                        try {
+                            sendSocket.send(packet_);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    }
+                } else {
+                    cur_min = cur_time;
+                    measurements_not_smaller = 0;
+                }
                 ++i;
                 consecutive_failures = 0;
-                sendSocket.setSoTimeout(2000);
+                sendSocket.setSoTimeout(4000);
             }
             sendSocket.close();
             recvSocket.close();
 
             if (consecutive_failures != 5 && !skipUploading) {
-                File upload_file = new File("/tmp/data.csv");
                 try {
                     FileWriter writer = new FileWriter("/tmp/data.csv");
                     String header = String.join(",", "id", "client_send", "client_rcv");
@@ -114,7 +136,7 @@ public class Network {
                     e.printStackTrace();
                 }
 
-                key = String.format("network-benchmark-results-%s.csv", request_id);
+                key = String.format("clock-synchronization-benchmark-results-%s.csv", request_id);
 
                 try {
                     PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(output_bucket).key(key).build();
@@ -125,7 +147,7 @@ public class Network {
             }
         } catch (SocketException e) {
             e.printStackTrace();
-	}
+        }
 
         retVal.put( "result", key );
         return retVal;
@@ -137,8 +159,7 @@ public class Network {
         int server_port;
         int repetitions;
         String output_bucket;
-        String income_timestamp;
-	boolean skipUploading;
+        boolean skipUploading;
 
         public String getRequest_id() {
             return request_id;
@@ -180,19 +201,11 @@ public class Network {
             this.output_bucket = output_bucket;
         }
 
-        public String getIncome_timestamp() {
-            return income_timestamp;
-        }
-
-        public void setIncome_timestamp(String income_timestamp) {
-            this.income_timestamp = income_timestamp;
-        }
-
-	public boolean getSkipUploading() {
+        public boolean getSkipUploading() {
             return skipUploading;
         }
 
-	public void setSkipUploading(boolean skipUploading) {
+        public void setSkipUploading(boolean skipUploading) {
             this.skipUploading = skipUploading;
         }
     }

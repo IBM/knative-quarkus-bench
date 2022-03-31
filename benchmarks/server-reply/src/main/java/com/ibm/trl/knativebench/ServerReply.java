@@ -1,4 +1,4 @@
-package com.ibm.trl.serverlessbench;
+package com.ibm.trl.knativebench;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -13,11 +13,11 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.ImageRecognition",
-  "methods":[{"name":"image_recognition","parameterTypes":["com.ibm.trl.serverlessbench.ImageRecognition$FunInput"] }]}
+  "name":"com.ibm.trl.knativebench.ImageRecognition",
+  "methods":[{"name":"image_recognition","parameterTypes":["com.ibm.trl.knativebench.ImageRecognition$FunInput"] }]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.ImageRecognition$FunInput",
+  "name":"com.ibm.trl.knativebench.ImageRecognition$FunInput",
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"setInput","parameterTypes":["java.lang.String"] }, 
@@ -25,7 +25,7 @@
   ]}
 ,
 {
-  "name":"com.ibm.trl.serverlessbench.ImageRecognition$RetValType",
+  "name":"com.ibm.trl.knativebench.ImageRecognition$RetValType",
   "methods":[
     {"name":"getMeasurement","parameterTypes":[] }, 
     {"name":"getResult","parameterTypes":[] }

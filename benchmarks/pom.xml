@@ -8,7 +8,7 @@
   <packaging>pom</packaging>
   <parent>
     <groupId>com.ibm.trl</groupId>
-    <artifactId>knative-serverless-benchmark</artifactId>
+    <artifactId>knative-quarkus-bench</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modules>

@@ -1,4 +1,4 @@
-package com.ibm.trl.serverlessbench;
+package com.ibm.trl.knativebench;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import org.jgrapht.util.SupplierUtil;
 
 import io.quarkus.funqy.Funq;
 
-public class GraphMST {
+public class GraphPageRank {
     static double nanosecInSec = 1_000_000_000.0;
 
     static Map<String, Integer> size_generators = Map.of("test",  10,
@@ -58,22 +58,18 @@ public class GraphMST {
     }
     
     @Funq
-    public RetValType<String, ArrayList<String>> mst(String size) {
-        RetValType<String, ArrayList<String>> retVal = new RetValType<>();
+    public RetValType<Integer, Double> pagerank(String size) {
+        RetValType<Integer, Double> retVal = new RetValType<>();
 
-        int graphSize = graphSize(size);
+        Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize(size), retVal);
 
-        Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize, retVal);
-
-        SpanningTreeAlgorithm<DefaultEdge> algo = new PrimMinimumSpanningTree<>(inputGraph);
+        PageRank<Integer, DefaultEdge> algo = new PageRank<>(inputGraph);
 
         long process_begin = System.nanoTime();
-        SpanningTreeAlgorithm.SpanningTree<DefaultEdge> mst = algo.getSpanningTree();
+        Map<Integer, Double> score = algo.getScores();
         long process_end= System.nanoTime();
 
-        ArrayList<String> mstList = new ArrayList<>(graphSize);
-        for(Iterator<DefaultEdge> it = mst.iterator(); it.hasNext(); mstList.add(it.next().toString()));
-        retVal.result = Map.of("mst", mstList);
+        retVal.result = score;
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
 
         return retVal;
