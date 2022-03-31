@@ -9,6 +9,13 @@ developed by researchers at ETH Z&uuml;rich.
 Quarkus is a cloud native Java framework based on modern standard APIs.
 More information about these advanced features is available at https://quarkus.io/.
 
+## Prerequisite
+
+* Java 11 or higher (need JDK to build from source)
+* Maven 3.6.2+ (3.8.1+ is recommended)
+* Docker
+
+
 ## Build Instructions
 
 ### Clone Git Repo
@@ -31,12 +38,6 @@ This project uses Quarkus
 to build Docker images.  This extension has several configuration parameters to build
 images with appropriate tags and to push these images to a container repository.
 The configuration parameters can be specified as Maven system parameters.
-
-To create an image that will be pushed to the quay.io repository,
-```shell
-mvn package -Dquarkus.container-image.resistry=quay.io -Dquarkus.container-image.group=mygroup
-```
-This will create container images with tags such as: `quay.io/mygroup/thumbnailer:jvm`.
 
 If you use `podman` instead of `docker`,
 ```shell
@@ -73,25 +74,6 @@ because it automatically uses the latest version of GraalVM, which is updated fr
 
 ## Usage Instructions
 
-### Setting Up Cloud Object Storage
-
-Some of the benchmark programs use cloud object storage to store input/output data.
-The object storage needs to support Amazon S3 compatible APIs because we use the Quarkus
-[Amazon S3 Client extension](https://quarkiverse.github.io/quarkiverse-docs/quarkus-amazon-services/dev/amazon-s3.html)
-to access object storage.
-
-The minimum required configurations are:
-1. Specify endpoint URL and region name in `src/main/resources/application.property`
-under each submodule,
-1. Specify credentials using two environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-
-For other configuration parameters, refer to
-[the guide document](https://quarkiverse.github.io/quarkiverse-docs/quarkus-amazon-services/dev/amazon-s3.html#_configuring_s3_clients).
-
-We tested our programs using sample input data published by the ETH Z&uuml;rich team
-at https://github.com/spcl/serverless-benchmarks-data.git.
-
-
 ### Running as a Stand-alone Program
 
 Each submodule creates a runnable JAR file or an executable binary.
@@ -109,12 +91,14 @@ The program works as an HTTP server listening to port 8080 and receiving/replyin
 You can use `curl` command to access the program, specifying the input data as POST data
 in JSON format. For example:
 ```shell
-curl http://localhost:8080/thmbnailer \
+curl http://localhost:8080/pagerank \
      -X POST \
      -H 'Content-Type: application/json' \
-     -d '{ "input_bucket": "inBucket", "output_bucket": "outBucket", \
-           "width": 1920, "height", 1080 }'
+     -d '"test"'
 ```
+computes page rank scores of a generated graph of 10 nodes.
+You can increase the number of graph nodes by setting the post data to `small` for 10,000 nodes
+and `large` for 100,000 nodes.
 
 
 For more detail about running and configuring a stand-alone program, refer to the guide for
@@ -134,6 +118,27 @@ A broker needs to be set up in your namespace.  This is described in
 
 Note that only a single broker is needed in a namespace regardless of the number of
 Knative event services.
+
+
+#### Preparing Container Images for Uploading to a Container Registry
+
+As described above, this project automatically build container image by using Quarkus
+[container-image-docker extension](https://quarkus.io/guides/container-image#docker).
+You can specify the host and group names of the image tag by using
+`quarkus.container-image.resistry` and `quarkus.container-image.group` configuration
+parameters, respectively.
+
+Following example creates an image that will be pushed to the quay.io registry:
+```shell
+mvn package -Dquarkus.container-image.resistry=quay.io -Dquarkus.container-image.group=mygroup
+```
+The created container image will be tagged as: `quay.io/mygroup/graph-pagerank:jvm`.
+
+You can push the built image to the registry by using `deploy` goal with setting
+`quarkus.container-image.push` to `true`:
+```shell
+mvn deploy -Dquarkus.container-image.push=true
+```
 
 
 #### Deploying Knative Services
@@ -171,10 +176,9 @@ curl http://<broker-endpoint>:<port>/ \
      -H 'Ce-Id: 1234' \
      -H 'Ce-Source: curl' \
      -H 'Ce-Specification: 1.0' \
-     -H 'Ce-Type: thumbnailer' \
+     -H 'Ce-Type: pagerank' \
      -H 'Content-Type: application/json' \
-     -d '{ "input_bucket": "inBucket", "output_bucket": "outBucket", \
-           "width": 1920, "height", 1080 }'
+     -d '"test"'
 ```
 
 
