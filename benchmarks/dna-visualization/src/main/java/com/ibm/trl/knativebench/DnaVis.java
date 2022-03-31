@@ -30,11 +30,11 @@ public class DnaVis {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.dna-vis.bucket_name")
+    @ConfigProperty(name = "knativebench.dna-vis.bucket_name")
     String bucket_name;
-    @ConfigProperty(name = "serverlessbench.dna-vis.input_key", defaultValue = "504/in/bacillus_subtilis.fasta")
+    @ConfigProperty(name = "knativebench.dna-vis.input_key", defaultValue = "504/in/bacillus_subtilis.fasta")
     String input_key;
-    @ConfigProperty(name = "serverlessbench.dna-vis.output_key", defaultValue = "504/out/bacillus_subtilis_squiggle.json")
+    @ConfigProperty(name = "knativebench.dna-vis.output_key", defaultValue = "504/out/bacillus_subtilis_squiggle.json")
     String output_key;
 
     @Funq

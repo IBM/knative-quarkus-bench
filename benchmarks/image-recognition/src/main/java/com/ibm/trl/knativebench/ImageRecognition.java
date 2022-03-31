@@ -49,10 +49,10 @@ public class ImageRecognition {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.image-recognition.input_bucket")
+    @ConfigProperty(name = "knativebench.image-recognition.input_bucket")
     String input_bucket;
 
-    @ConfigProperty(name = "serverlessbench.image-recognition.model_bucket")
+    @ConfigProperty(name = "knativebench.image-recognition.model_bucket")
     String model_bucket;
 
     @Funq

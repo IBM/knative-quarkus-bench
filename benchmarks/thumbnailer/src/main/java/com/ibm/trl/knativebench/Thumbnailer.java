@@ -29,10 +29,10 @@ public class Thumbnailer {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.thumbnailer.input_bucket")
+    @ConfigProperty(name = "knativebench.thumbnailer.input_bucket")
     String input_bucket;
 
-    @ConfigProperty(name = "serverlessbench.thumbnailer.output_bucket")
+    @ConfigProperty(name = "knativebench.thumbnailer.output_bucket")
     String output_bucket;
 
     public BufferedImage resize_image(BufferedImage bimg, int w, int h) throws IOException {

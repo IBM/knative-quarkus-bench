@@ -29,7 +29,7 @@ public class ClockSynchronization {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.clock-synchronization.output_bucket")
+    @ConfigProperty(name = "knativebench.clock-synchronization.output_bucket")
     String output_bucket;
 
     @Funq

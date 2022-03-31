@@ -30,7 +30,7 @@ public class Network {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.network.output_bucket")
+    @ConfigProperty(name = "knativebench.network.output_bucket")
     String output_bucket;
 
     @Funq

@@ -31,10 +31,10 @@ public class VideoProcessing {
     @Inject
     S3Client s3;
 
-    @ConfigProperty(name = "serverlessbench.video-processing.input_bucket")
+    @ConfigProperty(name = "knativebench.video-processing.input_bucket")
     String input_bucket;
 
-    @ConfigProperty(name = "serverlessbench.video-processing.output_bucket")
+    @ConfigProperty(name = "knativebench.video-processing.output_bucket")
     String output_bucket;
 
     private void call_ffmpeg(String[] args) {
