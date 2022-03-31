@@ -47,8 +47,6 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 
-
-
 public class Uploader {
 
 
@@ -56,8 +54,8 @@ public class Uploader {
     private UUID uuid;
     private String AWS_REGION = "ap-south-1";
     private String AWS_ENDPOINT = "defaultvalue";
-    private String IN_BUCKET = "trl-knative-benchmark-bucket-1";
-    private String OUT_BUCKET = "trl-knative-benchmark-bucket-2";
+    private String input_bucket = null;
+    private String output_bucket = null;
     private Region region = Region.AP_SOUTH_1; // any region is OK
     private URI endpointOverride = null;
     private String access_key_id = null;
@@ -80,15 +78,9 @@ public class Uploader {
         if ((value = System.getenv("AWS_SECRET_ACCESS_KEY")) != null)
             secret_access_key = System.getenv("AWS_SECRET_ACCESS_KEY");
 
-        if ((value = System.getenv("IN_BUCKET")) != null)
-            IN_BUCKET = value;
-
-        if ((value = System.getenv("OUT_BUCKET")) != null)
-            OUT_BUCKET = value;
-
         if ((value = System.getenv("AWS_REGION")) != null) {
             AWS_REGION = value;
-            region = Region.of(AWS_REGION); // right method?!?!?!
+            region = Region.of(AWS_REGION);
         } 
 
         credential = StaticCredentialsProvider
@@ -152,16 +144,26 @@ public class Uploader {
         if (input != null) {
             if (input.size != null)
                 key = input.size;
+            if (input.input_bucket != null)
+                input_bucket = input.input_bucket;
+            if (input.output_bucket != null)
+                output_bucket = input.output_bucket;
         }
+
+        if (input_bucket == null || output_bucket == null) {
+            retVal.result.put("message", "ERROR: Compress unable to run. input_bucket and output_bucket need to be set.");
+            return (retVal);
+        }
+
 
         File filePath=new File(String.format("/tmp/120-%s.txt",key,uuid));
         long downloadStartTime = System.nanoTime();
-        downloadFile(IN_BUCKET, key+"/yes.txt", filePath.toString());
+        downloadFile(input_bucket, key+"/yes.txt", filePath.toString());
         long downloadStopTime = System.nanoTime();
         long downloadSize = filePath.length();
 
         long uploadStartTime = System.nanoTime();
-        uploadFile(OUT_BUCKET, filePath.toString(), filePath.toString());
+        uploadFile(output_bucket, filePath.toString(), filePath.toString());
         long uploadStopTime = System.nanoTime();
 
         double downloadTime = (downloadStopTime - downloadStartTime)/1000000000.0;
@@ -172,15 +174,14 @@ public class Uploader {
         retVal.measurement.put("download_time",  (double)downloadTime);
         retVal.measurement.put("upload_time",   (double)uploadTime);
 
-        deleteFile(IN_BUCKET, filePath.toString());
+        deleteFile(input_bucket, filePath.toString());
 
         return (retVal);
     }
 
     public static class FunInput {
-//        public String bucket_name;
-//        public String input_key;
-//        public String output_key;
+	public String input_bucket;
+        public String output_bucket;
 	public String size;
     }
 
