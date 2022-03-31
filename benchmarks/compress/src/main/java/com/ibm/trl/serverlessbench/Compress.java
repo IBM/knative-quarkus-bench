@@ -53,8 +53,8 @@ public class Compress {
 
     private String AWS_REGION = "ap-south-1";
     private String AWS_ENDPOINT = "defaultvalue";
-    private String IN_BUCKET = "trl-knative-benchmark-bucket-1";
-    private String OUT_BUCKET = "trl-knative-benchmark-bucket-2";
+    private String input_bucket = "";
+    private String output_bucket = "";
 
     private Region region = Region.AP_SOUTH_1; // any region is OK
     private URI endpointOverride = null;
@@ -77,15 +77,9 @@ public class Compress {
         if ((value = System.getenv("AWS_SECRET_ACCESS_KEY")) != null)
             secret_access_key = System.getenv("AWS_SECRET_ACCESS_KEY");
 
-        if ((value = System.getenv("IN_BUCKET")) != null)
-            IN_BUCKET = value;
-
-        if ((value = System.getenv("OUT_BUCKET")) != null)
-            OUT_BUCKET = value;
-
         if ((value = System.getenv("AWS_REGION")) != null) {
             AWS_REGION = value;
-	    region = Region.of(AWS_REGION); // right method?!?!?!
+	    region = Region.of(AWS_REGION);
 	    } 
 
         credential = StaticCredentialsProvider
@@ -181,13 +175,21 @@ public class Compress {
         if (input != null) {
             if (input.size != null)
                 key = input.size;
+            if (input.input_bucket != null)
+                input_bucket = input.input_bucket;
+            if (input.output_bucket != null)
+                output_bucket = input.output_bucket;
         }
 
-        System.out.println("Starting Compress: "+key);
+	if (input_bucket == null || output_bucket == null) {
+            retVal.result.put("message", "ERROR: Compress unable to run. input_bucket and output_bucket need to be set.");
+            return (retVal);
+	}
+
         File downloadPath=new File(String.format("/tmp/%s-%s",key,uuid));
         downloadPath.mkdirs();
         long downloadStartTime = System.nanoTime();
-        downloadDirectory(IN_BUCKET, key, downloadPath.toString());
+        downloadDirectory(input_bucket, key, downloadPath.toString());
         long downloadStopTime = System.nanoTime();
         long downloadSize = parseDirectory(new File(downloadPath.getPath()+"/"+key));
 
@@ -198,7 +200,7 @@ public class Compress {
 
         long uploadStartTime = System.nanoTime();
         String archiveName = String.format("%s-%s.zip",key,uuid);
-        uploadFile(IN_BUCKET, archiveName, destinationFile.toString());
+        uploadFile(input_bucket, archiveName, destinationFile.toString());
         long uploadStopTime = System.nanoTime();
         long compressSize = destinationFile.length();
 
@@ -206,7 +208,7 @@ public class Compress {
         double compressTime = (compressStopTime - compressStartTime)/1000000000.0;
         double uploadTime = (uploadStopTime - uploadStartTime)/1000000000.0;
         
-        deleteFile(OUT_BUCKET, archiveName);
+        deleteFile(output_bucket, archiveName);
 
         retVal.result.put("download_size",    Long.toString(downloadSize));
         retVal.result.put("compress_size",    Long.toString(compressSize));
@@ -251,9 +253,8 @@ public class Compress {
 
 
     public static class FunInput {
-//        public String bucket_name;
-//        public String input_key;
-//        public String output_key;
+        public String input_bucket;
+        public String output_bucket;
         public String size;
     }
 
