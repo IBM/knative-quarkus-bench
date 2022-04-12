@@ -1,19 +1,16 @@
 package com.ibm.trl.knativebench;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
-import org.jgrapht.alg.scoring.PageRank;
 import org.jgrapht.alg.spanning.PrimMinimumSpanningTree;
 import org.jgrapht.generate.BarabasiAlbertGraphGenerator;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
-import org.jgrapht.traverse.BreadthFirstIterator;
 import org.jgrapht.util.SupplierUtil;
 
 import io.quarkus.funqy.Funq;
@@ -21,9 +18,11 @@ import io.quarkus.funqy.Funq;
 public class GraphMST {
     static double nanosecInSec = 1_000_000_000.0;
 
-    static Map<String, Integer> size_generators = Map.of("test",  10,
-                                                         "small", 10000,
-                                                         "large", 100000);
+    static Map<String, Integer> size_generators = Map.of("test",   10,
+                                                         "tiny",   100,
+                                                         "small",  1000,
+                                                         "medium", 10000,
+                                                         "large",  100000);
 
     private int graphSize(String size) {
         int graphSize = 10;  // default size is "test"
@@ -32,6 +31,8 @@ public class GraphMST {
             Integer gs = size_generators.get(size);
             if(gs != null) {
                 graphSize = gs.intValue();
+            } else if(size.length() > 0) {
+                graphSize = Integer.parseUnsignedInt(size);
             }
         }
 
@@ -57,8 +58,11 @@ public class GraphMST {
         return inputGraph;
     }
     
-    @Funq
-    public RetValType<String, ArrayList<String>> mst(String size) {
+    @Funq("graph-mst")
+    public RetValType<String, ArrayList<String>> graph_mst(FunInput input) {
+        String  size = input.size;
+        boolean debug = Boolean.parseBoolean(input.debug);
+
         RetValType<String, ArrayList<String>> retVal = new RetValType<>();
 
         int graphSize = graphSize(size);
@@ -73,10 +77,19 @@ public class GraphMST {
 
         ArrayList<String> mstList = new ArrayList<>(graphSize);
         for(Iterator<DefaultEdge> it = mst.iterator(); it.hasNext(); mstList.add(it.next().toString()));
-        retVal.result = Map.of("mst", mstList);
+
+        if(debug) {
+            retVal.result = Map.of("mst", mstList);
+        }
+
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
 
         return retVal;
+    }
+
+    public static class FunInput {
+        public String size;
+        public String debug;
     }
 
     public static class RetValType<V, U> {

@@ -1,19 +1,13 @@
 package com.ibm.trl.knativebench;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.jgrapht.Graph;
-import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
 import org.jgrapht.alg.scoring.PageRank;
-import org.jgrapht.alg.spanning.PrimMinimumSpanningTree;
 import org.jgrapht.generate.BarabasiAlbertGraphGenerator;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
-import org.jgrapht.traverse.BreadthFirstIterator;
 import org.jgrapht.util.SupplierUtil;
 
 import io.quarkus.funqy.Funq;
@@ -21,9 +15,11 @@ import io.quarkus.funqy.Funq;
 public class GraphPageRank {
     static double nanosecInSec = 1_000_000_000.0;
 
-    static Map<String, Integer> size_generators = Map.of("test",  10,
-                                                         "small", 10000,
-                                                         "large", 100000);
+    static Map<String, Integer> size_generators = Map.of("test",   10,
+                                                         "tiny",   100,
+                                                         "small",  1000,
+                                                         "medium", 10000,
+                                                         "large",  100000);
 
     private int graphSize(String size) {
         int graphSize = 10;  // default size is "test"
@@ -32,6 +28,8 @@ public class GraphPageRank {
             Integer gs = size_generators.get(size);
             if(gs != null) {
                 graphSize = gs.intValue();
+            } else if(size.length() > 0) {
+                graphSize = Integer.parseUnsignedInt(size);
             }
         }
 
@@ -57,8 +55,11 @@ public class GraphPageRank {
         return inputGraph;
     }
     
-    @Funq
-    public RetValType<Integer, Double> pagerank(String size) {
+    @Funq("graph-pagerank")
+    public RetValType<Integer, Double> graph_pagerank(FunInput input) {
+        String  size = input.size;
+        boolean debug = Boolean.parseBoolean(input.debug);
+
         RetValType<Integer, Double> retVal = new RetValType<>();
 
         Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize(size), retVal);
@@ -69,10 +70,18 @@ public class GraphPageRank {
         Map<Integer, Double> score = algo.getScores();
         long process_end= System.nanoTime();
 
-        retVal.result = score;
+        if(debug) {
+            retVal.result = score;
+        }
+
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
 
         return retVal;
+    }
+
+    public static class FunInput {
+        public String size;
+        public String debug;
     }
 
     public static class RetValType<V, U> {
