@@ -161,12 +161,12 @@ from the broker and return the result back to the broker as a newly created Clou
 
 The Cloud Event specification defines various HTTP headers starting with "Ce-".
 The following table describes the minimum required headers.
-|Header          |Description                     |
-|:--------------:|:-------------------------------|
-|Ce-Id           |An unique number                |
-|Ce-Source       |Source of the event (e.g., curl)|
-|Ce-Specification|Cloud Event Spec version (=1.0) |
-|Ce-Type         |Name of the service             |
+|Header        |Description                     |
+|:------------:|:-------------------------------|
+|Ce-Id         |An unique number                |
+|Ce-Source     |Source of the event (e.g., curl)|
+|Ce-Specversion|Cloud Event Spec version (=1.0) |
+|Ce-Type       |Name of the service             |
 
 An example for posting a Cloud Event using the `curl` command is:
 ```shell
@@ -175,7 +175,7 @@ curl http://<broker-endpoint>:<port>/ \
      -X POST \
      -H 'Ce-Id: 1234' \
      -H 'Ce-Source: curl' \
-     -H 'Ce-Specification: 1.0' \
+     -H 'Ce-Specversion: 1.0' \
      -H 'Ce-Type: pagerank' \
      -H 'Content-Type: application/json' \
      -d '"test"'
