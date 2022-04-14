@@ -49,7 +49,6 @@ import io.quarkus.funqy.Funq;
 
 public class Compress {
     private Logger log;
-    private UUID uuid;
 
     private String AWS_REGION = "ap-south-1";
     private String AWS_ENDPOINT = "defaultvalue";
@@ -62,6 +61,15 @@ public class Compress {
     private String secret_access_key = null;
     private StaticCredentialsProvider credential = null;
     private S3Client s3 = null;
+
+    void deleteLocalDir(File file) {
+        File[] flist = file.listFiles();
+        if (flist != null)
+            for (File f : flist)
+                if (!Files.isSymbolicLink(f.toPath()))
+                    deleteLocalDir(f);
+        file.delete();
+    }
 
     public void StorageSetup() throws Exception {
         String value;
@@ -157,13 +165,13 @@ public class Compress {
 
 
     public Compress() throws Exception {
-        uuid = UUID.randomUUID();
         StorageSetup();
         log = Logger.getLogger(Compress.class);
     }
 
     @Funq
     public RetValType compress(FunInput input) throws Exception {
+        UUID uuid = UUID.randomUUID();
         var retVal = new RetValType();
         String key = "large";
 
@@ -195,12 +203,12 @@ public class Compress {
 
         long compressStartTime = System.nanoTime();
         File destinationFile = new File(String.format("%s/%s-%s.zip",downloadPath.toString(),key,uuid));
-            zipDir(destinationFile, new File(downloadPath.getPath()+"/"+key));
+        zipDir(destinationFile, new File(downloadPath.getPath()+"/"+key));
         long compressStopTime = System.nanoTime();
 
         long uploadStartTime = System.nanoTime();
         String archiveName = String.format("%s-%s.zip",key,uuid);
-        uploadFile(input_bucket, archiveName, destinationFile.toString());
+        uploadFile(output_bucket, archiveName, destinationFile.toString());
         long uploadStopTime = System.nanoTime();
         long compressSize = destinationFile.length();
 
@@ -209,6 +217,7 @@ public class Compress {
         double uploadTime = (uploadStopTime - uploadStartTime)/1000000000.0;
         
         deleteFile(output_bucket, archiveName);
+	deleteLocalDir(downloadPath);
 
         retVal.result.put("download_size",    Long.toString(downloadSize));
         retVal.result.put("compress_size",    Long.toString(compressSize));
