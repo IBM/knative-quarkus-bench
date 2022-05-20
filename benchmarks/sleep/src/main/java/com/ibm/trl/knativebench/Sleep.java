@@ -4,13 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
+import org.jboss.logging.Logger;
+
 import io.quarkus.funqy.Funq;
 
 public class Sleep {
     static Map<String, Integer> size_generators = Map.of("test",  1,
                                                          "small", 100,
                                                          "large", 1000);
-
+    @Inject
+    Logger log;
+    
     @Funq
     public HashMap<String, Long> sleep(String size) {
         HashMap<String, Long> retVal = new HashMap<String, Long>();
@@ -30,6 +36,8 @@ public class Sleep {
         }
 
         retVal.put( "result", sleep_time );
+        
+        log.info("retVal.measurement="+retVal.toString());
 
         return retVal;
     }

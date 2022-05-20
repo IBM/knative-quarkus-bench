@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.jboss.logging.Logger;
 import org.jgrapht.Graph;
 import org.jgrapht.generate.BarabasiAlbertGraphGenerator;
 import org.jgrapht.graph.DefaultEdge;
@@ -22,7 +25,9 @@ public class GraphBFS {
                                                          "small",  1000,
                                                          "medium", 10000,
                                                          "large",  100000);
-
+    @Inject
+    Logger log;
+    
     private int graphSize(String size) {
         int graphSize = 10;  // default size is "test"
 
@@ -61,6 +66,8 @@ public class GraphBFS {
     public RetValType<String, ArrayList<Integer>> graph_bfs(FunInput input) {
         String  size = input.size;
         boolean debug = Boolean.parseBoolean(input.debug);
+        
+        log.info(String.format("size=%s, debug=%b", size, debug));
 
         RetValType<String, ArrayList<Integer>> retVal = new RetValType<>();
 
@@ -100,7 +107,9 @@ public class GraphBFS {
             retVal.result = Map.of("verticies", verticies, "layers", layers, "parents", new ArrayList<Integer>(Arrays.asList(parents)));
         }
 
-        retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
+        retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec);
+        
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal;
     }

@@ -17,11 +17,18 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
+import org.jboss.logging.Logger;
+
 import io.quarkus.funqy.Funq;
 
 
 public class ServerReply {
 
+    @Inject
+    Logger log;
+    
     @Funq("server-reply")
     public RetValType server_reply(FunInput input) {
         String address = input.getServer_address();
@@ -62,6 +69,8 @@ public class ServerReply {
         retVal.result = Map.of(     "result", line,
 			            "size", readSize + "");
         retVal.measurement = Map.of("process_time", processTimeEnd - processTimeBegin);
+        
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal;
     }

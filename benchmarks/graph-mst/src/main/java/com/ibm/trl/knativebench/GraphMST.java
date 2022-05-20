@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.jboss.logging.Logger;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
 import org.jgrapht.alg.spanning.PrimMinimumSpanningTree;
@@ -23,7 +26,9 @@ public class GraphMST {
                                                          "small",  1000,
                                                          "medium", 10000,
                                                          "large",  100000);
-
+    @Inject
+    Logger log;
+    
     private int graphSize(String size) {
         int graphSize = 10;  // default size is "test"
 
@@ -62,6 +67,8 @@ public class GraphMST {
     public RetValType<String, ArrayList<String>> graph_mst(FunInput input) {
         String  size = input.size;
         boolean debug = Boolean.parseBoolean(input.debug);
+        
+        log.info(String.format("size=%s, debug=%b", size, debug));
 
         RetValType<String, ArrayList<String>> retVal = new RetValType<>();
 
@@ -83,6 +90,8 @@ public class GraphMST {
         }
 
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
+        
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal;
     }
