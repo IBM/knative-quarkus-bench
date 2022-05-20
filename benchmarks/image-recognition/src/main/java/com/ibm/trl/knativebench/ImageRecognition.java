@@ -55,7 +55,7 @@ public class ImageRecognition {
     @ConfigProperty(name = "knativebench.image-recognition.model_bucket")
     String model_bucket;
 
-    @Funq
+    @Funq("image-recognition")
     public RetValType image_recognition(FunInput input) throws IOException {
         String key = input.getInput();
         String model_key = input.getModel();

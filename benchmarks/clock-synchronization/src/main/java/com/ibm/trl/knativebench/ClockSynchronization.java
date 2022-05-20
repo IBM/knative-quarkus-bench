@@ -32,7 +32,7 @@ public class ClockSynchronization {
     @ConfigProperty(name = "knativebench.clock-synchronization.output_bucket")
     String output_bucket;
 
-    @Funq
+    @Funq("clock-synchronization")
     public HashMap<String, String> clock_synchronization(FunInput input) {
         HashMap<String, String> retVal = new HashMap<String, String>();
         String key = "filename_tmp";

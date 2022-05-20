@@ -41,7 +41,7 @@ public class VideoProcessing {
     }
 
     BiFunction<String, Integer, String> to_gif = (video, duration) -> {
-        String output = String.format("/tmp/processed-%s.gif", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')));
+        String output = String.format("processed-%s.gif", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')));
         FFmpeg ffmpeg = null;
         FFprobe ffprobe = null;
         try {
@@ -96,12 +96,12 @@ public class VideoProcessing {
                                                                                  "extract-gif", to_gif,
                                                                                  "watermark", watermark);
     
-    @Funq
+    @Funq("video-processing")
     public RetValType video_processing(FunInput input) throws Exception {
         String key = input.getKey();
         int duration = input.getDuration();
         String op = input.getOp();
-        String download_path = String.format("/tmp/%s", key);
+        String download_path = String.format("%s", key);
 	if (input.getInput_bucket() != null) {
             input_bucket = input.getInput_bucket();
 	}

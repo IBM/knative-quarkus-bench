@@ -105,7 +105,7 @@ public class Thumbnailer {
     }
     
     private String upload_stream(String bucket, String[] file, BufferedImage bytes_data) throws IOException {
-        File upload_file = new File("/tmp/" + file[1]);
+        File upload_file = new File(file[1]);
         ImageIO.write(bytes_data, "png", upload_file);
         String key = String.join("/", file);
         PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();

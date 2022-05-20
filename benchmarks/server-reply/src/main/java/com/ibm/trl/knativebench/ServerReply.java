@@ -22,7 +22,7 @@ import io.quarkus.funqy.Funq;
 
 public class ServerReply {
 
-    @Funq
+    @Funq("server-reply")
     public RetValType server_reply(FunInput input) {
         String address = input.getServer_address();
         int port = input.getServer_port();
