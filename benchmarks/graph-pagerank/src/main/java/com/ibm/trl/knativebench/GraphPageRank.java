@@ -3,6 +3,9 @@ package com.ibm.trl.knativebench;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.jboss.logging.Logger;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.scoring.PageRank;
 import org.jgrapht.generate.BarabasiAlbertGraphGenerator;
@@ -20,6 +23,9 @@ public class GraphPageRank {
                                                          "small",  1000,
                                                          "medium", 10000,
                                                          "large",  100000);
+
+    @Inject
+    Logger log;
 
     private int graphSize(String size) {
         int graphSize = 10;  // default size is "test"
@@ -54,11 +60,13 @@ public class GraphPageRank {
 
         return inputGraph;
     }
-    
+
     @Funq("graph-pagerank")
     public RetValType<Integer, Double> graph_pagerank(FunInput input) {
         String  size = input.size;
         boolean debug = Boolean.parseBoolean(input.debug);
+
+        log.info(String.format("size=%s, debug=%b", size, debug));
 
         RetValType<Integer, Double> retVal = new RetValType<>();
 
@@ -75,6 +83,8 @@ public class GraphPageRank {
         }
 
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec); 
+
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal;
     }
