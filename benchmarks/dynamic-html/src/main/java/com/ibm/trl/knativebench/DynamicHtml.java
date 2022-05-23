@@ -110,6 +110,8 @@ public class DynamicHtml {
         retVal.result.put("input_size",    key);
         retVal.result.put("rendered_Length",    Long.toString(renderedTemplate.length()));
         retVal.measurement.put("run_time",  runTime);
+        
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return (retVal);
     }
