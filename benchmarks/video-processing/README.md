@@ -28,9 +28,8 @@ The functions taking parameters only accespt POST request. The functions taking 
 
 Sample curl command for testing the `/video-processing` function:
 
-Sample curl command for testing the `/video_processing` function:
 ```
-$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/video_processing | jq
+$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"key": "Anthem-30-16x9-lowres.mp4", "height": "128", "width": "128", "duration": "1", "op": "extract-gif"}' -X POST http://localhost:8080/video-processing | jq
 ```
 Result looks like:
 ```

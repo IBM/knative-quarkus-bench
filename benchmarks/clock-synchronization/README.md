@@ -24,9 +24,9 @@ java -jar target/quarkus-app/quarkus-run.jar
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
 The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
 
-Sample curl command for testing the `/clock_synchronization` function:
+Sample curl command for testing the `/clock-synchronization` function:
 ```
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "20202", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/clock_synchronization | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "20202", "repetitions": "1", "output_bucket": "trl-knative-benchmark-bucket", "income_timestamp": "test"}' -X POST http://localhost:8080/clock-synchronization | jq
 ```
 Result looks like:
 ```

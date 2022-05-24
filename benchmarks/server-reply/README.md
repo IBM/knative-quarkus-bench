@@ -57,5 +57,5 @@ If you want to learn more about building native executables, please consult http
 
 ### Sample curl commands for testing
 ```
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"server_address": "127.0.0.1", "server_port": "20202"}' -X POST http://localhost:8080/server_reply  | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"server_address": "127.0.0.1", "server_port": "20202"}' -X POST http://localhost:8080/server-reply  | jq
 ```
