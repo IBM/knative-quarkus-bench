@@ -7,6 +7,21 @@ This project is also useful to verify if there is any problems to build into nat
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
+## Preparation 
+
+Since thumbnailer benchmark attempts to download and upload files via Cloud Object Storage, following preparation steps are required.
+1) Setup [application.properties](src/main/resources/application.properties)
+
+An endpoint URL and bucket names must be given. For example,
+```
+knativebench.thumbnailer.input_bucket=knative-benchmark-input-bucket
+knativebench.thumbnailer.output_bucket=knative-benchmark-output-bucket
+quarkus.s3.endpoint-override=https://s3.us-south.cloud-object-storage.appdomain.cloud
+```
+
+2) Upload input files to the bucket
+- Image files we tested are found [here](https://github.com/spcl/serverless-benchmarks-data/tree/6a17a460f289e166abb47ea6298fb939e80e8beb/200.multimedia/210.thumbnailer).
+
 ## Packaging and running the application
 
 The application can be packaged using:
