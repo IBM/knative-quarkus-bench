@@ -59,6 +59,7 @@ public class ImageRecognition {
     public RetValType image_recognition(FunInput input) throws IOException {
         String key = input.getInput();
         String model_key = input.getModel();
+        String synset = input.getSynset();
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
         if (input.getInput_bucket() != null) {
             input_bucket = input.getInput_bucket();
@@ -85,6 +86,15 @@ public class ImageRecognition {
 	}
         long model_download_end = System.nanoTime();
 
+        long synset_download_begin = System.nanoTime();
+        String synset_path = String.join("/", "/tmp", synset);
+        try {
+            downloadFile(model_bucket, synset, synset_path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        long synset_download_end = System.nanoTime();
+
         long model_process_begin = System.nanoTime();
         Builder<Image, Classifications> builder = Criteria.builder()
                 .setTypes(Image.class, Classifications.class)
@@ -106,7 +116,7 @@ public class ImageRecognition {
                         new float[] {0.485f, 0.456f, 0.406f}, /*mean*/
                         new float[] {0.229f, 0.224f, 0.225f}) /*std*/)
                 .optApplySoftmax(true)
-                .optSynsetUrl("file:./src/main/resources/synset.txt")
+                .optSynsetUrl("file:" + synset_path)
                 .build();
 
             Criteria<Image, Classifications> criteria = builder.optTranslator(translator).build();
@@ -125,14 +135,15 @@ public class ImageRecognition {
         }
         long process_end = System.nanoTime();
 
-        long download_time = (image_download_end - image_download_begin)/1000;
+        long image_download_time = (image_download_end - image_download_begin)/1000;
         long model_download_time = (model_download_end - model_download_begin) / 1000;
+        long synset_download_time = (synset_download_end - synset_download_begin) / 1000;
         long model_process_time = (model_process_end - model_process_begin)/1000;
         long process_time = (process_end - process_begin)/1000;
 
         RetValType retVal = new RetValType();
         retVal.result = Map.of(     "class", ret);
-        retVal.measurement = Map.of("download_time", download_time + model_download_time,
+        retVal.measurement = Map.of("download_time", image_download_time + model_download_time + synset_download_time,
                                     "compute_time", process_time + model_process_time,
                                     "model_time", model_process_time,
                                     "model_download_time", model_download_time);
@@ -143,8 +154,9 @@ public class ImageRecognition {
     public void downloadFile(String bucket, String key, String filePath) throws Exception {
         File theFile = new File(filePath);
         File theDir = theFile.getParentFile();
-        if (!theDir.exists())
+        if (!theDir.exists()) {
             theDir.mkdirs();
+        }
         GetObjectRequest request = GetObjectRequest.builder().bucket(bucket).key(key).build();
         ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
         byte[] data = objectBytes.asByteArray();
@@ -156,6 +168,7 @@ public class ImageRecognition {
     public static class FunInput {
         private String input;
         private String model;
+        private String synset;
         private String input_bucket;
         private String model_bucket;
 
@@ -173,6 +186,14 @@ public class ImageRecognition {
 
         public void setModel(String model) {
             this.model = model;
+        }
+
+        public String getSynset() {
+            return synset;
+        }
+
+        public void setSynset(String synset) {
+            this.synset = synset;
         }
 
         public String getInput_bucket() {
