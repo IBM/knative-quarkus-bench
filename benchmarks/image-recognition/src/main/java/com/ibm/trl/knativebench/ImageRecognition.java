@@ -52,9 +52,6 @@ public class ImageRecognition {
     @ConfigProperty(name = "knativebench.image-recognition.input_bucket")
     String input_bucket;
 
-    @ConfigProperty(name = "knativebench.image-recognition.model_bucket")
-    String model_bucket;
-
     @Funq("image-recognition")
     public RetValType image_recognition(FunInput input) throws IOException {
         String key = input.getInput();
@@ -63,9 +60,6 @@ public class ImageRecognition {
         String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
         if (input.getInput_bucket() != null) {
             input_bucket = input.getInput_bucket();
-        }
-        if (input.getModel_bucket() != null) {
-            model_bucket = input.getModel_bucket();
         }
 
         long image_download_begin = System.nanoTime();
@@ -80,7 +74,7 @@ public class ImageRecognition {
         long model_download_begin = System.nanoTime();
         String model_path = String.join("/", "/tmp", model_key);
 	try {
-            downloadFile(model_bucket, model_key, model_path);
+            downloadFile(input_bucket, model_key, model_path);
         } catch (Exception e) {
             e.printStackTrace();
 	}
@@ -89,7 +83,7 @@ public class ImageRecognition {
         long synset_download_begin = System.nanoTime();
         String synset_path = String.join("/", "/tmp", synset);
         try {
-            downloadFile(model_bucket, synset, synset_path);
+            downloadFile(input_bucket, synset, synset_path);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -170,7 +164,6 @@ public class ImageRecognition {
         private String model;
         private String synset;
         private String input_bucket;
-        private String model_bucket;
 
         public String getInput() {
             return input;
@@ -202,14 +195,6 @@ public class ImageRecognition {
 
         public void setInput_bucket(String input_bucket) {
             this.input_bucket = input_bucket;
-        }
-
-        public String getModel_bucket() {
-            return model_bucket;
-        }
-
-        public void setModel_bucket(String model_bucket) {
-            this.model_bucket = model_bucket;
         }
     }
 
