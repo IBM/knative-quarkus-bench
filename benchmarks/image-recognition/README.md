@@ -9,6 +9,22 @@ Image-recognition benchmark uses [Deep Java Library](https://djl.ai/).
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
+## Preparation 
+
+Since image-recognition benchmark attempts to download three input files from Cloud Object Storage, following preparation steps are required.
+1) Setup [application.properties](src/main/resources/application.properties)
+
+An endpoint URL and a bucket name storing the input files must be given. For example,
+```
+knativebench.image-recognition.input_bucket=knative-benchmark-bucket
+quarkus.s3.endpoint-override=https://s3.us-south.cloud-object-storage.appdomain.cloud
+```
+
+2) Upload input files to the bucket
+- [resnet50.pt](src/main/resources/resnet50.pt)
+- [synset.txt](src/main/resources/synset.txt)
+- JPG files you want to use for the inference. JPG files we tested are found in https://github.com/spcl/serverless-benchmarks-data/tree/6a17a460f289e166abb47ea6298fb939e80e8beb/400.inference/411.image-recognition/fake-resnet.
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
@@ -34,7 +50,7 @@ The functions taking parameters only accespt POST request. The functions taking 
 
 Sample curl command for testing the `/image-recognition` function:
 ```
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input":"782px-Pumiforme.JPG","model":"resnet50.pt"}' -X POST http://localhost:8080/image-recognition | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"input":"782px-Pumiforme.JPG","model":"resnet50.pt","synset":"synset.txt"}' -X POST http://localhost:8080/image-recognition | jq
 ```
 Result looks like:
 ```
