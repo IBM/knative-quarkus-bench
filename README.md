@@ -94,11 +94,10 @@ in JSON format. For example:
 curl http://localhost:8080/pagerank \
      -X POST \
      -H 'Content-Type: application/json' \
-     -d '"test"'
+     -d '{"size":"test"}'
 ```
 computes page rank scores of a generated graph of 10 nodes.
-You can increase the number of graph nodes by setting the post data to `small` for 10,000 nodes
-and `large` for 100,000 nodes.
+You can increase the number of graph nodes by setting the post data to `tiny`, `small`, `medium` or `large` to set the graph size to `100`, `1,000`, `10,000`, or `100,000` nodes, respectively.
 
 
 For more detail about running and configuring a stand-alone program, refer to the guide for
@@ -178,7 +177,7 @@ curl http://<broker-endpoint>:<port>/ \
      -H 'Ce-Specversion: 1.0' \
      -H 'Ce-Type: pagerank' \
      -H 'Content-Type: application/json' \
-     -d '"test"'
+     -d '{"size":"test"}'
 ```
 
 
