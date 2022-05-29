@@ -16,21 +16,22 @@ to access object storage.
 
 The minimum required configurations are:
 * Specify credentials using two environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-* Specify endpoint URL using a system property `quarkus.s3.endpoint-override`
+* Specify endpoint URL using an environment variable `QUARKUS_S3_ENDPOINT_OVERRIDE` or
+  a system property `quarkus.s3.endpoint-override`
 
 To run the stand-alone Java version:
 ```shell
 export AWS_ACCESS_KEY_ID=<KeyID>
 export AWS_SECRET_ACCESS_KEY=<AccessKey>
-java -Dquarkus.s3.endpoint-override=<EndpointURL> \
-     -jar benchmarks/<benchName>/target/quarkus-app/quarkus-run.jar
+export QUARKUS_S3_ENDPOINT_OVERRIDE=<EndpointURL>
+java -jar benchmarks/<benchName>/target/quarkus-app/quarkus-run.jar
 ```
 To run the stand-alone native version:
 ```shell
 export AWS_ACCESS_KEY_ID=<KeyID>
 export AWS_SECRET_ACCESS_KEY=<AccessKey>
-benchmarks/<benchName>/target/<benchName>-1.0.0-SNAPSHOT-runner \
-  -Dquarkus.s3.endpoint-override=<EndpointURL>
+export QUARKUS_S3_ENDPOINT_OVERRIDE=<EndpointURL>
+benchmarks/<benchName>/target/<benchName>-1.0.0-SNAPSHOT-runner
 ```
 
 The endpoint ULR can also be specified in
