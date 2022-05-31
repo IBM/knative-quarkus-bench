@@ -4,14 +4,16 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -35,7 +37,7 @@ public class DnaVis {
     String input_bucket;
     @ConfigProperty(name = "knativebench.dna-vis.output_bucket")
     String output_bucket;
-    @ConfigProperty(name = "knativebench.dna-vis.key", defaultValue = "504/in/bacillus_subtilis.fasta")
+    @ConfigProperty(name = "knativebench.dna-vis.key")
     String key;
 
     @Inject
@@ -50,19 +52,6 @@ public class DnaVis {
         log.info(String.format("input_bucket=%s, output_bucket=%s, key=%s, debug=%b",
                                input.input_bucket, input.output_bucket, input.key, debug));
 
-        try {
-            inFile  = File.createTempFile("dnavis_input_", ".fasta");
-            outFile = File.createTempFile("dnavis_squiggle_", ".json");
-            inFile.deleteOnExit();
-            outFile.deleteOnExit();
-        } catch(IOException e) {
-            retVal.result.put("message", e.toString());
-            log.info(e.getStackTrace());
-            cleanFile(inFile, log);
-            cleanFile(outFile, log);
-            return retVal;
-        }
-
         if(input != null) {
             if(input.input_bucket != null)
                 input_bucket = input.input_bucket;
@@ -72,6 +61,18 @@ public class DnaVis {
                 key = input.key;
         }
 
+        // Create temporary files
+        try {
+            inFile  = File.createTempFile("dnavis_input_", ".fasta");
+            outFile = File.createTempFile("dnavis_squiggle_", ".json");
+            inFile.deleteOnExit();
+            outFile.deleteOnExit();
+        } catch(IOException e) {
+            cleanupAfterException(retVal, log, e, inFile, outFile);
+            return retVal;
+        }
+
+        // Download input file from object storage
         long download_begin = System.nanoTime();
         try (FileOutputStream fos = new FileOutputStream(inFile);
              BufferedOutputStream os = new BufferedOutputStream(fos)){
@@ -81,77 +82,47 @@ public class DnaVis {
                     .build();
             s3.getObject(getReq, ResponseTransformer.toOutputStream(os));
         } catch (Exception e) {
-            retVal.result.put("message", e.toString());
-            log.info(e.getStackTrace());
-            cleanFile(inFile, log);
-            cleanFile(outFile, log);
+            cleanupAfterException(retVal, log, e, inFile, outFile);
             return retVal;
         }
         long download_end = System.nanoTime();
         retVal.measurement.put("download_time", (download_end - download_begin)/nanosecInSec);
 
-        FASTAElementIterator itr;
-        String seq;
-        double[] x;
-        double[] y;
-
+        // Transform FASTA to Squiggle
+        ArrayList<SquiggleData> plotList = new ArrayList<>();
+        double                  process_total = 0.0;
         try (FASTAFileReader fasta = new FASTAFileReaderImpl(inFile)) {
-            itr = fasta.getIterator();
+            FASTAElementIterator itr = fasta.getIterator();
+
             if(!itr.hasNext()) {
                 retVal.result.put("message", "ERROR: No FASTA data");
-                cleanFile(inFile, log);
-                cleanFile(outFile, log);
+                cleanFiles(log, inFile, outFile);
                 return retVal;
             }
-            seq = itr.next().getSequence();
 
-            int      len = seq.length();
-            double   curX = 0.0;
-            double   curY = 0.0;
+            do {
+                process_total += transform(itr.next().getSequence(), plotList);
+            } while(itr.hasNext());
 
-            x = new double[len*2];
-            y = new double[len*2];
-
-            long process_begin = System.nanoTime();
-            for(int i = 0; i < len; i++, curX += 1.0) {
-                switch(seq.charAt(i)) {
-                    case 'A':  y[i * 2] = curY + 0.5; y[i * 2 + 1] = curY; break;
-                    case 'C':  y[i * 2] = curY - 0.5; y[i * 2 + 1] = curY; break;
-                    case 'G':  y[i * 2] = curY + 0.5; y[i * 2 + 1] = curY + 1.0; curY += 1.0; break;
-                    case 'T':  y[i * 2] = curY - 0.5; y[i * 2 + 1] = curY - 1.0; curY -= 1.0; break;
-//                    default:   y[i * 2] = curY;       y[i * 2 + 1] = curY; break;
-                }
-                x[i * 2]     = curX;
-                x[i * 2 + 1] = curX + 0.5;
-            }
-            long process_end = System.nanoTime();
-            retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec);
         } catch (Exception e) {
-            retVal.result.put("message", e.toString());
-            log.info(e.getStackTrace());
-            cleanFile(inFile, log);
-            cleanFile(outFile, log);
+            cleanupAfterException(retVal, log, e, inFile, outFile);
             return retVal;
         }
+        retVal.measurement.put("compute_time", process_total);
 
+        // Serialize to JSON
         long json_begin = System.nanoTime();
-        try (JsonGenerator gen = new JsonFactory().createGenerator(outFile, JsonEncoding.UTF8)) {
-            gen.writeStartObject();
-            gen.writeFieldName("x");
-            gen.writeArray(x, 0, x.length);
-            gen.writeFieldName("y");
-            gen.writeArray(y, 0, y.length);
-            gen.writeEndObject();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(outFile, plotList.toArray());
         } catch (Exception e) {
-            retVal.result.put("message", e.toString());
-            log.info(e.getStackTrace());
-            cleanFile(inFile, log);
-            cleanFile(outFile, log);
+            cleanupAfterException(retVal, log, e, inFile, outFile);
             return retVal;
         }
         long json_end = System.nanoTime();
         retVal.measurement.put("serialize_time", (json_end - json_begin)/nanosecInSec);
 
+        // Upload Squiggle data (if 'debug' == true)
         long upload_begin = System.nanoTime();
         long upload_end   = upload_begin;
         if(debug && output_bucket != null && !output_bucket.isEmpty()) {
@@ -162,10 +133,7 @@ public class DnaVis {
                         .build();
                 s3.putObject(putReq, outFile.toPath());
             } catch (Exception e) {
-                retVal.result.put("message", e.toString());
-                log.info(e.getStackTrace());
-                cleanFile(inFile, log);
-                cleanFile(outFile, log);
+                cleanupAfterException(retVal, log, e, inFile, outFile);
                 return retVal;
             }
             upload_end = System.nanoTime();
@@ -175,22 +143,71 @@ public class DnaVis {
         retVal.result.put("key",    key);
         retVal.measurement.put("upload_time", (upload_end - upload_begin)/nanosecInSec);
 
-        cleanFile(inFile, log);
-        cleanFile(outFile, log);
+        cleanFiles(log, inFile, outFile);
 
         log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal;
     }
 
+    private static double transform(String seq, ArrayList<SquiggleData> list) {
+        int      len = seq.length();
+        double   curX = 0.0;
+        double   curY = 0.0;
 
-    private static void cleanFile(File file, Logger log) {
-        try {
-            if(file != null && file.exists()) {
-                file.delete();
+        double[] x = new double[len*2];
+        double[] y = new double[len*2];
+
+        long process_begin = System.nanoTime();
+        for(int i = 0; i < len; i++, curX += 1.0) {
+            switch(seq.charAt(i)) {
+                case 'A': case 'a':  y[i * 2] = curY + 0.5; y[i * 2 + 1] = curY; break;
+                case 'C': case 'c':  y[i * 2] = curY - 0.5; y[i * 2 + 1] = curY; break;
+                case 'G': case 'g':  y[i * 2] = curY + 0.5; y[i * 2 + 1] = curY + 1.0; curY += 1.0; break;
+                case 'T': case 't':  y[i * 2] = curY - 0.5; y[i * 2 + 1] = curY - 1.0; curY -= 1.0; break;
+                default:             y[i * 2] = curY;       y[i * 2 + 1] = curY; break;
             }
-        } catch (Exception e) {
-            log.info(e.getStackTrace());
+            x[i * 2]     = curX;
+            x[i * 2 + 1] = curX + 0.5;
+        }
+        long process_end = System.nanoTime();
+
+        list.add(new SquiggleData(x, y));
+
+        return (process_end - process_begin)/nanosecInSec;
+    }
+
+    void cleanupAfterException(RetValType retVal, Logger log, Exception e, File inFile, File outFile) {
+        retVal.result.put("message", e.toString());
+        log.info(e.getStackTrace());
+        cleanFiles(log, inFile, outFile);
+    }
+
+    private static void cleanFiles(Logger log, File... files) {
+        for(File file : files) {
+            try {
+                if(file != null) {
+                    Files.delete(file.toPath());
+                }
+            } catch (Exception e) {
+                log.info(e.getStackTrace());
+            }
+        }
+    }
+
+    @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+    public static class SquiggleData {
+        public double[] x;
+        public double[] y;
+
+        SquiggleData(double[] x, double[] y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public SquiggleData() {
+            x = null;
+            y = null;
         }
     }
 
