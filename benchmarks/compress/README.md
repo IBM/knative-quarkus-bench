@@ -7,6 +7,7 @@ export AWS_ENDPOINT=AppropriateValue
 export AWS_ACCESS_KEY_ID=AppropriateValue
 export AWS_SECRET_ACCESS_KEY=AppropriateValue
 export AWS_REGION=AppropriateValue
+export QUARKUS_S3_ENDPOINT_OVERRIDE
 
 java -jar target/quarkus-app/quarkus-run.jar &
 
@@ -23,6 +24,7 @@ export AWS_REGION=AppropriateValue
 export AWS_ENDPOINT=AppropriateValue
 export AWS_ACCESS_KEY_ID=AppropriateValue
 export AWS_SECRET_ACCESS_KEY=AppropriateValue
+export QUARKUS_S3_ENDPOINT_OVERRIDE
 
 target/compress-1.0.0-SNAPSHOT-runner: &
 
