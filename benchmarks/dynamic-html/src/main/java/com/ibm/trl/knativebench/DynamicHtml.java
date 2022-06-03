@@ -64,6 +64,30 @@ public class DynamicHtml {
 "  </body>"+
 "</html>";
 
+   static Map<String, Integer> size_generators = Map.of("test",   10,
+                                                         "tiny",   100,
+                                                         "small",  1000,
+                                                         "medium", 10000,
+                                                         "large",  100000,
+                                                         "huge",   1000000,
+                                                         "massive",10000000);
+
+    private int inputSize(String size) {
+        int retval = 1;
+
+        if (size != null) {
+            Integer s = size_generators.get(size);
+            if (s != null) {
+                retval = s.intValue();
+            } else if (size.length() > 0) {
+                retval = Integer.parseUnsignedInt(size);
+            }
+        }
+
+        return retval;
+    }
+
+
 
     public DynamicHtml() throws Exception{
         log = Logger.getLogger(DynamicHtml.class);
@@ -74,11 +98,13 @@ public class DynamicHtml {
         var retVal = new RetValType();
 	Random rand = new Random();
 
-	String key = "1000";
+	String key = "1";
         if (input != null) {
             if (input.size != null)
                 key = input.size;
         }
+
+	int loadSize = inputSize(key);
 
 
 //        System.out.println("Starting DynamicHtml: "+key);
@@ -89,8 +115,7 @@ public class DynamicHtml {
 	HashMap<String, Object> context = new HashMap<String, Object>();
 
 	List<Integer> integers = new ArrayList<>();
-	for (int i = 0; i < 1000; i++) {
-//		integers.add(new Integer(rand.nextInt(1000000)));
+	for (int i = 0; i < loadSize; i++) {
 		integers.add(Integer.valueOf(rand.nextInt(1000000)));
 	}
 
@@ -104,14 +129,10 @@ public class DynamicHtml {
 
 	double runTime = (stopTime - startTime)/1000000000.0;
 
-//	String retval = "j110, "+String.format("%.03f",runTime)+", "+
-//                Long.toString(renderedTemplate.length());
-
         retVal.result.put("input_size",    key);
+        retVal.result.put("converted_size",    Integer.toString(loadSize));
         retVal.result.put("rendered_Length",    Long.toString(renderedTemplate.length()));
         retVal.measurement.put("run_time",  runTime);
-        
-        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return (retVal);
     }
