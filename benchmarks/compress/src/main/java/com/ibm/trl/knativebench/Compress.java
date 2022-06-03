@@ -62,13 +62,28 @@ public class Compress {
     private StaticCredentialsProvider credential = null;
     private S3Client s3 = null;
 
+    private File downloadPath = null;
+
     void deleteLocalDir(File file) {
+        log.info("Deleting from local file system: "+file.toPath());
         File[] flist = file.listFiles();
         if (flist != null)
             for (File f : flist)
                 if (!Files.isSymbolicLink(f.toPath()))
                     deleteLocalDir(f);
         file.delete();
+    }
+
+    public void finalize() {
+	if (downloadPath != null) {
+                log.info("Compress: Running finalizer.");
+		try {
+			deleteLocalDir(downloadPath);
+		}
+			catch (Exception e) {
+			log.info("Exception deleting from local filesystem: "+e.toString());
+		}
+	}
     }
 
     public void StorageSetup() throws Exception {
@@ -165,8 +180,9 @@ public class Compress {
 
 
     public Compress() throws Exception {
-        StorageSetup();
         log = Logger.getLogger(Compress.class);
+        log.info("Initializing Compress");
+        StorageSetup();
     }
 
     @Funq
@@ -194,7 +210,7 @@ public class Compress {
             return (retVal);
 	}
 
-        File downloadPath=new File(String.format("/tmp/%s-%s",key,uuid));
+        downloadPath=new File(String.format("/tmp/%s-%s",key,uuid));
         downloadPath.mkdirs();
         long downloadStartTime = System.nanoTime();
         downloadDirectory(input_bucket, key, downloadPath.toString());
@@ -216,8 +232,19 @@ public class Compress {
         double compressTime = (compressStopTime - compressStartTime)/1000000000.0;
         double uploadTime = (uploadStopTime - uploadStartTime)/1000000000.0;
         
-        deleteFile(output_bucket, archiveName);
-	deleteLocalDir(downloadPath);
+	try {
+		deleteFile(output_bucket, archiveName);
+	}
+	catch (Exception e) {
+		log.info("Exception deleting from cloud storage: "+e.toString());
+	}
+
+	try {
+		deleteLocalDir(downloadPath);
+	}
+	catch (Exception e) {
+		log.info("Exception deleting from local filesystem: "+e.toString());
+	}
 
         retVal.result.put("download_size",    Long.toString(downloadSize));
         retVal.result.put("compress_size",    Long.toString(compressSize));
