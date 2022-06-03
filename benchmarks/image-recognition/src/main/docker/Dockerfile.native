@@ -14,11 +14,11 @@
 # docker run -i --rm -p 8080:8080 quarkus/knative-quarkus-bench
 #
 ###
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.5
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.6
 WORKDIR /work/
-RUN microdnf install python3 python3-requests freetype nc fontconfig \
+RUN microdnf --disableplugin=subscription-manager --disablerepo='*' --enablerepo='ubi-8-*' install python3 python3-requests freetype nc fontconfig \
     && pip3 install jinja2 \
-    && microdnf clean all \
+    && microdnf --disableplugin=subscription-manager --disablerepo='*' --enablerepo='ubi-8-*' clean all \
     && chown 1001 /work \
     && chmod "g+rwX" /work \
     && chown 1001:root /work \
