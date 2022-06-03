@@ -14,7 +14,7 @@
 # docker run -i --rm -p 8081:8080 quarkus/jgrapht-funqy
 #
 ###
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.6
 WORKDIR /work/
 RUN chown 1001 /work \
     && chmod "g+rwX" /work \
