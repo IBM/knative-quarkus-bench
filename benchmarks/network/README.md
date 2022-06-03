@@ -32,7 +32,7 @@ java -jar target/quarkus-app/quarkus-run.jar
 ```
 
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
-The functions taking parameters only accespt POST request. The functions taking no parameter accept both GET and POST request.
+The functions taking parameters only accepts POST request. The functions taking no parameter accept both GET and POST request.
 
 ### Sample curl command:
 ```
@@ -46,8 +46,8 @@ Result looks like:
 ```
 Valid choices of the test data size are `test`, `small`, and `large`, where the graph sizes are set to `1`, `100`, and `1,000`, respectively.
 
-Be careful about quartation marks. In Funqy, post data need to be JSON format. So, a string value in post data needs to have double quatation marks (`"`)
-aroud the data. You may also need another quartation marks or back-quote (`\`) to avoid shell command line interpretation.
+Be careful about quotation marks. In Funqy, post data need to be JSON format. So, a string value in post data needs to have double quotation marks (`"`)
+around the data. You may also need another quotation mark or back-slash (`\`) to avoid shell command line interpretation.
 
 ### Building an über-jar
 If you want to build an _über-jar_, execute the following command:
