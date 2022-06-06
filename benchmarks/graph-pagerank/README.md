@@ -40,7 +40,7 @@ This application receives following parameters from POST data in JSON format:
 |size         |Number of nodes of a generated graph | N |    10 | N |
 |debug        |Flag if sorted scores are printed out| N | false | N |
 
-&starf; Although both `size` and `debug` are optional, an object still needs to be sent
+&starf; Although both `size` and `debug` can be ommitted, an object still needs to be sent
 as a POST data, as `-d '{}'`.
 
 The `size` parameter can be __an integer__ or __*a data size name*__ listed below:
@@ -60,10 +60,11 @@ curl http://localhost:8080/graph-pagerank \
      -H 'Content-Type: application/json' \
      -d '{"size":"small"}'
 ```
-generates an undirected graph of 1,000 nodes and computes PageRank scores of the nodes.
+generates an undirected graph of 1,000 nodes and computes PageRank scores of the nodes,
+but does not return the scores because `debug` parameter is `false`.
 
 Note that returning the computed scores can take much longer time than generating a graph and
-compuring the scores. Quarks runtime serializes the reruned scores into JSON, but this is
+compuring the scores. Quarks runtime serializes the returned scores into JSON, but this is
 a time-consuming process.
 Therefore, skiping returning the scores is recommended for evaluation of performance.
 
@@ -75,12 +76,12 @@ curl http://<broker-endpoint>:<port>/ \
      -H 'Ce-Id: 1234' \
      -H 'Ce-Source: curl' \
      -H 'Ce-Specversion: 1.0' \
-     -H 'Ce-Type: dna-visualization' \
+     -H 'Ce-Type: graph-pagerank' \
      -H 'Content-Type: application/json' \
      -d '{"size":30, "debug":"true"}'
 ```
 This request creates a graph of 30 nodes, computes scores, and returns the sorted scores
-as JSON string because `debug` parameter is set to `true`.
+as a JSON string because `debug` parameter is set to `true`.
 
 
 ## Customizing the Default Value of Input Parameters
