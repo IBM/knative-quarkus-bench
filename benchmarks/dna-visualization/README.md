@@ -19,12 +19,15 @@ a FASTA file, so the file format should be acceptable by JFASTA.
 
 The input files we tested are:
 * [The sample FASTA file published by EHT Z&uuml;rich team](https://github.com/spcl/serverless-benchmarks-data/blob/6a17a460f289e166abb47ea6298fb939e80e8beb/500.scientific/504.dna-visualisation/bacillus_subtilis.fasta)
-* Euryarchaeotoes DNA sequence
+* [DNA sequence of Methanocaldococcus jannaschii](https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/091/665/GCA_000091665.1_ASM9166v1/GCA_000091665.1_ASM9166v1_genomic.fna.gz)
+  (ungzip after download)
 
 The input file is assumed to be stored in an cloud object storage (COS).
 You need to set up environment variables as described in
-[UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
+[benchmarks/UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
 
+(FYI) Methanocaldococcus jannaschii is the first archaeon to be genome sequenced completely.
+Its data size is less than a half of the sample data published by ETH Z&uuml;rich team.
 
 ## Building and Running the Application
 
@@ -51,7 +54,6 @@ This application receives following parameters from POST data in JSON format:
 |output_bucket|COS bucket to upload output files     |Y|(None) |Y|
 |key          |COS objet key of the input/output file|Y|(None) |Y|
 |debug        |Flag if output is uploaded to COS     |N|false  |N|
-
 For example:
 ```shell
 curl http://localhost:8080/dna-visualization \
@@ -59,16 +61,15 @@ curl http://localhost:8080/dna-visualization \
      -H 'Content-Type: application/json' \
      -d '{"input_buket":"MyInputBucket", \
           "output_buket":"MyOutputBucket", \
-          "key":"FASTAfiles/NewSequence.fasta", \
-	  "debug":"true"}'
+          "key":"FASTAfiles/NewSequence.fasta"}
 ```
 downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket `MyInputBucket`,
-transforms the DNA sequence to a two-demensional plot using Squiggle method, and
-uploads the output to a COS bucket `MyOutputBucket` with the same object key.
+transforms the DNA sequence to a two-demensional plot using Squiggle method, but
+does not upload the output to a COS bucket.
 
 Note that uploading a file to COS can take much longer time than downloading a file and
 transforming the DNA sequence. Therefore, skiping uploading the file is recommended for
-evaluation of transforming performance.
+evaluation of performance.
 
 To send a request to a Knative eventing service,
 ```shell
@@ -83,9 +84,12 @@ curl http://<broker-endpoint>:<port>/ \
      -d '{"input_buket":"MyInputBucket", \
           "output_buket":"MyOutputBucket", \
           "key":"FASTAfiles/NewSequence.fasta", \
-	  "debug":"true"}'
+          "debug":"true"}'
 ```
-
+This request downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket
+`MyInputBucket`, transforms the DNA sequence to a two-demensional plot using Squiggle method,
+and uploads the output to a COS bucket `MyOutputBucket` with the same object key because
+`debug` parameter is set to `true`.
 
 ## Customizing the Default Value of Input Parameters
 
