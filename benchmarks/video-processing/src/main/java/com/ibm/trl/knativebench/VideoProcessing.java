@@ -149,7 +149,7 @@ public class VideoProcessing {
     private void download(String input_bucket, String key, String download_path) throws Exception {
         File theFile = new File(download_path);
         File theDir = theFile.getParentFile();
-        if (!theDir.exists())
+	if (theDir != null && !theDir.exists())
             theDir.mkdirs();
         GetObjectRequest request = GetObjectRequest.builder().bucket(input_bucket).key(key).build();
         ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
