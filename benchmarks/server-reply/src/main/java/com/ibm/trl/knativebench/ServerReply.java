@@ -41,7 +41,7 @@ public class ServerReply {
             proc = Runtime.getRuntime().exec(cmd);
             TimeUnit.SECONDS.sleep(5);
         } catch (Exception e) {
-            System.out.println("Server didn't launch.");
+            System.out.println("Server didn't launch: "+e.toString());
         }
 
         long processTimeBegin = System.nanoTime();
@@ -56,9 +56,9 @@ public class ServerReply {
             in.close();
             socket.close();
         } catch (SocketException e) {
-            line = "SocketException";
+            line = "SocketException: "+e.toString();
         } catch (IOException e) {
-            line = "IOException";
+            line = "IOException: "+e.toString();
         }
 
         long processTimeEnd = System.nanoTime();
