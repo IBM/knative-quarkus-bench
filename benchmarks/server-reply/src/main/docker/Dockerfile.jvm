@@ -28,9 +28,9 @@ ARG RUN_JAVA_VERSION=1.3.8
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 # Install java and the run-java script
 # Also set up permissions for user `1001`
-RUN microdnf --disableplugin=subscription-manager --disablerepo='*' --enablerepo='ubi-8-*' install nmap curl ca-certificates ${JAVA_PACKAGE} \
-    && microdnf --disableplugin=subscription-manager --disablerepo='*' --enablerepo='ubi-8-*' update \
-    && microdnf --disableplugin=subscription-manager --disablerepo='*' --enablerepo='ubi-8-*' clean all \
+RUN microdnf --disablerepo='*' --enablerepo='ubi-8-*' install nmap curl ca-certificates ${JAVA_PACKAGE} \
+    && microdnf --disablerepo='*' --enablerepo='ubi-8-*' update \
+    && microdnf --disablerepo='*' --enablerepo='ubi-8-*' clean all \
     && mkdir /deployments \
     && chown 1001 /deployments \
     && chmod "g+rwX" /deployments \
