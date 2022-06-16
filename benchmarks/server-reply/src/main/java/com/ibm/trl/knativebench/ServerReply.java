@@ -25,6 +25,7 @@ import io.quarkus.funqy.Funq;
 
 
 public class ServerReply {
+    static double nanosecInSec = 1_000_000_000.0;
 
     @Inject
     Logger log;
@@ -68,7 +69,7 @@ public class ServerReply {
         RetValType retVal = new RetValType();
         retVal.result = Map.of(     "result", line,
 			            "size", readSize + "");
-        retVal.measurement = Map.of("process_time", processTimeEnd - processTimeBegin);
+        retVal.measurement = Map.of("process_time", (processTimeEnd - processTimeBegin)/nanosecInSec);
         
         log.info("retVal.measurement="+retVal.measurement.toString());
 
@@ -98,7 +99,7 @@ public class ServerReply {
 
     public static class RetValType {
         Map<String, String> result;
-        Map<String, Long> measurement;
+        Map<String, Double> measurement;
 
         public Map<String, String> getResult() {
             return result;
@@ -108,11 +109,11 @@ public class ServerReply {
             this.result = result;
         }
 
-        public Map<String, Long> getMeasurement() {
+        public Map<String, Double> getMeasurement() {
             return measurement;
         }
 
-        public void setMeasurement(Map<String, Long> measurement) {
+        public void setMeasurement(Map<String, Double> measurement) {
             this.measurement = measurement;
         }
     }
