@@ -13,12 +13,14 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 import io.quarkus.funqy.Funq;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -27,15 +29,19 @@ import software.amazon.awssdk.core.sync.RequestBody;
 
 
 public class Network {
+    static double nanosecInSec = 1_000_000_000.0;
+
     @Inject
     S3Client s3;
+    @Inject
+    Logger log;
 
     @ConfigProperty(name = "knativebench.network.output_bucket")
     String output_bucket;
 
     @Funq
-    public HashMap<String, String> network(FunInput input) {
-        HashMap<String, String> retVal = new HashMap<String, String>();
+    public RetValType network(FunInput input) {
+        RetValType retVal = new RetValType(); 
         String key = "filename_tmp";
     
         String request_id = input.getRequest_id();
@@ -47,6 +53,7 @@ public class Network {
         }
 	boolean skipUploading = input.getSkipUploading();
 
+        long processTimeBegin = System.nanoTime();
         List<Long[]> times = new ArrayList<Long[]>();
         int i = 0;
 
@@ -127,8 +134,21 @@ public class Network {
             e.printStackTrace();
 	}
 
-        retVal.put( "result", key );
+        long processTimeEnd = System.nanoTime();
+        retVal.result = Map.of( "result", key );
+        retVal.measurement = Map.of("process_time", (processTimeEnd - processTimeBegin)/nanosecInSec);
+        log.info("retVal.measurement="+retVal.measurement.toString());
         return retVal;
+    }
+
+    public static class RetValType {
+        public Map<String, String> result;
+        public Map<String, Double> measurement;
+
+        RetValType () {
+            result      = new HashMap<String, String>();
+            measurement = new HashMap<String, Double>();
+        }
     }
 
     public static class FunInput {
