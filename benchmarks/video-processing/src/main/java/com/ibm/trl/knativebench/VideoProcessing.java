@@ -18,6 +18,7 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -30,6 +31,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class VideoProcessing {
     @Inject
     S3Client s3;
+    @Inject
+    Logger log;
 
     @ConfigProperty(name = "knativebench.video-processing.input_bucket")
     String input_bucket;
@@ -138,6 +141,8 @@ public class VideoProcessing {
                                     "upload_time", upload_time,
                                     "upload_size", upload_size,
                                     "compute_time", process_time);
+        
+        log.info("retVal.measurement="+retVal.measurement.toString());
         return retVal;
     }
     

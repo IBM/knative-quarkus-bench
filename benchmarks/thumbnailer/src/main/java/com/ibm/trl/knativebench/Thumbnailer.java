@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 import io.quarkus.funqy.Funq;
 
@@ -28,6 +29,8 @@ import software.amazon.awssdk.core.sync.RequestBody;
 public class Thumbnailer {
     @Inject
     S3Client s3;
+    @Inject
+    Logger log;
 
     @ConfigProperty(name = "knativebench.thumbnailer.input_bucket")
     String input_bucket;
@@ -84,6 +87,7 @@ public class Thumbnailer {
                                     "upload_time", upload_time,
                                     "upload_size", resized_size,
                                     "compute_time", process_time);
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal;
     }

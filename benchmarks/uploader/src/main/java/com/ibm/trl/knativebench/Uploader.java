@@ -175,6 +175,7 @@ public class Uploader {
         retVal.measurement.put("upload_time",   (double)uploadTime);
 
         deleteFile(input_bucket, filePath.toString());
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return (retVal);
     }

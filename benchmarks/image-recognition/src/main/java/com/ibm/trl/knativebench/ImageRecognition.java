@@ -33,6 +33,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 import io.quarkus.funqy.Funq;
 import javax.inject.Inject;
@@ -48,6 +49,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class ImageRecognition {
     @Inject
     S3Client s3;
+    @Ibject
+    Logger log;
 
     @ConfigProperty(name = "knativebench.image-recognition.input_bucket")
     String input_bucket;
@@ -141,6 +144,8 @@ public class ImageRecognition {
                                     "compute_time", process_time + model_process_time,
                                     "model_time", model_process_time,
                                     "model_download_time", model_download_time);
+        
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal; 
     }
