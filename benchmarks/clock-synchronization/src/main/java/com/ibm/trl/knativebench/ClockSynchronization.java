@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 import io.quarkus.funqy.Funq;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -26,8 +27,12 @@ import software.amazon.awssdk.core.sync.RequestBody;
 
 
 public class ClockSynchronization {
+    static double nanosecInSec = 1_000_000_000.0;
+    
     @Inject
     S3Client s3;
+    @Inject
+    Logger log;
 
     @ConfigProperty(name = "knativebench.clock-synchronization.output_bucket")
     String output_bucket;
@@ -49,6 +54,8 @@ public class ClockSynchronization {
         List<Long[]> times = new ArrayList<Long[]>();
         System.out.printf("Starting communication with %s:%s\n", address, String.valueOf(port));
         int i = 0;
+        
+        long processTimeBegin = System.nanoTime();
 
         try {
             DatagramSocket sendSocket = new DatagramSocket(null);
@@ -148,8 +155,11 @@ public class ClockSynchronization {
         } catch (SocketException e) {
             e.printStackTrace();
         }
+        long processTimeEnd = System.nanoTime();
 
         retVal.put( "result", key );
+        log.info("retVal.measurement="+String.valueOf((processTimeEnd - processTimeBegin)/nanosecInSec));
+        
         return retVal;
     }
 

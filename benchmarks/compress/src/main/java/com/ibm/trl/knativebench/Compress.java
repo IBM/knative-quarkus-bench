@@ -252,6 +252,8 @@ public class Compress {
         retVal.measurement.put("download_time",  downloadTime);
         retVal.measurement.put("compress_time",   compressTime);
         retVal.measurement.put("upload_time",   uploadTime);
+        
+        log.info("retVal.measurement="+retVal.measurement.toString());
 
         return (retVal);
     }
