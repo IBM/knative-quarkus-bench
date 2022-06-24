@@ -20,4 +20,5 @@ COPY target/*-runner /application
 EXPOSE 8080
 USER nonroot
 
-CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
+ENV JAVA_OPTIONS -Dquarkus.http.host=0.0.0.0
+CMD ["sh", "-c", "./application ${JAVA_OPTIONS}"]
