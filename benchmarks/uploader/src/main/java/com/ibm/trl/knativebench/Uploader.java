@@ -116,6 +116,7 @@ public class Uploader {
             theDir.mkdirs();
         GetObjectRequest request = GetObjectRequest.builder().bucket(bucket).key(key).build();
         ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(request);
+        
         byte[] data = objectBytes.asByteArray();
         OutputStream os = new FileOutputStream(theFile);
         os.write(data);

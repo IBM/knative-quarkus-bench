@@ -49,7 +49,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class ImageRecognition {
     @Inject
     S3Client s3;
-    @Ibject
+    @Inject
     Logger log;
 
     @ConfigProperty(name = "knativebench.image-recognition.input_bucket")
