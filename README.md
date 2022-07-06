@@ -124,12 +124,12 @@ Knative event services.
 As described above, this project automatically build container image by using Quarkus
 [container-image-docker extension](https://quarkus.io/guides/container-image#docker).
 You can specify the host and group names of the image tag by using
-`quarkus.container-image.resistry` and `quarkus.container-image.group` configuration
+`quarkus.container-image.registry` and `quarkus.container-image.group` configuration
 parameters, respectively.
 
 Following example creates an image that will be pushed to the quay.io registry:
 ```shell
-mvn package -Dquarkus.container-image.resistry=quay.io -Dquarkus.container-image.group=mygroup
+mvn package -Dquarkus.container-image.registry=quay.io -Dquarkus.container-image.group=mygroup
 ```
 The created container image will be tagged as: `quay.io/mygroup/graph-pagerank:jvm`.
 
