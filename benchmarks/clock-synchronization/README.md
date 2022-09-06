@@ -11,7 +11,7 @@ If you want to learn more about Quarkus, please visit its website: https://quark
 
 Clock-synchronization benchmark attempts to upload a result file via Cloud Object Storage unless `skipUploading` parameter is true (See [an example curl command](#sample-curl-command)). 
 
-If you want to updalod result files, it is required to setup [application.properties](src/main/resources/application.properties) to give an endpoint URL and bucket names such as
+If you want to upload result files, it is required to setup [application.properties](src/main/resources/application.properties) to give an endpoint URL and bucket names such as
 ```
 knativebench.clock-synchronization.output_bucket=knative-benchmark-output-bucket
 quarkus.s3.endpoint-override=https://s3.us-south.cloud-object-storage.appdomain.cloud
