@@ -49,11 +49,11 @@ target/dna-visualization-1.0.0-SNAPSHOT-runner
 This application receives following parameters from POST data in JSON format:
 
 |Name         |Value                         |Required?|Default|Default is customizable?|
-|:-----------:|:-----------------------------------|:-:|:------|:----------------------:|
-|input_bucket |COS bucket to download input files    |Y|(None) |Y|
-|output_bucket|COS bucket to upload output files     |Y|(None) |Y|
-|key          |COS objet key of the input/output file|Y|(None) |Y|
-|debug        |Flag if output is uploaded to COS     |N|false  |N|
+|:-----------:|:------------------------------------|:-:|:------|:----------------------:|
+|input_bucket |COS bucket to download input files     |Y|(None) |Y|
+|output_bucket|COS bucket to upload output files      |Y|(None) |Y|
+|key          |COS object key of the input/output file|Y|(None) |Y|
+|debug        |Flag if output is uploaded to COS      |N|false  |N|
 For example:
 ```shell
 curl http://localhost:8080/dna-visualization \
@@ -87,14 +87,14 @@ curl http://<broker-endpoint>:<port>/ \
           "debug":"true"}'
 ```
 This request downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket
-`MyInputBucket`, transforms the DNA sequence to a two-demensional plot using Squiggle method,
+`MyInputBucket`, transforms the DNA sequence to a two-dimensional plot using Squiggle method,
 and uploads the output to a COS bucket `MyOutputBucket` with the same object key because
 `debug` parameter is set to `true`.
 
 ## Customizing the Default Value of Input Parameters
 
 The default values of the three parameters can be customized by using environment variables
-or by modifying `resources/application.properties`.  Folloing table describes their names
+or by modifying `resources/application.properties`.  The following table describes their names
 to change the defaults:
 |Name         |Environment Variable              |Key in `application.properties`   |
 |:-----------:|:---------------------------------|:---------------------------------|
