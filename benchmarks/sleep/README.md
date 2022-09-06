@@ -22,7 +22,7 @@ java -jar target/quarkus-app/quarkus-run.jar
 ```
 
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
-The functions taking parameters only accepts POST request. The functions taking no parameter accept both GET and POST request.
+The functions taking parameters only accept POST requests. The functions taking no parameter accept both GET and POST request.
 
 Sample curl command for testing the `/sleep` function:
 ```
