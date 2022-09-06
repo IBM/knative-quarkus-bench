@@ -14,8 +14,8 @@ because JGraphT does not have BFS method/iterator.
 
 ## Preparing Input Data
 
-The input to this application is a nubmer of nodes of a generated graph.
-No input file needs to be prepared.
+The input to this application is the number of nodes of a generated graph.
+No input file is needed.
 
 
 ## Building and Running the Application
@@ -65,8 +65,8 @@ curl http://localhost:8080/graph-bfs \
 generates an undirected graph of 1,000 nodes and traverses it in BFS order, but does not return
 the list of visited nodes in BFS order because `debug` parameter is `false`.
 
-Note that returning the resulting BFS list can take much longer time than generating a graph and
-traversing it.  Quarks runtime serializes the returned node list into JSON, but this is
+Note that returning the resulting BFS list can take much longer than generating and
+traversing a graph.  Quarkus runtime serializes the returned node list into JSON, but this is
 a time-consuming process.
 Therefore, skiping returning the node list is recommended for evaluation of performance.
 
@@ -82,7 +82,7 @@ curl http://<broker-endpoint>:<port>/ \
      -H 'Content-Type: application/json' \
      -d '{"size":30, "debug":"true"}'
 ```
-This request creates a graph of 30 nodes, traversed it in BFS order, and returns the visited
+This request creates a graph of 30 nodes, traversed in BFS order, and returns the visited
 node list as a JSON string because `debug` parameter is set to `true`.
 
 
