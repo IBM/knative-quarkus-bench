@@ -12,13 +12,13 @@ This application uses [JGraphT](https://jgrapht.org/) for generating and handlin
 
 ## Preparing Input Data
 
-The input to this application is a nubmer of nodes of a generated graph.
-No input file needs to be prepared.
+The input to this application is the number of nodes of a generated graph.
+No input file is required.
 
 
 ## Building and Running the Application
 
-Build project as described in [the README at the top level](../../README.md) if it has not.
+Build project as described in [the README at the top level](../../README.md) as necessary.
 
 Then, the application can run as a local HTTP server.
 To run the stand-alone Java version:
@@ -63,10 +63,10 @@ curl http://localhost:8080/graph-mst \
 generates an undirected graph of 1,000 nodes and computes an MST, but does not return
 the resulting MST because `debug` parameter is `false`.
 
-Note that returning the resulting MST can take much longer time than generating a graph and
-compuring MST.  Quarks runtime serializes the returned MST into JSON, but this is
+Note that returning the resulting MST can take much longer than generating a graph and
+computing MST.  Quarkus runtime serializes the returned MST into JSON, but this is
 a time-consuming process.
-Therefore, skiping returning the MST is recommended for evaluation of performance.
+Therefore, skipping returning the MST is recommended for evaluation of performance.
 
 To send a request to a Knative eventing service,
 ```shell
