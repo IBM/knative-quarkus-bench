@@ -19,11 +19,19 @@ java -jar target/quarkus-app/quarkus-run.jar
 ```
 
 Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
-The functions taking parameters only accepts POST request. The functions taking no parameter accept both GET and POST request.
+The functions taking parameters only accept POST request. The functions taking no parameter accept both GET and POST request.
 
-The `/server-reply` function receives a test data size as a string, and returns result in JSON format:
+The `/server-reply` function receives a test data size as a string, and returns the result in JSON format:
 ```
-
+{
+  "result": {
+    "size": "1024",
+    "result": ""
+  },
+  "measurement": {
+    "process_time": 0.002436617
+  }
+}
 ```
 Valid choices of the test data size are `test`, `small`, and `large`, where the graph sizes are set to `1`, `100`, and `1,000`, respectively.
 
