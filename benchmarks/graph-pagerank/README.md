@@ -12,13 +12,13 @@ This application uses [JGraphT](https://jgrapht.org/) for generating and handlin
 
 ## Preparing Input Data
 
-The input to this application is a nubmer of nodes of a generated graph.
-No input file needs to be prepared.
+The input to this application is a number of nodes of a generated graph.
+No input file is required.
 
 
 ## Building and Running the Application
 
-Build project as described in [the README at the top level](../../README.md) if it has not.
+Build project as described in [the README at the top level](../../README.md) as necessary.
 
 Then, the application can run as a local HTTP server.
 To run the stand-alone Java version:
@@ -63,8 +63,8 @@ curl http://localhost:8080/graph-pagerank \
 generates an undirected graph of 1,000 nodes and computes PageRank scores of the nodes,
 but does not return the scores because `debug` parameter is `false`.
 
-Note that returning the computed scores can take much longer time than generating a graph and
-compuring the scores. Quarks runtime serializes the returned scores into JSON, but this is
+Note that returning the computed scores can take much longer than generating a graph and
+computing the scores. Quarkus runtime serializes the returned scores into JSON, but this is
 a time-consuming process.
 Therefore, skiping returning the scores is recommended for evaluation of performance.
 
