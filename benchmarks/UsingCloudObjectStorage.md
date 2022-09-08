@@ -34,7 +34,7 @@ export QUARKUS_S3_ENDPOINT_OVERRIDE=<EndpointURL>
 benchmarks/<benchName>/target/<benchName>-1.0.0-SNAPSHOT-runner
 ```
 
-The endpoint ULR can also be specified in
+The endpoint URL can also be specified in
 `benchmarks/<benchName>/src/main/resources/application.property`.
 For other configuration parameters, refer to
 [the guide document](https://quarkiverse.github.io/quarkiverse-docs/quarkus-amazon-services/dev/amazon-s3.html#_configuring_s3_clients).
@@ -80,7 +80,7 @@ curl http://<broker-endpoint>:<port>/ \
 ```
 to send a Knative service.
 
-**Note for Knaive services:** the `curl` command simply posts a Cloud Event to the broker and exits,
+**Note for Knative services:** the `curl` command simply posts a Cloud Event to the broker and exits,
 returning the HTTP status code `202 Accepted`.
 (the `-v` option tells `curl` to show the HTTP status code)
 You need to set up a listener for the event returned
