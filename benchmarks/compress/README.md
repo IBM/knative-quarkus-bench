@@ -1,7 +1,7 @@
-To build local jvm jar (from top level)
+To build local a jvm jar file run:
 `mvn clean install`
 
-To run locally with jvm version:
+To run locally with `jvm`:
 ```
 export AWS_ENDPOINT=AppropriateValue
 export AWS_ACCESS_KEY_ID=AppropriateValue
@@ -15,10 +15,10 @@ curl -s --w "\n" -H 'Content-Type:application/json'  -d '{"size":"somevalue", "i
 killall java
 ```
 
-To build the native verison:
+To build the native image run:
 `mvn clean install -Pnative`
 
-To run locally with native version:
+To run the local local native image:
 ```
 export AWS_REGION=AppropriateValue
 export AWS_ENDPOINT=AppropriateValue

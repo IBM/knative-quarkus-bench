@@ -1,8 +1,8 @@
-# Server-reply Project
+u Server-reply Project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+To learn more about Quarkus, please visit  https://quarkus.io/.
 
 ## Packaging and running the application
 
@@ -10,16 +10,16 @@ The application can be packaged using:
 ```shell script
 mvn -Dskiptests clean package
 ```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
+This creates `quarkus-run.jar` in the `target/quarkus-app/` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
 
-The application is now runnable using:
+The application is runnable using:
 ```shell script
 java -jar target/quarkus-app/quarkus-run.jar
 ```
 
-Now the server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
-The functions taking parameters only accept POST request. The functions taking no parameter accept both GET and POST request.
+The server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
+Functions with parameters only accept POST requests. Functions without parameters accept both GET and POST requests.
 
 The `/server-reply` function receives a test data size as a string, and returns the result in JSON format:
 ```
@@ -35,32 +35,32 @@ The `/server-reply` function receives a test data size as a string, and returns 
 ```
 Valid choices of the test data size are `test`, `small`, and `large`, where the graph sizes are set to `1`, `100`, and `1,000`, respectively.
 
-Be careful about quotation marks. In Funqy, post data need to be JSON format. So, a string value in post data needs to have double quotation marks (`"`)
+Be careful with quotation marks. In Funqy, post data needs to be JSON format. So, a string value in post data needs to have double quotation marks (`"`)
 around the data. You may also need another quotation mark or back-slash (`\`) to avoid shell command line interpretation.
 
 ### Building an über-jar
-If you want to build an _über-jar_, execute the following command:
+To build an _über-jar_, execute the following command:
 ```shell script
 mvn package -Dquarkus.package.type=uber-jar
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+The application, packaged as an _über-jar_, is runnable using `java -jar target/*-runner.jar`.
 
 ## Creating a native executable
 
-You can create a native executable using: 
+To build a native executable: 
 ```shell script
 mvn package -Pnative
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
+If GraalVM is not installed, the native executable can be built in a container: 
 ```shell script
 mvn package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/jgrapht-funqy-0.0.1-SNAPSHOT-runner`
+To execute the native image: `./target/server-reply-1.0.0-SNAPSHOT-runner`
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
+To learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
 
 
 ### Sample curl commands for testing

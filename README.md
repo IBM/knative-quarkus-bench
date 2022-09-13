@@ -7,13 +7,13 @@ We ported the individual benchmarks to this environment from those at
 developed by researchers at ETH Z&uuml;rich.
 
 Quarkus is a cloud native Java framework based on modern standard APIs.
-More information about these advanced features is available at https://quarkus.io/.
+See https://quarkus.io/ for more information about Quarkus.
 
 ## Prerequisite
 
 * Java 11 or higher (need JDK to build from source)
 * Maven 3.6.2+ (3.8.1+ is recommended)
-* Docker
+* Docker  (If already using `podman` on RHEL 8 or higher, installing `podman-docker` is a fairly transparant method to provide Docker compatibility.)
 
 
 ## Build Instructions
@@ -57,16 +57,16 @@ For other configuration parameters, refer to
 
 One of the major features of Quarkus is native binary support.
 You can build these microservice benchmarks as native binaries
-by adding `-Pnative` in the Maven command line:
+by adding `-Pnative` to the Maven command line:
 ```shell
 mvn package -Pnative
 ```
 
-The version tag for native executable images is set to `:native`.
+The version tag for native executable images will be set to `:native`.
 
 Building native executables uses
 [GraalVM Native Image](https://www.graalvm.org/22.0/reference-manual/native-image/).
-If `native-image` isn't set up in your environment, Quarkus automatically downloads
+If `native-image` is not acailable in your environment, Quarkus automatically downloads
 a container image of the latest GraalVM with Native Image support and builds the project
 in the container.  We recommend this automated containerized build
 because it automatically uses the latest version of GraalVM, which is updated frequently.
@@ -87,7 +87,7 @@ To run the stand-alone native version:
 benchmarks/<benchname>/target/<benchname>-1.0.0-SNAPSHOT-runner
 ```
 
-The program works as an HTTP server listening to port 8080 and receiving/replying JSON objects.
+The program works as an HTTP server listening to port 8080 that receives and returns JSON objects.
 You can use `curl` command to access the program, specifying the input data as POST data
 in JSON format. For example:
 ```shell
@@ -109,7 +109,7 @@ For more detail about running and configuring a stand-alone program, refer to th
 #### Prerequisites
 
 Knative needs to be installed in your Kubernetes/OpenShift environment.
-If not, the easiest way to install Knative is to use Kubernetes Operator, as described at
+The easiest way to install Knative is to use Kubernetes Operator, as described at
 https://knative.dev/docs/install/operator/knative-with-operators/.
 
 A broker needs to be set up in your namespace.  This is described in
@@ -121,19 +121,19 @@ Knative event services.
 
 #### Preparing Container Images for Uploading to a Container Registry
 
-As described above, this project automatically build container image by using Quarkus
+As described above, this project automatically builds container images by using Quarkus
 [container-image-docker extension](https://quarkus.io/guides/container-image#docker).
 You can specify the host and group names of the image tag by using
 `quarkus.container-image.registry` and `quarkus.container-image.group` configuration
 parameters, respectively.
 
-Following example creates an image that will be pushed to the quay.io registry:
+The following example creates an image that will be pushed to the quay.io registry:
 ```shell
 mvn package -Dquarkus.container-image.registry=quay.io -Dquarkus.container-image.group=mygroup
 ```
 The created container image will be tagged as: `quay.io/mygroup/graph-pagerank:jvm`.
 
-You can push the built image to the registry by using `deploy` goal with setting
+You can push the built image to the registry by using the `deploy` goal and setting
 `quarkus.container-image.push` to `true`:
 ```shell
 mvn deploy -Dquarkus.container-image.push=true
@@ -162,7 +162,7 @@ The Cloud Event specification defines various HTTP headers starting with "Ce-".
 The following table describes the minimum required headers.
 |Header        |Description                     |
 |:------------:|:-------------------------------|
-|Ce-Id         |An unique number                |
+|Ce-Id         |A unique number                 |
 |Ce-Source     |Source of the event (e.g., curl)|
 |Ce-Specversion|Cloud Event Spec version (=1.0) |
 |Ce-Type       |Name of the service             |
@@ -182,6 +182,6 @@ curl http://<broker-endpoint>:<port>/ \
 
 
 Note that the `curl` command simply posts a Cloud Event to the broker and exits, returning the
-HTTP status code `202 Accepted`. (the `-v` option tells `curl` to show the HTTP status code)
+HTTP status code `202 Accepted`. (The `-v` option tells `curl` to show the HTTP status code.)
 You need to set up a listener for the event returned
 from the service if you want to receive the returned value.
