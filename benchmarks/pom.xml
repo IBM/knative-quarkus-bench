@@ -22,10 +22,10 @@
     <module>thumbnailer</module>
     <module>video-processing</module>
     <module>image-recognition</module>
-    <module>graph-pagerank</module>
     <module>graph-mst</module>
     <module>graph-bfs</module>
     <module>dna-visualization</module>
+    <module>graph-pagerank</module>
   </modules>
   <properties>
     <quarkus.container-image.build>true</quarkus.container-image.build>
