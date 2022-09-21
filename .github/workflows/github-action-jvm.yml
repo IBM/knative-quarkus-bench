@@ -17,9 +17,9 @@ jobs:
       - run: echo "${{ github.repository }} repository cloned to runner."
       - name: Build JVM images
         run:
-          cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=IBM
+          cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=${{ github.repository }}
       - run: echo "JVM build status ${{ job.status }}."
       - name: Push the images
         run:
-          cd ${{ github.workspace }} && echo mvn package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=IBM/knative-quarkus-bench -Dquarkus.container-image.push=true
+          cd ${{ github.workspace }} && echo mvn package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=${{ github.repository }} -Dquarkus.container-image.push=true
       - run: echo "Image push status ${{ job.status }}."
