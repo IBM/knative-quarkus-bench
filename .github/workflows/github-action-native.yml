@@ -1,0 +1,21 @@
+name: Build Workflow for Knative Quarkus Bench Native
+on: [push]
+jobs:
+  build-native:
+    runs-on: ubuntu-latest
+    steps:
+      - name: login to github container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "Event ${{ github.event_name }} triggered run on Github ${{ runner.os }} server."
+      - run: echo "Branch ${{ github.ref }} and repo ${{ github.repository }}."
+      - name: Check out repo code
+        uses: actions/checkout@v3
+      - run: echo "${{ github.repository }} repository cloned to runner."
+      - name: Build and push Native images
+        run:
+          cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=IBM/knative-quarkus-bench -Pnative && echo -Dquarkus.container-image.push=true -Pnative
+      - run: echo "Native build and push status ${{ job.status }}."
