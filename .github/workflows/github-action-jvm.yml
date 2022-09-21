@@ -21,5 +21,5 @@ jobs:
       - run: echo "JVM build status ${{ job.status }}."
       - name: Push the images
         run:
-          cd ${{ github.workspace }} && echo mvn package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench -Dquarkus.container-image.push=true
+          cd ${{ github.workspace }} && mvn package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench -Dquarkus.container-image.push=true
       - run: echo "Image push status ${{ job.status }}."
