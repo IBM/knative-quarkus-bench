@@ -15,7 +15,7 @@ Since the image-recognition benchmark attempts to download three input files fro
 2) Upload input files to the bucket:
 - [resnet50.pt](src/main/resources/resnet50.pt)
 - [synset.txt](src/main/resources/synset.txt)
-- JPG files you want to use for the inference. The JPG files we tested are found at https://github.com/spcl/serverless-benchmarks-data/tree/6a17a460f289e166abb47ea6298fb939e80e8beb/400.inference/411.image-recognition/fake-resnet.
+- JPG files for inference processing. The JPG files we tested are found at https://github.com/spcl/serverless-benchmarks-data/tree/6a17a460f289e166abb47ea6298fb939e80e8beb/400.inference/411.image-recognition/fake-resnet.
 
 ## Running the application in dev mode
 

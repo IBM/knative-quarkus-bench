@@ -44,13 +44,13 @@ For other configuration parameters, refer to
 
 ## Copying Input Data to Cloud Object Storage
 
-We used sample input data published by the ETH Z&uuml;rich team for testing many of the benchmarks.
+We used sample input data published by the ETH Z&uuml;rich team to test many of the benchmarks.
 These are available at https://github.com/spcl/serverless-benchmarks-data.git.
 
 
 ## Specifying Object Storage Parameters within a Request
 
-You can specify bucket names and object keys (AKA file names) as POST data in JSON format.
+Bucket names and object keys (AKA file names) are specified as POST data in JSON format.
 
 For example:
 ```shell
