@@ -10,7 +10,7 @@ on:
 jobs:
   build-jvm:
     env:
-      foobar: nothing
+      FOOBAR: nothing
     runs-on: ubuntu-latest
     steps:     
       - uses: actions/checkout@v3
@@ -30,8 +30,14 @@ jobs:
       - name: Check out repo code
         uses: actions/checkout@v3
       - run: echo "${{ github.repository }} repository cloned to runner."
+      - run: echo "FOOBAR is $FOOBAR"
+      - run: echo "FOOBAR is ${FOOBAR}"
       - run: echo "foobar is $foobar"
       - run: echo "foobar is ${foobar}"
+      - run: echo FOOBAR is $FOOBAR
+      - run: echo FOOBAR is ${FOOBAR}
+      - run: echo foobar is $foobar
+      - run: echo foobar is ${foobar}
       - run: export foobar=something
       - run: echo "foobar is $foobar"
       - run: echo "foobar is ${foobar}"
