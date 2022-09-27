@@ -1,5 +1,12 @@
-name: Build Workflow for Knative Quarkus Bench JVM
-on: [push]
+name: JVM Knative Quarkus Bench Workflow
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+      - '*.MD'
+      - '.gitignore'
+      - 'LICENSE'
+      - '.github/workflows/github-action-native.yml'
 jobs:
   build-jvm:
     runs-on: ubuntu-latest
@@ -16,16 +23,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: make sure repository is lowercase
+        run: echo "SAFE_REPO_NAME=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
       - run: echo "Event ${{ github.event_name }} triggered run on Github ${{ runner.os }} server."
-      - run: echo "Branch ${{ github.ref }} and repo ${{ github.repository }}."
+      - run: echo "Branch ${{ github.ref }} and repo ${SAFE_REPO_NAME}."
       - name: Check out repo code
         uses: actions/checkout@v3
       - run: echo "${{ github.repository }} repository cloned to runner."
       - name: Build JVM images
         run:
-          cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench
+          cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=${SAFE_REPO_NAME}
       - run: echo "JVM build status ${{ job.status }}."
       - name: Push the images
         run:
-          cd ${{ github.workspace }} && mvn package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench -Dquarkus.container-image.push=true
+          cd ${{ github.workspace }} && mvn package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=${SAFE_REPO_NAME} -Dquarkus.container-image.push=true
       - run: echo "Image push status ${{ job.status }}."
