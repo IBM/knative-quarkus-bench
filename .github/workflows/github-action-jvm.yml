@@ -23,13 +23,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: make sure repository is lowercase
+        run: echo "SAFE_REPO_NAME=${{ github.repository }}" >>${GITHUB_ENV}
       - run: echo "Event ${{ github.event_name }} triggered run on Github ${{ runner.os }} server."
-      - run: echo "Branch ${{ github.ref }} and repo ${{ github.repository }}."
+      - run: echo "Branch ${{ github.ref }} and repo ${SAFE_REPO_NAME}."
       - name: Check out repo code
         uses: actions/checkout@v3
       - run: echo "${{ github.repository }} repository cloned to runner."
-      - run: env.foobar=somevalue
-      - run: echo "env.foobar is ${{env.foobar}}"
       - name: Build JVM images
         run:
           cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench
