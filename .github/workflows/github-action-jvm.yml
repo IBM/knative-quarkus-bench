@@ -6,8 +6,11 @@ on:
       - '*.MD'
       - '.gitignore'
       - 'LICENSE'
+      - '.github/workflows/github-action-native.yml'
 jobs:
   build-jvm:
+    env:
+      foobar: nothing
     runs-on: ubuntu-latest
     steps:     
       - uses: actions/checkout@v3
@@ -27,8 +30,13 @@ jobs:
       - name: Check out repo code
         uses: actions/checkout@v3
       - run: echo "${{ github.repository }} repository cloned to runner."
+      - run: echo "foobar is $foobar"
+      - run: echo "foobar is ${foobar}"
+      - run: echo "foobar is ${{foobar}}"
       - run: export foobar=something
-      - run: echo foobar is ${foobar}
+      - run: echo "foobar is $foobar"
+      - run: echo "foobar is ${foobar}"
+      - run: echo "foobar is ${{foobar}}"
       - name: Build JVM images
         run:
           cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench

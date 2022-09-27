@@ -6,6 +6,7 @@ on:
       - '*.MD'
       - '.gitignore'
       - 'LICENSE'
+      - '.github/workflows/github-action-jvm.yml'
 jobs:
   build-native:
     runs-on: ubuntu-latest
