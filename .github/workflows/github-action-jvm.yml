@@ -9,8 +9,6 @@ on:
       - '.github/workflows/github-action-native.yml'
 jobs:
   build-jvm:
-    env:
-      FOOBAR: nothingCAPS
     runs-on: ubuntu-latest
     steps:     
       - uses: actions/checkout@v3
@@ -30,20 +28,8 @@ jobs:
       - name: Check out repo code
         uses: actions/checkout@v3
       - run: echo "${{ github.repository }} repository cloned to runner."
-      - run: echo "FOOBAR is $FOOBAR"
-      - run: echo "FOOBAR is ${FOOBAR}"
-      - run: echo "foobar is $foobar"
-      - run: echo "foobar is ${foobar}"
-      - run: echo FOOBAR is $FOOBAR
-      - run: echo FOOBAR is ${FOOBAR}
-      - run: echo foobar is $foobar
-      - run: echo foobar is ${foobar}
-      - run: export foobar=something
-      - run: echo "foobar is $foobar"
-      - run: echo "foobar is ${foobar}"
-      - run: export FOOBAR=something
-      - run: echo "FOOBAR is $FOOBAR"
-      - run: echo "FOOBAR is ${FOOBAR}"
+      - run: env.foobar=somevalue
+      - run: echo "env.foobar is ${{env.foobar}}"
       - name: Build JVM images
         run:
           cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench
