@@ -21,11 +21,12 @@
 # docker run -i --rm -p 8080:8080 -p 5005:5005 -e JAVA_ENABLE_DEBUG="true" quarkus/knative-quarkus-bench-jvm
 #
 ###
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ARG JAVA_PACKAGE=openjdk-17-jdk
 ARG RUN_JAVA_VERSION=1.3.8
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
+ENV DEBIAN_FRONTEND=noninteractive
 # Install java and the run-java script
 # Also set up permissions for user `1001`
 RUN apt --yes update \
