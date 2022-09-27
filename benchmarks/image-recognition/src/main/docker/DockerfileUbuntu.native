@@ -14,8 +14,9 @@
 # docker run -i --rm -p 8080:8080 quarkus/knative-quarkus-bench
 #
 ###
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 WORKDIR /work/
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt --yes update \
     && apt --yes install python3 python3-pip python3-requests ffmpeg netcat fontconfig \
     && pip3 install jinja2 \
