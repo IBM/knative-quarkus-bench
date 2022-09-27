@@ -1,4 +1,4 @@
-name: Build Workflow for Knative Quarkus Bench Native
+name: Native Workflow for Knative Quarkus Bench
 on:
   push:
     paths-ignore:
@@ -6,7 +6,6 @@ on:
       - '*.MD'
       - '.gitignore'
       - 'LICENSE'
-      - 'workflows/github-action-*.yml'
 jobs:
   build-native:
     runs-on: ubuntu-latest

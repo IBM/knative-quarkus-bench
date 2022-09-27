@@ -1,4 +1,4 @@
-name: Build Workflow for Knative Quarkus Bench JVM
+name: JVM Workflow for Knative Quarkus Bench
 on:
   push:
     paths-ignore:
@@ -6,7 +6,6 @@ on:
       - '*.MD'
       - '.gitignore'
       - 'LICENSE'
-      - 'workflows/github-action-*.yml'
 jobs:
   build-jvm:
     runs-on: ubuntu-latest
@@ -28,6 +27,8 @@ jobs:
       - name: Check out repo code
         uses: actions/checkout@v3
       - run: echo "${{ github.repository }} repository cloned to runner."
+      - run |
+          env
       - name: Build JVM images
         run:
           cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench
