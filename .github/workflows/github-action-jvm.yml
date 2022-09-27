@@ -10,7 +10,8 @@ on:
 jobs:
   build-jvm:
     env:
-      FOOBAR: nothing
+      FOOBAR: nothingCAPS
+      foobar: nothinglower
     runs-on: ubuntu-latest
     steps:     
       - uses: actions/checkout@v3
@@ -41,6 +42,9 @@ jobs:
       - run: export foobar=something
       - run: echo "foobar is $foobar"
       - run: echo "foobar is ${foobar}"
+      - run: export FOOBAR=something
+      - run: echo "FOOBAR is $FOOBAR"
+      - run: echo "FOOBAR is ${FOOBAR}"
       - name: Build JVM images
         run:
           cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench
