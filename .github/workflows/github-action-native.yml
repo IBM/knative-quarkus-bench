@@ -1,4 +1,4 @@
-name: Native Workflow for Knative Quarkus Bench
+name: Native Knative Quarkus Bench Workflow
 on:
   push:
     paths-ignore:

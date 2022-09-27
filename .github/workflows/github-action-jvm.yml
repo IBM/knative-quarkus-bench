@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 name: JVM Workflow for Knative Quarkus Bench
+=======
+name: JVM Knative Quarkus Bench Workflow
+>>>>>>> upstream/main
 on:
   push:
     paths-ignore:
