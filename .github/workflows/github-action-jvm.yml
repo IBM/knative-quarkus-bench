@@ -27,8 +27,7 @@ jobs:
       - name: Check out repo code
         uses: actions/checkout@v3
       - run: echo "${{ github.repository }} repository cloned to runner."
-      - run |
-          env
+      - run: env
       - name: Build JVM images
         run:
           cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=ibm/knative-quarkus-bench
