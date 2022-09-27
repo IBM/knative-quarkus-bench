@@ -11,7 +11,7 @@ See https://quarkus.io/ for more information about Quarkus.
 
 ## Prerequisite
 
-* Java 11 or higher (need JDK to build from source)
+* Java 17 or higher (need JDK to build from source)
 * Maven 3.6.2+ (3.8.1+ is recommended)
 * Docker  (If already using `podman` on RHEL 8 or higher, installing `podman-docker` is a fairly transparant method to provide Docker compatibility.)
 
