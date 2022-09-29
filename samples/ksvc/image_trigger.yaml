@@ -1,0 +1,15 @@
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: image-recognition-trigger
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: image-recognition
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: image-recognition

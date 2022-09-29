@@ -1,0 +1,16 @@
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: graph-pagerank-trigger
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: graph-pagerank
+      source: curl
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: graph-pagerank
