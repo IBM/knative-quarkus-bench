@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -179,7 +180,7 @@ public class DnaVis {
 
     void cleanupAfterException(RetValType retVal, Logger log, Exception e, File inFile, File outFile) {
         retVal.result.put("message", e.toString());
-        log.info(e.getStackTrace());
+        log.info(Arrays.toString(e.getStackTrace()).replace(", ", "\n    "));
         cleanFiles(log, inFile, outFile);
     }
 
@@ -190,7 +191,7 @@ public class DnaVis {
                     Files.delete(file.toPath());
                 }
             } catch (Exception e) {
-                log.info(e.getStackTrace());
+                log.info(Arrays.toString(e.getStackTrace()).replace(", ", "\n    "));
             }
         }
     }
