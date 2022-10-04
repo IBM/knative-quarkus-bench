@@ -105,6 +105,7 @@ public class VideoProcessing {
         int duration = input.getDuration();
         String op = input.getOp();
         String download_path = String.format("%s", key);
+        boolean debug = Boolean.parseBoolean(input.debug);
 	if (input.getInput_bucket() != null) {
             input_bucket = input.getInput_bucket();
 	}
@@ -114,24 +115,34 @@ public class VideoProcessing {
 
         long download_begin = System.nanoTime();
         download(input_bucket, key, download_path);
-        long download_size = Files.size(new File(download_path).toPath());
         long download_stop = System.nanoTime();
+        long download_size = Files.size(new File(download_path).toPath());
 
         long process_begin = System.nanoTime();
         String upload_path = operations.get(op).apply(download_path, duration);
         long process_end = System.nanoTime();
 
-        long upload_begin = System.nanoTime();
-        File f1 = new File(upload_path);
-        File f = new File(key);
-        String out_key = ((f.getParent() != null)? f.getParent() + "/" : "") + f1.getName();
-        long upload_size = Files.size(new File(upload_path).toPath());
-        upload(output_bucket, out_key, upload_path);
-        long upload_stop = System.nanoTime();
+        String out_key = "";
+        long output_size  = 0L;
+        long upload_begin = 0L;
+        long upload_stop  = 0L;
+
+        if(upload_path != null) {
+            File output_file = new File(upload_path);
+            output_size = Files.size(output_file.toPath());
+
+            if(debug) {
+                File f = new File(key);
+                out_key = ((f.getParent() != null)? f.getParent() + "/" : "") + output_file.getName();
+                upload_begin = System.nanoTime();
+                upload(output_bucket, out_key, upload_path);
+                upload_stop = System.nanoTime();
+            }
+        }
 
         long download_time = (download_stop - download_begin)/1000;
-        long upload_time = (upload_stop - upload_begin)/1000;
-        long process_time = (process_end - process_begin)/1000;
+        long process_time  = (process_end   - process_begin)/1000;
+        long upload_time   = (upload_stop   - upload_begin)/1000;
 
         RetValType retVal = new RetValType();
         retVal.result = Map.of(     "bucket", output_bucket,
@@ -139,7 +150,7 @@ public class VideoProcessing {
         retVal.measurement = Map.of("download_time", download_time,
                                     "download_size", download_size,
                                     "upload_time", upload_time,
-                                    "upload_size", upload_size,
+                                    "output_size", output_size,
                                     "compute_time", process_time);
         
         log.info("retVal.measurement="+retVal.measurement.toString());
@@ -172,6 +183,7 @@ public class VideoProcessing {
         private String op;
 	private String input_bucket;
 	private String output_bucket;
+        public  String debug;
 
         public int getHeight() {
             return height;
