@@ -51,6 +51,7 @@ public class Thumbnailer {
         String key = input.getObjectKey().replaceAll(" ", "+");
         int width = object_width;
         int height = object_height;
+        boolean debug = Boolean.parseBoolean(input.debug);
         if (input.getInput_bucket() != null) {
             input_bucket = input.getInput_bucket();
         }
@@ -70,10 +71,14 @@ public class Thumbnailer {
         long process_end = System.nanoTime();
 
         long upload_begin = System.nanoTime();
+        long upload_end   = upload_begin;
         File f = new File(key);
         String[] out_key = new String[] {f.getParent(), "resized-" + f.getName()};
-        String key_name = upload_stream(output_bucket, out_key, resized);
-        long upload_end = System.nanoTime();
+        String key_name = "";
+        if(debug) {
+            key_name = upload_stream(output_bucket, out_key, resized);
+            upload_end = System.nanoTime();
+        }
 
         long download_time = (download_end - download_begin)/1000;
         long upload_time = (upload_end - upload_begin)/1000;
@@ -124,6 +129,7 @@ public class Thumbnailer {
         private String objectKey;
         private String input_bucket;
         private String output_bucket;
+        public  String debug;
 
         public int getHeight() {
             return height;
