@@ -95,6 +95,7 @@ public class DynamicHtml {
 
     @Funq
     public RetValType dynamicHtml(FunInput input) throws Exception {
+        boolean debug = Boolean.parseBoolean(input.debug);
         var retVal = new RetValType();
 	Random rand = new Random();
 
@@ -134,6 +135,10 @@ public class DynamicHtml {
         retVal.result.put("rendered_Length",    Long.toString(renderedTemplate.length()));
         retVal.measurement.put("run_time",  runTime);
 
+        if(debug) {
+            retVal.result.put("rendered_HTML", renderedTemplate);
+        }
+
         log.info("retVal.measurement="+retVal.measurement.toString());
         return (retVal);
     }
@@ -142,7 +147,8 @@ public class DynamicHtml {
 //        public String bucket_name;
 //        public String input_key;
 //        public String output_key;
-	public String size;
+        public String size;
+        public String debug;
     }
 
     public static class RetValType {
