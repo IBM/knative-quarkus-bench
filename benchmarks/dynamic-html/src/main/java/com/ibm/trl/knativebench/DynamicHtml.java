@@ -93,7 +93,7 @@ public class DynamicHtml {
         log = Logger.getLogger(DynamicHtml.class);
     }
 
-    @Funq
+    @Funq("dynamic-html")
     public RetValType dynamicHtml(FunInput input) throws Exception {
         boolean debug = Boolean.parseBoolean(input.debug);
         var retVal = new RetValType();
@@ -112,28 +112,42 @@ public class DynamicHtml {
 
         long startTime = System.nanoTime();
 
+        long initStart = System.nanoTime();
 	Jinjava jinjava = new Jinjava();
+        long initEnd = System.nanoTime();
 	HashMap<String, Object> context = new HashMap<String, Object>();
 
+        long setupStart = System.nanoTime();
 	List<Integer> integers = new ArrayList<>(loadSize);
 	for (int i = 0; i < loadSize; i++) {
 		integers.add(Integer.valueOf(rand.nextInt(1000000)));
 	}
+        long setupEnd = System.nanoTime();
 
 	context.put("username", "testname");
 	context.put("random_numbers", integers);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 	context.put("cur_time", timestamp.toString());
 
+        long renderStart = System.nanoTime();
 	String renderedTemplate = jinjava.render(template, context);
-        long stopTime = System.nanoTime();
+        long renderEnd = System.nanoTime();
+        long stopTime = renderEnd;
 
-	double runTime = (stopTime - startTime)/1000000000.0;
+        double initTime   = (initEnd   - initStart)/1000000000.0;
+        double setupTime  = (setupEnd  - setupStart)/1000000000.0;
+        double renderTime = (renderEnd - renderStart)/1000000000.0;
+        double runTime    = (stopTime  - startTime)/1000000000.0;
 
-        retVal.result.put("input_size",    key);
-        retVal.result.put("converted_size",    Integer.toString(loadSize));
-        retVal.result.put("rendered_Length",    Long.toString(renderedTemplate.length()));
-        retVal.measurement.put("run_time",  runTime);
+        retVal.result.put("input_size",      key);
+        retVal.result.put("converted_size",  Integer.toString(loadSize));
+        retVal.result.put("rendered_Length", Long.toString(renderedTemplate.length()));
+        retVal.measurement.put("total_run_time", runTime);
+        retVal.measurement.put("init_time",      initTime);
+        retVal.measurement.put("setup_time",     setupTime);
+        retVal.measurement.put("render_time",    renderTime);
+        retVal.measurement.put("input_size",     (double)loadSize);
+        retVal.measurement.put("render_size",    (double)(renderedTemplate.length()));
 
         if(debug) {
             retVal.result.put("rendered_HTML", renderedTemplate);
