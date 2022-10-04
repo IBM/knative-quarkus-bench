@@ -1,0 +1,47 @@
+---
+kind: Service
+apiVersion: serving.knative.dev/v1
+metadata:
+  name: dna-visualization
+spec:
+  template:
+    matedata:
+      annotations:
+        autoscaling.knative.dev/scale-to-zero-pod-retention-period: 5m
+    spec:
+      containers:
+        - image: ghcr.io/ibm/knative-quarkus-bench/dna-visualization:jvm
+          name: benchmark
+          env:
+            - name: TYPE
+              value: dna-visualization
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cos
+                  key: keyId
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cos
+                  key: secretKey
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-endpoint
+                  key: region
+            - name: AWS_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-endpoint
+                  key: endpoint
+            - name: QUARKUS_S3_ENDPOINT_OVERRIDE
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-endpoint
+                  key: endpoint
+            - name: JAVA_OPTS_APPEND
+              valueFrom:
+                configMapKeyRef:
+                  name: java-env
+                  key: JAVA_OPTIONS

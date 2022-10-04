@@ -1,0 +1,47 @@
+---
+kind: Service
+apiVersion: serving.knative.dev/v1
+metadata:
+  name: video-processing
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/scale-to-zero-pod-retention-period: "59m"
+    spec:
+      containers:
+        - image: ghcr.io/ibm/knative-quarkus-bench/video-processing:jvm
+          name: benchmark
+          env:
+            - name: TYPE
+              value: video-processing
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cos
+                  key: keyId
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cos
+                  key: secretKey
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-endpoint
+                  key: region
+            - name: QUARKUS_S3_ENDPOINT_OVERRIDE
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-endpoint
+                  key: endpoint
+            - name: AWS_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-endpoint
+                  key: endpoint
+            - name: JAVA_OPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: video-java-env
+                  key: JAVA_OPTIONS
