@@ -114,7 +114,7 @@ public class DynamicHtml {
 	Jinjava jinjava = new Jinjava();
 	HashMap<String, Object> context = new HashMap<String, Object>();
 
-	List<Integer> integers = new ArrayList<>();
+	List<Integer> integers = new ArrayList<>(loadSize);
 	for (int i = 0; i < loadSize; i++) {
 		integers.add(Integer.valueOf(rand.nextInt(1000000)));
 	}
