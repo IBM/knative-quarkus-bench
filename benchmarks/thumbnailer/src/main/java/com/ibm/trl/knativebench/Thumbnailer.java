@@ -80,18 +80,18 @@ public class Thumbnailer {
             upload_end = System.nanoTime();
         }
 
-        long download_time = (download_end - download_begin)/1000;
-        long upload_time = (upload_end - upload_begin)/1000;
-        long process_time = (process_end - process_begin)/1000;
+        double download_time = (download_end - download_begin)/1000_000_000.0;
+        double upload_time   = (upload_end - upload_begin)/1000_000_000.0;
+        double process_time   = (process_end - process_begin)/1000_000_000.0;
 
         RetValType retVal = new RetValType();
         retVal.result = Map.of(     "bucket", output_bucket,
                                     "key", key_name);
-        retVal.measurement = Map.of("download_time", download_time,
-                                    "download_size", image_size,
-                                    "upload_time", upload_time,
-                                    "upload_size", resized_size,
-                                    "compute_time", process_time);
+        retVal.measurement = Map.of("download_time", Double.valueOf(download_time),
+                                    "download_size", Double.valueOf(image_size),
+                                    "upload_time",   Double.valueOf(upload_time),
+                                    "upload_size",   Double.valueOf(resized_size),
+                                    "compute_time",  Double.valueOf(process_time));
         log.info("retVal.measurement="+retVal.measurement.toString());
 
         return retVal;
@@ -175,7 +175,7 @@ public class Thumbnailer {
     
     public static class RetValType {
         Map<String, String> result;
-        Map<String, Long> measurement;
+        Map<String, Double> measurement;
 
         public Map<String, String> getResult() {
             return result;
@@ -185,11 +185,11 @@ public class Thumbnailer {
             this.result = result;
         }
 
-        public Map<String, Long> getMeasurement() {
+        public Map<String, Double> getMeasurement() {
             return measurement;
         }
 
-        public void setMeasurement(Map<String, Long> measurement) {
+        public void setMeasurement(Map<String, Double> measurement) {
             this.measurement = measurement;
         }
     }
