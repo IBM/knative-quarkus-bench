@@ -3,11 +3,14 @@ package com.ibm.trl.knativebench;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.function.BiFunction;
 import java.util.HashMap;
 import java.util.Map;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import javax.inject.Inject;
 
@@ -17,6 +20,7 @@ import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
+import org.apache.commons.io.IOExceptionList;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -67,9 +71,39 @@ public class VideoProcessing {
         return output;
     };
 
+    static Path watermarkPath = Path.of("/tmp/watermark.png");
+    private String getWatermark() {
+    	if(Files.exists(watermarkPath)) {
+    		return watermarkPath.toString();
+    	}
+
+    	Path tmpPath = null;
+    	try(InputStream res = getClass().getResourceAsStream("/watermark.png")) {
+    		tmpPath = Files.createTempFile(Path.of("/tmp"), "watermark", ".png");
+    		Files.copy(res, tmpPath, StandardCopyOption.REPLACE_EXISTING);
+    		if(!Files.exists(watermarkPath)) {
+    			Files.copy(tmpPath, watermarkPath, StandardCopyOption.REPLACE_EXISTING);
+    		}
+    		Files.delete(tmpPath);
+
+    		return watermarkPath.toString();
+
+    	} catch(IOException e) {
+    		e.printStackTrace();
+    		if(tmpPath != null && Files.exists(tmpPath)) {
+    			try {
+    				Files.delete(tmpPath);
+    			} catch(IOException e2) {
+    				e2.printStackTrace();
+    			}
+    		}
+    	}
+    	return null;
+    }
+
     BiFunction<String, Integer, String> watermark = (video, duration) -> {
         String output = String.format("/tmp/processed-%s.gif", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')));
-        String watermark_file = "src/main/resources/watermark.png";
+        String watermark_file = getWatermark();
         FFmpeg ffmpeg = null;
         FFprobe ffprobe = null;
         try {
