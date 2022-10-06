@@ -29,7 +29,6 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 # Install java and the run-java script
 # Also set up permissions for user `1001`
 RUN microdnf --disablerepo='*' --enablerepo='ubi-8-*' install python3 python3-requests curl ca-certificates freetype fontconfig nc ${JAVA_PACKAGE} \
-    && pip3 install jinja2 \
     && microdnf --disablerepo='*' --enablerepo='ubi-8-*' update \
     && microdnf --disablerepo='*' --enablerepo='ubi-8-*' clean all \
     && mkdir /deployments \

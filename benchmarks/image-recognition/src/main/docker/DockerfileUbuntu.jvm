@@ -30,8 +30,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install java and the run-java script
 # Also set up permissions for user `1001`
 RUN apt --yes update \
-    && apt --yes install python3 python3-pip python3-requests curl ffmpeg netcat ca-certificates-java ca-certificates fontconfig ${JAVA_PACKAGE} \
-    && pip3 install jinja2 \
+    && apt --yes install python3 python3-pip python3-requests curl netcat ca-certificates-java ca-certificates fontconfig ${JAVA_PACKAGE} \
     && mkdir /deployments \
     && chown 1001 /deployments \
     && chmod "g+rwX" /deployments \
