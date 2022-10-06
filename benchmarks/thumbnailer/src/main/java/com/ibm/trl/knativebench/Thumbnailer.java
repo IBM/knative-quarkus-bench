@@ -41,6 +41,7 @@ public class Thumbnailer {
     public BufferedImage resize_image(BufferedImage bimg, int w, int h) throws IOException {
         Image thumbnail = bimg.getScaledInstance(w, h, Image.SCALE_DEFAULT);
         BufferedImage ret_image = new BufferedImage(thumbnail.getWidth(null), thumbnail.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        ret_image.createGraphics().drawImage(thumbnail, null, null);
         return ret_image;
     }
     
