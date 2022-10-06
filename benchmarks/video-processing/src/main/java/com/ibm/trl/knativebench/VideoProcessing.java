@@ -62,7 +62,9 @@ public class VideoProcessing {
                 .setInput(video)
                 .overrideOutputFiles(true)
                 .addOutput(output)
-                .setFormat("mp4")
+                .setFormat("gif")
+                .setVideoFrameRate(10, 1)
+                .setVideoResolution(320, 240)
                 .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);        
@@ -102,7 +104,7 @@ public class VideoProcessing {
     }
 
     BiFunction<String, Integer, String> watermark = (video, duration) -> {
-        String output = String.format("/tmp/processed-%s.gif", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')));
+        String output = String.format("processed-%s.mp4", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')));
         String watermark_file = getWatermark();
         FFmpeg ffmpeg = null;
         FFprobe ffprobe = null;
@@ -117,6 +119,7 @@ public class VideoProcessing {
                 .setInput(video)
                 .addInput(watermark_file)
                 .overrideOutputFiles(true)
+                .setComplexFilter("overlay=main_w/2-overlay_w/2:main_h/2-overlay_h/2")
                 .addOutput(output)
                 .setFormat("mp4")
                 .done();
