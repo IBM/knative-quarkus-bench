@@ -95,20 +95,23 @@ public class DynamicHtml {
 
     @Funq("dynamic-html")
     public RetValType dynamicHtml(FunInput input) throws Exception {
-        boolean debug = Boolean.parseBoolean(input.debug);
         var retVal = new RetValType();
 	Random rand = new Random();
 
 	String key = "1";
+        boolean debug = false;
         if (input != null) {
             if (input.size != null)
                 key = input.size;
+            if (input.debug != null)
+		debug = Boolean.parseBoolean(input.debug);
         }
 
 	int loadSize = inputSize(key);
 
-
-//        System.out.println("Starting DynamicHtml: "+key);
+        if (debug) {
+		System.out.println("Starting DynamicHtml: "+key);
+        }
 
         long startTime = System.nanoTime();
 
@@ -149,7 +152,7 @@ public class DynamicHtml {
         retVal.measurement.put("input_size",     (double)loadSize);
         retVal.measurement.put("render_size",    (double)(renderedTemplate.length()));
 
-        if(debug) {
+        if (debug) {
             retVal.result.put("rendered_HTML", renderedTemplate);
         }
 
@@ -158,9 +161,6 @@ public class DynamicHtml {
     }
 
     public static class FunInput {
-//        public String bucket_name;
-//        public String input_key;
-//        public String output_key;
         public String size;
         public String debug;
     }
