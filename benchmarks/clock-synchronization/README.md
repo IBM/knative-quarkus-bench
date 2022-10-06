@@ -59,7 +59,7 @@ If GraalVM is not installed, the the native executable can be built in a contain
 mvn package -Pnative -Dquarkus.native.container-build=true
 ```
 
-The native image can be executed with: `./target/clock-synchronization-1.0.0-SNAPSHOT.jar`
+The native image can be executed with: `./target/clock-synchronization-1.0.0-SNAPSHOT.runner`
 
 To learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
 

@@ -79,6 +79,6 @@ If GraalVM is not installed, a native executable can be built in a container usi
 mvn package -Pnative -Dquarkus.native.container-build=true
 ```
 
-To execute the native executable: `./target/image-recognition-1.0.0-SNAPSHOT.jar`
+To execute the native executable: `./target/image-recognition-1.0.0-SNAPSHOT.runner`
 
 To learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.

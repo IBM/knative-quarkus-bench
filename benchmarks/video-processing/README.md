@@ -79,6 +79,6 @@ If GraalVM is not installed, build the native executable in a container using:
 mvn package -Pnative -Dquarkus.native.container-build=true
 ```
 
-Run the native executable with: `./target/video-processing-1.0.0-SNAPSHOT.jar`
+Run the native executable with: `./target/video-processing-1.0.0-SNAPSHOT.runner`
 
 To learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.

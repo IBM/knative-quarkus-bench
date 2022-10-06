@@ -54,7 +54,7 @@ Bucket names and object keys (AKA file names) are specified as POST data in JSON
 
 For example:
 ```shell
-curl http://localhost:8080/thmbnailer \
+curl http://localhost:8080/thumbnailer \
      -X POST \
      -H 'Content-Type: application/json' \
      -d '{ "input_bucket": "inBucket", \

@@ -59,8 +59,8 @@ For example:
 curl http://localhost:8080/dna-visualization \
      -X POST \
      -H 'Content-Type: application/json' \
-     -d '{"input_buket":"MyInputBucket", \
-          "output_buket":"MyOutputBucket", \
+     -d '{"input_bucket":"MyInputBucket", \
+          "output_bucket":"MyOutputBucket", \
           "key":"FASTAfiles/NewSequence.fasta"}
 ```
 downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket `MyInputBucket`,
@@ -81,8 +81,8 @@ curl http://<broker-endpoint>:<port>/ \
      -H 'Ce-Specversion: 1.0' \
      -H 'Ce-Type: dna-visualization' \
      -H 'Content-Type: application/json' \
-     -d '{"input_buket":"MyInputBucket", \
-          "output_buket":"MyOutputBucket", \
+     -d '{"input_bucket":"MyInputBucket", \
+          "output_bucket":"MyOutputBucket", \
           "key":"FASTAfiles/NewSequence.fasta", \
           "debug":"true"}'
 ```

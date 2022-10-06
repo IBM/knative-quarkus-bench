@@ -42,7 +42,7 @@ This application receives the following parameters from POST data in JSON format
 |size         |Number of nodes of a generated graph    | N |    10 | N |
 |debug        |Flag if visited node list is printed out| N | false | N |
 
-&starf; Although both `size` and `debug` can be ommitted, an object still must still be sent
+&starf; Although both `size` and `debug` can be omitted, an object still must still be sent
 as a POST data, e.g. `-d '{}'`.
 
 The `size` parameter can be __an integer__ or __*a data size name*__ as listed below:

@@ -1,16 +1,16 @@
 # knative-quarkus-bench dynamic-html benchmark
 
 The dynamic-html benchmark uses the [jinjava library](https://github.com/HubSpot/jinjava)
-to dynamically create html using a template and randomly generated data.
+to dynamically create html using a template and generated data.
 
 Although details on building and using benchmarks in this project are described in
 [the project documentation](../../README.md), the following show several specific examples
 as a brief introduction:
 
-To build a standalone jvm jar:
+To build a jvm jar:
 `mvn clean install`
 
-To run this standalone `jvm` jar, first start the application:
+To run this `jvm` jar locally, first start the application:
 ```
 java -jar target/quarkus-app/quarkus-run.jar
 ```
