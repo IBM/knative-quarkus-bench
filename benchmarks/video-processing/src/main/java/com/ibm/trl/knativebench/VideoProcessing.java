@@ -62,7 +62,9 @@ public class VideoProcessing {
                 .setInput(video)
                 .overrideOutputFiles(true)
                 .addOutput(output)
-                .setFormat("mp4")
+                .setFormat("gif")
+                .setVideoFrameRate(10, 1)
+                .setVideoResolution(320, 240)
                 .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);        
