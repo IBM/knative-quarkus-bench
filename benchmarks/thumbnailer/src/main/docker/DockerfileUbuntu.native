@@ -19,7 +19,6 @@ WORKDIR /work/
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt --yes update \
     && apt --yes install python3 python3-pip python3-requests ffmpeg netcat fontconfig \
-    && pip3 install jinja2 \
     && chown 1001 /work \
     && chmod "g+rwX" /work \
     && chown 1001:root /work \

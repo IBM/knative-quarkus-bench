@@ -17,7 +17,6 @@
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.6
 WORKDIR /work/
 RUN microdnf --disablerepo='*' --enablerepo='ubi-8-*' install python3 python3-requests freetype nc fontconfig \
-    && pip3 install jinja2 \
     && microdnf --disablerepo='*' --enablerepo='ubi-8-*' clean all \
     && chown 1001 /work \
     && chmod "g+rwX" /work \

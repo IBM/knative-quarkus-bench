@@ -30,7 +30,6 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 # Also set up permissions for user `1001`
 RUN apt --yes update \
     && apt --yes install python3 python3-pip python3-requests curl ffmpeg netcat ca-certificates-java ca-certificates fontconfig ${JAVA_PACKAGE} \
-    && pip3 install jinja2 \
     && mkdir /deployments \
     && chown 1001 /deployments \
     && chmod "g+rwX" /deployments \
