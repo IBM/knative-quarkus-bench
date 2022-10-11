@@ -123,6 +123,7 @@ public class ImageRecognition {
             Predictor<Image, Classifications> predictor = model.newPredictor();
             String tokens = predictor.predict(img).best().getClassName();
             ret = tokens.substring(tokens.indexOf(' ') + 1);
+            model.getNDManager().close();
         } catch (ModelNotFoundException e) {
             e.printStackTrace();
         } catch (MalformedModelException e) {
