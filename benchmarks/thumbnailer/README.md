@@ -55,5 +55,4 @@ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png"
 ```
 ## Customizing the Default Value of Input Parameters
 
-This application takes all input parameters from the POST data, and there are no parameters
-that can be customized via environment variables or `application.properties`.
+Some parameters can be customized via environment variables or `application.properties`.
