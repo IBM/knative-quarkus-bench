@@ -47,6 +47,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 
 public class ImageRecognition {
+    private static final double nanosecInSec = 1_000_000_000.0;
+
     @Inject
     S3Client s3;
     @Inject
@@ -132,11 +134,11 @@ public class ImageRecognition {
         }
         long process_end = System.nanoTime();
 
-        long image_download_time = (image_download_end - image_download_begin)/1000;
-        long model_download_time = (model_download_end - model_download_begin) / 1000;
-        long synset_download_time = (synset_download_end - synset_download_begin) / 1000;
-        long model_process_time = (model_process_end - model_process_begin)/1000;
-        long process_time = (process_end - process_begin)/1000;
+        double image_download_time = (image_download_end - image_download_begin)/nanosecInSec;
+        double model_download_time = (model_download_end - model_download_begin) / nanosecInSec;
+        double synset_download_time = (synset_download_end - synset_download_begin) / nanosecInSec;
+        double model_process_time = (model_process_end - model_process_begin)/nanosecInSec;
+        double process_time = (process_end - process_begin)/nanosecInSec;
 
         RetValType retVal = new RetValType();
         retVal.result = Map.of(     "class", ret);
@@ -205,7 +207,7 @@ public class ImageRecognition {
 
     public static class RetValType {
         Map<String, String> result;
-        Map<String, Long> measurement;
+        Map<String, Double> measurement;
 
         public Map<String, String> getResult() {
             return result;
@@ -215,16 +217,16 @@ public class ImageRecognition {
             this.result = result;
         }
 
-        public Map<String, Long> getMeasurement() {
+        public Map<String, Double> getMeasurement() {
             return measurement;
         }
 
-        public void setMeasurement(Map<String, Long> measurement) {
+        public void setMeasurement(Map<String, Double> measurement) {
             this.measurement = measurement;
         }
 
         RetValType() {
-            measurement = new HashMap<String, Long>();
+            measurement = new HashMap<String, Double>();
         }
     }
 }
