@@ -33,6 +33,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 
 public class VideoProcessing {
+    private static final double nanosecInSec = 1_000_000_000.0;
+
     @Inject
     S3Client s3;
     @Inject
@@ -153,14 +155,14 @@ public class VideoProcessing {
         long download_begin = System.nanoTime();
         download(input_bucket, key, download_path);
         long download_stop = System.nanoTime();
-        long download_size = Files.size(new File(download_path).toPath());
+        double download_size = Files.size(new File(download_path).toPath());
 
         long process_begin = System.nanoTime();
         String upload_path = operations.get(op).apply(download_path, duration);
         long process_end = System.nanoTime();
 
         String out_key = "";
-        long output_size  = 0L;
+        double output_size  = 0d;
         long upload_begin = 0L;
         long upload_stop  = 0L;
 
@@ -177,9 +179,9 @@ public class VideoProcessing {
             }
         }
 
-        long download_time = (download_stop - download_begin)/1000;
-        long process_time  = (process_end   - process_begin)/1000;
-        long upload_time   = (upload_stop   - upload_begin)/1000;
+        double download_time = (download_stop - download_begin)/nanosecInSec;
+        double process_time  = (process_end   - process_begin)/nanosecInSec;
+        double upload_time   = (upload_stop   - upload_begin)/nanosecInSec;
 
         RetValType retVal = new RetValType();
         retVal.result = Map.of(     "bucket", output_bucket,
@@ -281,7 +283,7 @@ public class VideoProcessing {
 
     public static class RetValType {
         Map<String, String> result;
-        Map<String, Long> measurement;
+        Map<String, Double> measurement;
 
         public Map<String, String> getResult() {
             return result;
@@ -291,11 +293,11 @@ public class VideoProcessing {
             this.result = result;
         }
 
-        public Map<String, Long> getMeasurement() {
+        public Map<String, Double> getMeasurement() {
             return measurement;
         }
 
-        public void setMeasurement(Map<String, Long> measurement) {
+        public void setMeasurement(Map<String, Double> measurement) {
             this.measurement = measurement;
         }
     }
