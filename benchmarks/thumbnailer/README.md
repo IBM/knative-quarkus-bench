@@ -1,78 +1,59 @@
 # Thumbnailer Project
 
-This is a project to port and test [serverless-benchmarks](https://github.com/spcl/serverless-benchmarks) using Quarkus
-[Funqy HTTP Binding](https://quarkus.io/guides/funqy-http), which creates a stand-alone application using serverless functions.
+This is a Quarkus port of 210.thumbnailer from [SeBS: Serverless Benchmark Suite](https://github.com/spcl/serverless-benchmarks).
 
-To learn more about Quarkus, please refer to https://quarkus.io/ .
+This application downloads an image file as the input from Cloud Object Storage (COS), generates a thumbnail image of the given file, and uploads the thumbnail image.
 
-## Preparation 
+## Preparing Input Data
 
-Since thumbnailer benchmark attempts to download and upload files via Cloud Object Storage, following preparation steps are required.
-1) Follow the instructions in [this README]:(../UsingCloudObjectStorage.md).
+Input files we tested can be found found [here](https://github.com/spcl/serverless-benchmarks-data/tree/6a17a460f289e166abb47ea6298fb939e80e8beb/200.multimedia/210.thumbnailer).
 
-2) Upload input files to the bucket
-- Image files we tested are found [here](https://github.com/spcl/serverless-benchmarks-data/tree/6a17a460f289e166abb47ea6298fb939e80e8beb/200.multimedia/210.thumbnailer).
+The input file is assumed to be stored in Cloud Object Storage (COS). COS environment variable configuration is described [here]( ../UsingCloudObjectStorage.md).
 
-## Packaging and running the application
+## Building and Running the Application
 
-The application can be packaged using:
-```shell script
-mvn clean package
-```
-This produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Build the project as described in [this README](../../README.md).
 
-The application is runnable using:
-```shell script
+Then, the application can run as a local HTTP server.
+To run the stand-alone Java version:
+```shell
 java -jar target/quarkus-app/quarkus-run.jar
 ```
-
-The server listens to `localhost:8080`, and functions are accessible at `/<functionName>` path. 
-Functions with parameters only accept POST requests. Functions without parameters accept both GET and POST requests.
-
-The `/pagerank` function receives a test data size as a string, and returns result in JSON format:
+To run the stand-alone native version:
+```shell
+target/thumbnailer-1.0.0-SNAPSHOT-runner
 ```
-$ curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST http://localhost:8080/thumbnailer | jq
+
+This application receives the following parameters from POST data in JSON format:
+
+|Name         |Value                         |Required?|Default|
+|:-----------:|:------------------------------------|:-:|:------:|
+|input_bucket |COS bucket to download input files     |Y|(None) |
+|output_bucket|COS bucket to upload output files      |Y|(None) |
+|objectkey    |COS object key of the input file       |Y|(None) |
+|height       |Height of resized image file           |Y|(None) |
+|width        |Width of resized image file            |Y|(None) |
+|debug        |Flag if output is uploaded to COS      |N|false  |
+
+For example:
+
+```shell
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST http://localhost:8080/thumbnailer | jq
 {
   "result": {
-    "key": "resized-index.png",
-    "bucket": "sample-knative-benchmark-bucket"
+    "bucket": "trl-knative-benchmark-bucket-2",
+    "key": ""
   },
   "measurement": {
+    "download_time": 1.988398514,
     "download_size": 116060,
-    "download_time": 1106799,
-    "compute_time": 1577,
-    "upload_size": 125,
-    "upload_time": 1187295
+    "upload_time": 0,
+    "upload_size": 21704,
+    "compute_time": 0.050419163
   }
 }
-
 ```
-Valid choices of the test data size are `test`, `small`, and `large`, where the graph sizes are set to `10`, `10,000`, and `100,000`, respectively.
+## Customizing the Default Value of Input Parameters
 
-Be careful with quotation marks. In Funqy, post data need to be in JSON format. So, a string value in post data needs to have double quotation marks (`"`)
-around the data. You may also need another quotation mark or back-slash (`\`) to avoid shell command line interpretation.
-
-### Building an über-jar
-To build an _über-jar_, execute the following command:
-```shell script
-mvn package -Dquarkus.package.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-To build a native executable use: 
-```shell script
-mvn package -Pnative
-```
-
-If GraalVM is not installed, the native executable can be built in a container using: 
-```shell script
-mvn package -Pnative -Dquarkus.native.container-build=true
-```
-
-Run the native executable with: `./target/knative-quarkus-bench-thumbnailer-1.0.0-SNAPSHOT-runner`
-
-To learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
+This application takes all input parameters from the POST data, and there are no parameters
+that can be customized via environment variables or `application.properties`.
