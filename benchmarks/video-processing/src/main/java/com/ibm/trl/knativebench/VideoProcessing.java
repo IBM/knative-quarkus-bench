@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;
 
 import org.apache.commons.io.IOExceptionList;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -60,14 +62,18 @@ public class VideoProcessing {
             e.printStackTrace();
             return null;
         }
-        FFmpegBuilder builder = new FFmpegBuilder()
-                .setInput(video)
-                .overrideOutputFiles(true)
-                .addOutput(output)
-                .setFormat("gif")
-                .setVideoFrameRate(10, 1)
-                .setVideoResolution(320, 240)
-                .done();
+        FFmpegOutputBuilder outBuilder = new FFmpegBuilder()
+            .setInput(video)
+            .overrideOutputFiles(true)
+            .addOutput(output);
+        if (duration > 0) {
+            outBuilder.setDuration(duration.longValue(), TimeUnit.SECONDS);
+        }
+        FFmpegBuilder builder = outBuilder
+            .setFormat("gif")
+            .setVideoFrameRate(10, 1)
+            .setVideoResolution(320, 240)
+            .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);        
         executor.createJob(builder).run();
@@ -117,14 +123,18 @@ public class VideoProcessing {
             e.printStackTrace();
             return null;
         }
-        FFmpegBuilder builder = new FFmpegBuilder()
-                .setInput(video)
-                .addInput(watermark_file)
-                .overrideOutputFiles(true)
-                .setComplexFilter("overlay=main_w/2-overlay_w/2:main_h/2-overlay_h/2")
-                .addOutput(output)
-                .setFormat("mp4")
-                .done();
+        FFmpegOutputBuilder outBuilder = new FFmpegBuilder()
+            .setInput(video)
+            .addInput(watermark_file)
+            .overrideOutputFiles(true)
+            .setComplexFilter("overlay=main_w/2-overlay_w/2:main_h/2-overlay_h/2")
+            .addOutput(output);
+        if (duration > 0) {
+            outBuilder.setDuration(duration.longValue(), TimeUnit.SECONDS);
+        }
+        FFmpegBuilder builder = outBuilder
+            .setFormat("mp4")
+            .done();
 
         FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
         executor.createJob(builder).run();
