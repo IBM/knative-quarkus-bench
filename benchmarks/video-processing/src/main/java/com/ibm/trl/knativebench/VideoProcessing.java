@@ -215,30 +215,12 @@ public class VideoProcessing {
     }
 
     public static class FunInput {
-        private int height;
-        private int width;
         private String key;
         private int duration;
         private String op;
 	private String input_bucket;
 	private String output_bucket;
         public  String debug;
-
-        public int getHeight() {
-            return height;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
-        }
-
-        public int getWidth() {
-            return width;
-        }
-
-        public void setWidth(int width) {
-            this.width = width;
-        }
 
         public String getKey() {
             return key;
