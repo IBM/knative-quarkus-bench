@@ -31,7 +31,7 @@ This application receives the following parameters from POST data in JSON format
 |input_bucket |COS bucket to download input files     |Y|(None) |
 |output_bucket|COS bucket to upload output files      |Y|(None) |
 |key          |COS object key of the input file       |Y|(None) |
-|duration     |Video duration                         |Y|(None) |
+|duration     |Video duration in seconds              |N|duration of the input video |
 |op           |"extract-gif" for gif generation or "watermark" for watermark video generation |Y|(None)|
 |debug        |Flag if output is uploaded to COS      |N|false  |
 
