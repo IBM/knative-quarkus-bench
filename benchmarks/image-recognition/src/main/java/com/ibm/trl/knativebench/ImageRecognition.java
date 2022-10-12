@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Paths;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -49,6 +51,10 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class ImageRecognition {
     private static final double nanosecInSec = 1_000_000_000.0;
 
+    private static Builder<Image, Classifications> model;
+
+    private static final Object lock = new Object();
+
     @Inject
     S3Client s3;
     @Inject
@@ -57,51 +63,76 @@ public class ImageRecognition {
     @ConfigProperty(name = "knativebench.image-recognition.input_bucket")
     String input_bucket;
 
+
     @Funq("image-recognition")
     public RetValType image_recognition(FunInput input) throws IOException {
         String key = input.getInput();
+        String key_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
+
         String model_key = input.getModel();
+        String model_key_path = String.join("/", "/tmp", model_key);
+
         String synset = input.getSynset();
-        String download_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
+        String synset_path = String.join("/", "/tmp", synset);
+
         if (input.getInput_bucket() != null) {
             input_bucket = input.getInput_bucket();
         }
 
+        String image_path = key_path;
         long image_download_begin = System.nanoTime();
-        String image_path = download_path;
-	try {
-            downloadFile(input_bucket, key, download_path);
+        try {
+            downloadFile(input_bucket, key, key_path);
         } catch (Exception e) {
             e.printStackTrace();
         }
         long image_download_end = System.nanoTime();
 
-        long model_download_begin = System.nanoTime();
-        String model_path = String.join("/", "/tmp", model_key);
-	try {
-            downloadFile(input_bucket, model_key, model_path);
-        } catch (Exception e) {
-            e.printStackTrace();
-	}
-        long model_download_end = System.nanoTime();
+        long synset_download_begin = 0l;
+        long synset_download_end = 0l;
+        long model_download_begin = 0l;
+        long model_download_end = 0l;
+        long model_process_begin = 0l;
+        long model_process_end = 0l;
+        if (model != null) {
+            synset_download_begin = System.nanoTime();
+            synset_download_end = synset_download_begin;
+            model_download_begin = System.nanoTime();
+            model_download_end = model_download_begin;
+            model_process_begin = System.nanoTime();
+            model_process_end = model_process_begin;
+        } else {
+            synchronized(lock) {
+                if (model != null) {
+                    synset_download_begin = System.nanoTime();
+                    synset_download_end = synset_download_begin;
+                    model_download_begin = System.nanoTime();
+                    model_download_end = model_download_begin;
+                    model_process_begin = System.nanoTime();
+                    model_process_end = model_process_begin;
+                } else {
+                    try {
+                        synset_download_begin = System.nanoTime();
+                        downloadFile(input_bucket, synset, synset_path);
+                        synset_download_end = System.nanoTime();
 
-        long synset_download_begin = System.nanoTime();
-        String synset_path = String.join("/", "/tmp", synset);
-        try {
-            downloadFile(input_bucket, synset, synset_path);
-        } catch (Exception e) {
-            e.printStackTrace();
+                        model_download_begin = System.nanoTime();
+                        downloadFile(input_bucket, model_key, model_key_path);
+                        model_download_end = System.nanoTime();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    model_process_begin = System.nanoTime();
+                    model = Criteria.builder()
+                        .setTypes(Image.class, Classifications.class)
+                       .optModelPath(Paths.get(model_key_path));
+                    model_process_end = System.nanoTime();
+               }
+            }
         }
-        long synset_download_end = System.nanoTime();
-
-        long model_process_begin = System.nanoTime();
-        Builder<Image, Classifications> builder = Criteria.builder()
-                .setTypes(Image.class, Classifications.class)
-                .optModelPath(Paths.get(model_path));
-        long model_process_end = System.nanoTime();
 
         long process_begin = System.nanoTime();
-
         Image img = ImageFactory.getInstance().fromFile(Paths.get(image_path));
         img.getWrappedImage();
 
@@ -118,7 +149,7 @@ public class ImageRecognition {
                 .optSynsetUrl("file:" + synset_path)
                 .build();
 
-            Criteria<Image, Classifications> criteria = builder.optTranslator(translator).build();
+            Criteria<Image, Classifications> criteria = model.optTranslator(translator).build();
             ZooModel<Image, Classifications> model = criteria.loadModel();
             Predictor<Image, Classifications> predictor = model.newPredictor();
             String tokens = predictor.predict(img).best().getClassName();
@@ -149,6 +180,8 @@ public class ImageRecognition {
                                     "model_download_time", model_download_time);
         
         log.info("retVal.measurement="+retVal.measurement.toString());
+
+        Files.delete(Paths.get(URI.create("file:///" + key_path)));
 
         return retVal; 
     }
