@@ -43,9 +43,13 @@ public class ClockSynchronization {
         String key = "filename_tmp";
 
         String request_id = input.getRequest_id();
+        if (request_id == null) {
+            request_id = "test";
+        }
         String address = input.getServer_address();
         Integer port = Integer.valueOf(input.getServer_port());
-        Integer repetitions = Integer.valueOf(input.getRepetitions());
+        int rep = input.getRepetitions();
+        Integer repetitions = Integer.valueOf(rep == 0? 1 : rep);
         if (input.getOutput_bucket() != null) {
             output_bucket = input.getOutput_bucket();
         }
