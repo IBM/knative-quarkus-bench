@@ -51,7 +51,7 @@ public class Network {
 	if (input.getOutput_bucket() != null) {
             output_bucket = input.getOutput_bucket();
         }
-	boolean skipUploading = input.getSkipUploading();
+        boolean debug = input.getDebug();
 
         long processTimeBegin = System.nanoTime();
         List<Long[]> times = new ArrayList<Long[]>();
@@ -106,7 +106,7 @@ public class Network {
             sendSocket.close();
             recvSocket.close();
 
-            if (consecutive_failures != 5 && !skipUploading) {
+            if (consecutive_failures != 5 && debug) {
                 File upload_file = new File("/tmp/data.csv");
                 try {
                     FileWriter writer = new FileWriter("/tmp/data.csv");
@@ -158,7 +158,7 @@ public class Network {
         int repetitions;
         String output_bucket;
         String income_timestamp;
-	boolean skipUploading;
+        boolean debug;
 
         public String getRequest_id() {
             return request_id;
@@ -208,12 +208,12 @@ public class Network {
             this.income_timestamp = income_timestamp;
         }
 
-	public boolean getSkipUploading() {
-            return skipUploading;
+        public boolean getDebug() {
+            return debug;
         }
 
-	public void setSkipUploading(boolean skipUploading) {
-            this.skipUploading = skipUploading;
+        public void setDebug(boolean debug) {
+            this.debug = debug;
         }
     }
 }

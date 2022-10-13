@@ -49,7 +49,7 @@ public class ClockSynchronization {
         if (input.getOutput_bucket() != null) {
             output_bucket = input.getOutput_bucket();
         }
-        boolean skipUploading = input.getSkipUploading();
+        boolean debug = input.getDebug();
 
         List<Long[]> times = new ArrayList<Long[]>();
         System.out.printf("Starting communication with %s:%s\n", address, String.valueOf(port));
@@ -129,7 +129,7 @@ public class ClockSynchronization {
             sendSocket.close();
             recvSocket.close();
 
-            if (consecutive_failures != 5 && !skipUploading) {
+            if (consecutive_failures != 5 && debug) {
                 try {
                     FileWriter writer = new FileWriter("/tmp/data.csv");
                     String header = String.join(",", "id", "client_send", "client_rcv");
@@ -169,7 +169,7 @@ public class ClockSynchronization {
         int server_port;
         int repetitions;
         String output_bucket;
-        boolean skipUploading;
+        boolean debug;
 
         public String getRequest_id() {
             return request_id;
@@ -211,12 +211,12 @@ public class ClockSynchronization {
             this.output_bucket = output_bucket;
         }
 
-        public boolean getSkipUploading() {
-            return skipUploading;
+        public boolean getDebug() {
+            return debug;
         }
 
-        public void setSkipUploading(boolean skipUploading) {
-            this.skipUploading = skipUploading;
+        public void setDebug(boolean debug) {
+            this.debug = debug;
         }
     }
 }
