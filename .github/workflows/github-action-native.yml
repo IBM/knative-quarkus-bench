@@ -35,3 +35,16 @@ jobs:
         run:
           cd ${{ github.workspace }} && mvn clean package -Dquarkus.container-image.registry=ghcr.io -Dquarkus.container-image.group=${SAFE_REPO_NAME} -Dquarkus.container-image.push=true -Pnative
       - run: echo "Native build and push status ${{ job.status }}."
+      - name: Build Environment Version Information
+        run: |
+          echo "OS version:"
+          cat /etc/issue.net
+          echo
+          echo "java version:"
+          java --version
+          echo
+          echo "mvn version:"
+          mvn -v
+          echo
+          echo "cc version:"
+          cc -v
