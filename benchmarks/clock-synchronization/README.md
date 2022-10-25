@@ -21,7 +21,7 @@ java -jar target/quarkus-app/quarkus-run.jar
 ```
 To run the stand-alone native version:
 ```shell
-target/imae-recognition-1.0.0-SNAPSHOT-runner
+target/clock-synchronization-1.0.0-SNAPSHOT-runner
 ```
 
 This application receives the following parameters from POST data in JSON format:
@@ -29,8 +29,8 @@ This application receives the following parameters from POST data in JSON format
 |Name         |Value                         |Required?|Default|
 |:---------------:|:-----------------------------------------------|:-:|:-----:|
 |output_bucket    |COS bucket to download input files              |Y  |(None) |
-|server_address   |Server's IP address                             |Y  |(None) |
-|server_pot       |Server's port number                            |Y  |(None) |
+|server_address   |Server IP address                               |Y  |(None) |
+|server_pot       |Server port number                              |Y  |(None) |
 |repetitions      |Number of repetition to finish earlier          |N  |1      |
 |request_id       |any string that will be included in the message |N  |"test" |
 |debug            |Flag if output is uploaded to COS               |N  |false  |

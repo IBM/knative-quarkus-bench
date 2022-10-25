@@ -23,7 +23,7 @@ java -jar target/quarkus-app/quarkus-run.jar
 ```
 To run the stand-alone native version:
 ```shell
-target/imae-recognition-1.0.0-SNAPSHOT-runner
+target/image-recognition-1.0.0-SNAPSHOT-runner
 ```
 
 This application receives the following parameters from POST data in JSON format:

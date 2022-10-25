@@ -4,7 +4,7 @@ The uploader benchmark uploads files to cloud storage.
 
 Although details on building and using benchmarks in this project are described in
 [the project documentation](../../README.md), and details on using cloud storage are described in
-[this file]](../UsingCloudObjectStorage.md), the following show several specific examples
+[this file](../UsingCloudObjectStorage.md), the following show several specific examples
 as a brief introduction:
 
 To build a jvm jar file:

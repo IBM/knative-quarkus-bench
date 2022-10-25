@@ -1,7 +1,7 @@
 # knative-quarkus-bench/benchmarks Module
 
-The following table is a list of currently available benchmark programs.
-Note that benchmarks that use object storage need additional configuration
+The following table shows the currently available benchmark programs.
+Benchmarks that use object storage require additional configuration
 described in [UsingCloudObjectStorage.md](UsingCloudObjectStorage.md).
 
 |Benchmark Name        |Description                                 | Uses Object Storage?  |

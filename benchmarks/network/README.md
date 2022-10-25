@@ -63,6 +63,6 @@ If GraalVM is not installed, a native executable can be built in a container:
 mvn package -Pnative -Dquarkus.native.container-build=true
 ```
 
-To a native executable: `./target/network-1.0.0-SNAPSHOT-runner`
+To run a native executable: `./target/network-1.0.0-SNAPSHOT-runner`
 
 To learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.

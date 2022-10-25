@@ -41,7 +41,7 @@ For example:
 curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST http://localhost:8080/thumbnailer | jq
 {
   "result": {
-    "bucket": "trl-knative-benchmark-bucket-2",
+    "bucket": "knative-benchmark-bucket-2",
     "key": ""
   },
   "measurement": {

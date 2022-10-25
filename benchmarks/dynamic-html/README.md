@@ -32,7 +32,7 @@ curl -s --w "\n" -H 'Content-Type:application/json' -d '{"size":"small"}' -X POS
 ```
 
 This benchmark supports the following load sizes:
-| size label | random integers added |
+| Size Label | Random Integers Added |
 |:----------:|:---------------------:|
 | test       | 10        |
 | tiny       | 100       |

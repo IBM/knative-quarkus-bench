@@ -1,4 +1,4 @@
-# Dna-visualization Project
+# dna-visualization Project
 
 This is a Quarkus port of 504.dna-visualization from
 [SeBS: Serverless Benchmark Suite](https://github.com/spcl/serverless-benchmarks).
@@ -54,6 +54,7 @@ This application receives the following parameters from POST data in JSON format
 |output_bucket|COS bucket to upload output files      |Y|(None) |Y|
 |key          |COS object key of the input/output file|Y|(None) |Y|
 |debug        |Flag if output is uploaded to COS      |N|false  |N|
+
 For example:
 ```shell
 curl http://localhost:8080/dna-visualization \
@@ -63,15 +64,15 @@ curl http://localhost:8080/dna-visualization \
           "output_bucket":"MyOutputBucket", \
           "key":"FASTAfiles/NewSequence.fasta"}
 ```
-downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket `MyInputBucket`,
+The above example downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket `MyInputBucket`,
 transforms the DNA sequence to a two-dimensional plot using the Squiggle method, but
 does not upload the output to a COS bucket.
 
-Note that uploading a file to COS can take much longer time than downloading a file and
+Note that uploading a file to COS can take much longer than downloading a file and
 transforming the DNA sequence. Therefore, skipping uploading the file is recommended for
 evaluation of performance.
 
-To send a request to a Knative eventing service,
+To send a request to a Knative eventing service:
 ```shell
 curl http://<broker-endpoint>:<port>/ \
      -v \

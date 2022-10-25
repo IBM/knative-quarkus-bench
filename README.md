@@ -7,9 +7,9 @@ We ported the individual benchmarks to this environment from those at
 developed by researchers at ETH Z&uuml;rich.
 
 Quarkus is a cloud native Java framework based on modern standard APIs.
-See https://quarkus.io/ for more information about Quarkus.
+See https://quarkus.io/ for more information.
 
-## Prerequisite
+## Prerequisites
 
 * Java 17 or higher (need JDK to build from source)
 * Maven 3.6.2+ (3.8.1+ is recommended)
@@ -30,7 +30,7 @@ mvn package
 ```
 
 This step builds all benchmark programs and creates Docker images for each.
-Note that the version tag is set to `:jvm`, to distinguish
+The version tag is set to `:jvm`, to distinguish
 Java images from native images, as described below.
 
 This project uses Quarkus
@@ -55,7 +55,7 @@ Other configuration parameters are documented in
 
 ### Creating Native Executables (Optional)
 
-One of the major features of Quarkus is native binary support.
+Native binary support is one of the major features of Quarkus.
 These benchmarks can be built as native binaries
 by adding `-Pnative` to the Maven command line:
 ```shell
@@ -96,7 +96,7 @@ curl http://localhost:8080/pagerank \
      -H 'Content-Type: application/json' \
      -d '{"size":"test"}'
 ```
-computes page rank scores of a generated graph of 10 nodes.
+The above example computes page rank scores of a generated graph of 10 nodes.
 The number of graph nodes can be increased by setting the post data to `tiny`, `small`, `medium` or `large` to set the graph size to `100`, `1,000`, `10,000`, or `100,000` nodes, respectively.
 
 
@@ -115,7 +115,7 @@ https://knative.dev/docs/install/operator/knative-with-operators/.
 A broker needs to be set up in the target namespace.  This is described in the
 [Knative documentation](https://knative.dev/docs/eventing/getting-started/#adding-a-broker-to-the-namespace).
 
-Note that only a single broker is needed in a namespace regardless of the number of
+A single broker is sufficient in a given namespace regardless of the number of
 Knative event services.
 
 
@@ -149,14 +149,14 @@ Although this can be deployed manually, the "Deployment" step can be skipped
 by utilizing the Knative helper as described in the
 [Quarkus Funqy Knative Events extension documentation](https://quarkus.io/guides/funqy-knative-events).
 
-Note that "apiVersion" is "serving.knative.dev/v1" in the Funqy Knative guide, instead of
+"apiVersion" is "serving.knative.dev/v1" in the Funqy Knative guide, instead of
 "v1" as described in the Knative guide.
 
 
 #### Accessing Knative Services
 
 Knative services receive input as a [Cloud Event](https://cloudevents.io/) object
-from the broker and return the result back to the broker as a newly created Cloud Event.
+from the broker and return the result to the broker as a newly created Cloud Event.
 
 The Cloud Event specification defines various HTTP headers starting with "Ce-".
 The following table describes the minimum required headers.
@@ -167,7 +167,7 @@ The following table describes the minimum required headers.
 |Ce-Specversion|Cloud Event Spec version (=1.0) |
 |Ce-Type       |Name of the service             |
 
-An example for posting a Cloud Event using the `curl` command is:
+The following is an example of posting a Cloud Event using the `curl` command:
 ```shell
 curl http://<broker-endpoint>:<port>/ \
      -v \
@@ -181,7 +181,7 @@ curl http://<broker-endpoint>:<port>/ \
 ```
 
 
-Note that the `curl` command simply posts a Cloud Event to the broker and exits, returning the
+The `curl` command simply posts a Cloud Event to the broker and exits, returning the
 HTTP status code `202 Accepted`. (The `-v` option tells `curl` to show the HTTP status code.)
 In order to receive the returned value, a listener must be configured for the event
 returned from the service.

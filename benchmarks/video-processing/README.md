@@ -21,7 +21,7 @@ java -jar target/quarkus-app/quarkus-run.jar
 ```
 To run the stand-alone native version:
 ```shell
-target/imae-recognition-1.0.0-SNAPSHOT-runner
+target/video-processing-1.0.0-SNAPSHOT-runner
 ```
 
 This application receives the following parameters from POST data in JSON format:
@@ -44,7 +44,7 @@ The result looks like:
 ```
 {
   "result": {
-    "bucket": "trl-knative-benchmark-bucket-2",
+    "bucket": "knative-benchmark-bucket-2",
     "key": ""
   },
   "measurement": {

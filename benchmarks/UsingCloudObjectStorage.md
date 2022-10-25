@@ -1,6 +1,6 @@
 # Using Cloud Object Storage in this Project
 
-## Prerequisite
+## Prerequisites
 
 * Access to a cloud object storage that supports Amazon S3 API, such as Amazon S3,
 IBM Cloud Object Storage, or local MinIO server
@@ -52,7 +52,7 @@ These are available at https://github.com/spcl/serverless-benchmarks-data.git.
 
 Bucket names and object keys (AKA file names) are specified as POST data in JSON format.
 
-For example:
+For example, to send a request to a local server:
 ```shell
 curl http://localhost:8080/thumbnailer \
      -X POST \
@@ -63,7 +63,8 @@ curl http://localhost:8080/thumbnailer \
            "width": 300, \
            "height", 200 }'
 ```
-to send a request to a local server, or
+
+To send a request to a Knative service:
 
 ```shell
 curl http://<broker-endpoint>:<port>/ \
@@ -80,7 +81,6 @@ curl http://<broker-endpoint>:<port>/ \
            "width": 300, \
            "height", 200 }'
 ```
-to send a request to a Knative service.
 
 **Note for Knative services:** The `curl` command simply posts a Cloud Event to the broker and exits,
 returning the HTTP status code `202 Accepted`.
