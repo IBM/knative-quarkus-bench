@@ -15,8 +15,3 @@ spec:
           env:
             - name: TYPE
               value: sleep
-            - name: JAVA_OPTIONS
-              valueFrom:
-                configMapKeyRef:
-                  name: java-env
-                  key: JAVA_OPTIONS

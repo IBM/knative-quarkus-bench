@@ -15,8 +15,3 @@ spec:
           env:
             - name: TYPE
               value: "printRetValTypeD"
-            - name: JAVA_OPTS_APPEND
-              valueFrom:
-                configMapKeyRef:
-                  name: html-java-env
-                  key: JAVA_OPTIONS

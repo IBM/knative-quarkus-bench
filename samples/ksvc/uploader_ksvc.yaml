@@ -37,8 +37,3 @@ spec:
                 configMapKeyRef:
                   name: cos-endpoint
                   key: s3Endpoint
-            - name: JAVA_OPTS_APPEND
-              valueFrom:
-                configMapKeyRef:
-                  name: java-env
-                  key: JAVA_OPTIONS

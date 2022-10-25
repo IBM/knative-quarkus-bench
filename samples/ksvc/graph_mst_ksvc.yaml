@@ -12,8 +12,3 @@ spec:
           env:
             - name: TYPE
               value: "printRetValTypeU"
-            - name: JAVA_OPTS_APPEND
-              valueFrom:
-                configMapKeyRef:
-                  name: mst-java-env
-                  key: JAVA_OPTIONS

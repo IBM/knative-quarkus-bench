@@ -5,7 +5,7 @@ metadata:
   name: dna-visualization
 spec:
   template:
-    matedata:
+    metedata:
       annotations:
         autoscaling.knative.dev/scale-to-zero-pod-retention-period: 5m
     spec:
@@ -40,8 +40,3 @@ spec:
                 configMapKeyRef:
                   name: cos-endpoint
                   key: endpoint
-            - name: JAVA_OPTS_APPEND
-              valueFrom:
-                configMapKeyRef:
-                  name: java-env
-                  key: JAVA_OPTIONS
