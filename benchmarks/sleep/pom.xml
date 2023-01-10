@@ -23,6 +23,10 @@
   </dependencyManagement>
   <dependencies>
     <dependency>
+      <groupId>org.qbicc.quarkus</groupId>
+      <artifactId>quarkus-qbicc</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-funqy-knative-events</artifactId>
     </dependency>
