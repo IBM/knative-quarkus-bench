@@ -23,10 +23,6 @@
   </dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>org.qbicc.quarkus</groupId>
-      <artifactId>quarkus-qbicc</artifactId>
-    </dependency>
-    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-funqy-knative-events</artifactId>
     </dependency>
@@ -147,6 +143,15 @@
       <properties>
         <quarkus.package.type>native</quarkus.package.type>
       </properties>
+    </profile>
+    <profile>
+      <id>qbicc</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.qbicc.quarkus</groupId>
+          <artifactId>quarkus-qbicc</artifactId>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </project>
