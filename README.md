@@ -53,7 +53,7 @@ Other configuration parameters are documented in
 [Quarkus documentation](https://quarkus.io/guides/container-image#customizing).
 
 
-### Creating Native Executables (Optional)
+### Creating Native Executables using GraalVM (Optional)
 
 Native binary support is one of the major features of Quarkus.
 These benchmarks can be built as native binaries
@@ -71,6 +71,16 @@ a container image of the latest GraalVM with Native Image support and builds the
 in the container.  This automated containerized build is beneficial as
 it automatically uses the latest version of GraalVM, which is updated frequently.
 
+### Creating Native Executables Using qbicc (Optional)
+
+You can optionally build native binaries using [qbicc](https://github.com/qbicc/qbicc)
+by adding `-Pqbicc` to the Maven command line:
+```shell
+mvn package -Pqbicc
+```
+
+In the short term, you will need a local snapshot build of [quarkus-qbicc](https://github.com/qbicc/quarkus-qbicc),
+the Quarkus extension for compiling with qbicc.  We have not yet released a version of `quarkus-qbicc` to maven central. 
 
 ## Usage Instructions
 
