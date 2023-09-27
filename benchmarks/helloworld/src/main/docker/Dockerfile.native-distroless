@@ -1,0 +1,8 @@
+FROM quay.io/quarkus/quarkus-distroless-image:1.0
+COPY target/*-runner /application
+
+EXPOSE 8080
+USER nonroot
+
+ENV JAVA_OPTIONS -Dquarkus.http.host=0.0.0.0
+CMD ["sh", "-c", "./application ${JAVA_OPTIONS}"]

@@ -1,3 +1,6 @@
+####
+# This Dockerfile is used in order to build a container that runs the Quarkus application in native (no JVM) mode
+###
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.8
 WORKDIR /work/
 RUN chown 1001 /work \
@@ -9,4 +12,4 @@ EXPOSE 8080
 USER 1001
 
 ENV JAVA_OPTIONS -Dquarkus.http.host=0.0.0.0
-CMD ["sh", "-c", "./application ${JAVA_OPTIONS}"]
+CMD ["sh", "-c", "grep 'model name' /proc/cpuinfo | head -1; ./application ${JAVA_OPTIONS}"]
