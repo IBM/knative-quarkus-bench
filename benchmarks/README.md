@@ -13,6 +13,7 @@ described in [UsingCloudObjectStorage.md](UsingCloudObjectStorage.md).
 |graph-bfs             |Traverse a generated graph in breadth-first order              | N |
 |graph-mst             |Compute minimum spanning tree of a generated graph             | N |
 |graph-pagerank        |Compute page rank scores of a generated graph                  | N |
+|helloworld            |A very simple benchmark that creates a string                  | N |
 |image-recognition     |Image classification using a deep learning model from Model Zoo| Y |
 |network               |Repeatedly measure send and receive time of a datagram socket  | Y |
 |server-reply          |Measure time to read a stream socket                           | N |
