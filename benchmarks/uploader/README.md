@@ -17,12 +17,19 @@ export AWS_ACCESS_KEY_ID=AppropriateValue
 export AWS_SECRET_ACCESS_KEY=AppropriateValue
 export AWS_REGION=AppropriateValue
 export QUARKUS_S3_ENDPOINT_OVERRIDE=AppropriateValue
+export KNATIVEBENCH_UPLOADER_INPUT_BUCKET=AppropriateValue
+export KNATIVEBENCH_UPLOADER_OUTPUT_BUCKET=AppropriateValue
 
 java -jar target/quarkus-app/quarkus-run.jar
 ```
+The buckets are deploy-time settings (the two `KNATIVEBENCH_UPLOADER_*` variables above, or
+`knativebench.uploader.input_bucket` / `knativebench.uploader.output_bucket` in `application.properties`).
+They cannot be set in a request.
+See [UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
+
 Then in another terminal window:
 ```
-curl -s --w "\n" -H 'Content-Type:application/json'  -d '{"size":"somevalue", "input_bucket":"somevalue", "output_bucket":"somevalue"}' -X POST http://localhost:8080/uploader
+curl -s --w "\n" -H 'Content-Type:application/json'  -d '{"size":"somevalue"}' -X POST http://localhost:8080/uploader
 ```
 
 To build a native application:
@@ -35,11 +42,13 @@ export AWS_ACCESS_KEY_ID=AppropriateValue
 export AWS_SECRET_ACCESS_KEY=AppropriateValue
 export AWS_REGION=AppropriateValue
 export QUARKUS_S3_ENDPOINT_OVERRIDE=AppropriateValue
+export KNATIVEBENCH_UPLOADER_INPUT_BUCKET=AppropriateValue
+export KNATIVEBENCH_UPLOADER_OUTPUT_BUCKET=AppropriateValue
 
 target/uploader-1.0.0-SNAPSHOT-runner
 ```
 Then in another terminal window:
 ```
-curl -s --w "\n" -H 'Content-Type:application/json' -d '{"size":"somevalue", "input_bucket":"somevalue", "output_bucket":"somevalue"}' -X POST http://localhost:8080/uploader
+curl -s --w "\n" -H 'Content-Type:application/json' -d '{"size":"somevalue"}' -X POST http://localhost:8080/uploader
 ```
 

@@ -50,10 +50,14 @@ public class ClockSynchronization {
         Integer port = Integer.valueOf(input.getServer_port());
         int rep = input.getRepetitions();
         Integer repetitions = Integer.valueOf(rep == 0? 1 : rep);
+        // Buckets are deploy-time settings only; a request must not choose them.
         if (input.getOutput_bucket() != null) {
-            output_bucket = input.getOutput_bucket();
+            throw new IllegalArgumentException("output_bucket cannot be set in a request");
         }
         boolean debug = input.getDebug();
+        if (debug && (output_bucket == null || output_bucket.isEmpty())) {
+            throw new IllegalStateException("knativebench.clock-synchronization.output_bucket must be configured when debug is true");
+        }
 
         List<Long[]> times = new ArrayList<Long[]>();
         System.out.printf("Starting communication with %s:%s\n", address, String.valueOf(port));

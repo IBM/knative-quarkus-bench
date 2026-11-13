@@ -24,13 +24,17 @@ To run the stand-alone native version:
 target/thumbnailer-1.0.0-SNAPSHOT-runner
 ```
 
+The input and output buckets are deploy-time settings (environment variables
+`KNATIVEBENCH_THUMBNAILER_INPUT_BUCKET` and `KNATIVEBENCH_THUMBNAILER_OUTPUT_BUCKET`, or
+`knativebench.thumbnailer.input_bucket` and `knativebench.thumbnailer.output_bucket`
+in `application.properties`). They cannot be set in a request.
+See [UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
+
 This application receives the following parameters from POST data in JSON format:
 
 |Name         |Value                         |Required?|Default|
 |:-----------:|:------------------------------------|:-:|:------:|
-|input_bucket |COS bucket to download input files     |Y|(None) |
-|output_bucket|COS bucket to upload output files      |Y|(None) |
-|objectkey    |COS object key of the input file       |Y|(None) |
+|objectKey    |COS object key of the input file       |Y|(None) |
 |height       |Height of resized image file           |Y|(None) |
 |width        |Width of resized image file            |Y|(None) |
 |debug        |Flag if output is uploaded to COS      |N|false  |
@@ -38,7 +42,7 @@ This application receives the following parameters from POST data in JSON format
 For example:
 
 ```shell
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectkey": "index.png", "height": "128", "width": "128"}' -X POST http://localhost:8080/thumbnailer | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"objectKey": "index.png", "height": "128", "width": "128"}' -X POST http://localhost:8080/thumbnailer | jq
 {
   "result": {
     "bucket": "knative-benchmark-bucket-2",

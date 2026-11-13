@@ -48,18 +48,52 @@ We used sample input data published by the ETH Z&uuml;rich team to test many of 
 These are available at https://github.com/spcl/serverless-benchmarks-data.git.
 
 
-## Specifying Object Storage Parameters within a Request
+## Specifying Bucket Names (Deploy-Time Settings)
 
-Bucket names and object keys (AKA file names) are specified as POST data in JSON format.
+Bucket names are **deploy-time settings**. They are not accepted in a request:
+a request that includes `input_bucket` or `output_bucket` is rejected.
+Only object keys (AKA file names) are specified as POST data in JSON format.
+
+Set the bucket names with environment variables or with
+`benchmarks/<benchName>/src/main/resources/application.properties`.
+The environment variable name is the property name in upper case with `.` and `-` replaced by `_`:
+
+|Benchmark          |Environment Variables                                                                       |
+|:------------------|:-------------------------------------------------------------------------------------------|
+|thumbnailer        |`KNATIVEBENCH_THUMBNAILER_INPUT_BUCKET`, `KNATIVEBENCH_THUMBNAILER_OUTPUT_BUCKET`           |
+|video-processing   |`KNATIVEBENCH_VIDEO_PROCESSING_INPUT_BUCKET`, `KNATIVEBENCH_VIDEO_PROCESSING_OUTPUT_BUCKET` |
+|image-recognition  |`KNATIVEBENCH_IMAGE_RECOGNITION_INPUT_BUCKET`                                               |
+|dna-visualization  |`KNATIVEBENCH_DNA_VIS_INPUT_BUCKET`, `KNATIVEBENCH_DNA_VIS_OUTPUT_BUCKET`                   |
+|compress           |`KNATIVEBENCH_COMPRESS_INPUT_BUCKET`, `KNATIVEBENCH_COMPRESS_OUTPUT_BUCKET`                 |
+|uploader           |`KNATIVEBENCH_UPLOADER_INPUT_BUCKET`, `KNATIVEBENCH_UPLOADER_OUTPUT_BUCKET`                 |
+|network            |`KNATIVEBENCH_NETWORK_OUTPUT_BUCKET`                                                        |
+|clock-synchronization|`KNATIVEBENCH_CLOCK_SYNCHRONIZATION_OUTPUT_BUCKET`                                        |
+
+For example, to run the stand-alone Java version of thumbnailer:
+```shell
+export KNATIVEBENCH_THUMBNAILER_INPUT_BUCKET=inBucket
+export KNATIVEBENCH_THUMBNAILER_OUTPUT_BUCKET=outBucket
+java -jar benchmarks/thumbnailer/target/quarkus-app/quarkus-run.jar
+```
+
+For a Knative service, set the same variables in the container's `env` section.
+
+**Deployer responsibilities.** Because the service reads from and writes to the configured buckets
+using the credentials you give it:
+* Use dedicated buckets for the benchmark, and do not store other data in them.
+* Allow only trusted parties to write to the input bucket. Whoever can write there controls
+  the files the benchmark processes (including media files passed to ffmpeg).
+* Use credentials that are limited to those buckets.
+* Keep the service endpoint private (see the Security Considerations section of the top-level README).
+
+## Specifying Object Keys within a Request
 
 For example, to send a request to a local server:
 ```shell
 curl http://localhost:8080/thumbnailer \
      -X POST \
      -H 'Content-Type: application/json' \
-     -d '{ "input_bucket": "inBucket", \
-           "output_bucket": "outBucket", \
-           "objectKey": "test.jpg", \
+     -d '{ "objectKey": "test.jpg", \
            "width": 300, \
            "height", 200 }'
 ```
@@ -72,12 +106,10 @@ curl http://<broker-endpoint>:<port>/ \
      -X POST \
      -H 'Ce-Id: 1234' \
      -H 'Ce-Source: curl' \
-     -H 'Ce-Specification: 1.0' \
+     -H 'Ce-Specversion: 1.0' \
      -H 'Ce-Type: thumbnailer' \
      -H 'Content-Type: application/json' \
-     -d '{ "input_bucket": "inBucket", \
-           "output_bucket": "outBucket", \
-           "objectKey": "test.jpg", \
+     -d '{ "objectKey": "test.jpg", \
            "width": 300, \
            "height", 200 }'
 ```

@@ -21,4 +21,4 @@ EXPOSE 8080
 USER 1001
 
 ENV JAVA_OPTIONS -Dquarkus.http.host=0.0.0.0
-CMD ["sh", "-c", "./application ${JAVA_OPTION}"]
+CMD ["sh", "-c", "./application ${JAVA_OPTIONS}"]

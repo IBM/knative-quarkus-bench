@@ -26,11 +26,15 @@ To run the stand-alone native version:
 target/image-recognition-1.0.0-SNAPSHOT-runner
 ```
 
+The input bucket is a deploy-time setting (environment variable
+`KNATIVEBENCH_IMAGE_RECOGNITION_INPUT_BUCKET` or `knativebench.image-recognition.input_bucket`
+in `application.properties`). It cannot be set in a request.
+See [UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
+
 This application receives the following parameters from POST data in JSON format:
 
 |Name         |Value                         |Required?|Default|
 |:-----------:|:------------------------------------|:-:|:------:|
-|input_bucket |COS bucket to download input files     |Y|(None) |
 |input        |COS object key of the input file       |Y|(None) |
 |model        |Model file name                        |Y|(None) |
 |synset       |Synset file name                       |Y|(None) |

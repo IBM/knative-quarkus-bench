@@ -162,6 +162,65 @@ by utilizing the Knative helper as described in the
 "apiVersion" is "serving.knative.dev/v1" in the Funqy Knative guide, instead of
 "v1" as described in the Knative guide.
 
+The sample services in `samples/ksvc/` read the object storage credentials from a
+Secret named `cos`, the endpoint and region from a ConfigMap named `cos-endpoint`,
+and the bucket names from a ConfigMap named `cos-buckets`. Create the bucket
+ConfigMap before deploying the services that use buckets, using only the keys
+your chosen services need:
+```shell
+kubectl create configmap cos-buckets \
+  --from-literal=thumbnailerInputBucket=<bucket> --from-literal=thumbnailerOutputBucket=<bucket> \
+  --from-literal=videoInputBucket=<bucket>       --from-literal=videoOutputBucket=<bucket> \
+  --from-literal=imageRecognitionInputBucket=<bucket> \
+  --from-literal=dnaVisInputBucket=<bucket>      --from-literal=dnaVisOutputBucket=<bucket> \
+  --from-literal=compressInputBucket=<bucket>    --from-literal=compressOutputBucket=<bucket> \
+  --from-literal=uploaderInputBucket=<bucket>    --from-literal=uploaderOutputBucket=<bucket> \
+  --from-literal=networkOutputBucket=<bucket>    --from-literal=clockOutputBucket=<bucket>
+```
+A service whose key is missing from the ConfigMap will not start.
+
+
+#### Security Considerations
+
+These programs are benchmarks, intended to be deployed temporarily to run an
+experiment and then removed. They are **not hardened for production or for
+untrusted callers**:
+
+* Bucket names are deploy-time settings. A request cannot choose them, and a
+  request that includes `input_bucket` or `output_bucket` is rejected. The
+  storage endpoint and credentials are also deploy-time settings.
+* Object keys and similar values (such as `size`, `model` and `synset`) still
+  come from the caller. The benchmarks confine them to a scratch location
+  when building local file paths, but anyone who can send requests can make
+  the service read any object in the configured input bucket and, where output
+  is enabled, write objects in the configured output bucket.
+* The contents of the input bucket are processed as given (for example, media
+  files are passed to ffmpeg). Whoever can write to that bucket controls them.
+* The `network` and `clock-synchronization` benchmarks take a target
+  `server_address` and `server_port` from the request, because they measure
+  network behavior against a server you choose. Anyone who can send requests
+  can therefore make the service send small UDP packets (carrying the
+  request's `request_id`) to any host and port reachable from the pod, and
+  have it listen on a UDP port of their choosing. Rely on network policy and
+  private access to limit where the pods can reach.
+* The numeric parameters (for example `repetitions`, `width`, `height` and
+  `duration`) are not capped, so a caller can make a request use a lot of
+  time or memory.
+* The services have no authentication of their own.
+
+As the deployer, you are responsible for:
+* Using dedicated buckets that only trusted parties can write to, and not
+  storing other data in them.
+* Giving the services storage credentials limited to those buckets.
+* Making the services reachable only by the people conducting the experiment
+  (for example, use
+  [cluster-local visibility](https://knative.dev/docs/serving/services/private-services/)
+  for Knative services).
+* Removing the deployment when the experiment is finished.
+
+See [benchmarks/UsingCloudObjectStorage.md](benchmarks/UsingCloudObjectStorage.md)
+for how to set the buckets.
+
 
 #### Accessing Knative Services
 

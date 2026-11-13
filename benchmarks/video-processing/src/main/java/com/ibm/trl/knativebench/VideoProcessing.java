@@ -7,8 +7,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -52,7 +54,9 @@ public class VideoProcessing {
     }
 
     BiFunction<String, Integer, String> to_gif = (video, duration) -> {
-        String output = String.format("processed-%s.gif", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')));
+        // Write the output next to the input, inside the per-request work directory.
+        String output = Path.of(video).resolveSibling(
+            String.format("processed-%s.gif", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')))).toString();
         FFmpeg ffmpeg = null;
         FFprobe ffprobe = null;
         try {
@@ -112,7 +116,9 @@ public class VideoProcessing {
     }
 
     BiFunction<String, Integer, String> watermark = (video, duration) -> {
-        String output = String.format("processed-%s.mp4", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')));
+        // Write the output next to the input, inside the per-request work directory.
+        String output = Path.of(video).resolveSibling(
+            String.format("processed-%s.mp4", video.substring(video.lastIndexOf('/')+1, video.lastIndexOf('.')))).toString();
         String watermark_file = getWatermark();
         FFmpeg ffmpeg = null;
         FFprobe ffprobe = null;
@@ -150,17 +156,41 @@ public class VideoProcessing {
     
     @Funq("video-processing")
     public RetValType video_processing(FunInput input) throws Exception {
+        // The S3 key comes from the request, so it must never be used as a local path.
+        // Download into a private per-request directory using only the key's base name.
+        Path workDir = Files.createTempDirectory("video-processing");
+        try {
+            return video_processing(input, workDir);
+        } finally {
+            try (Stream<Path> paths = Files.walk(workDir)) {
+                paths.sorted(Comparator.reverseOrder()).forEach(p -> p.toFile().delete());
+            } catch (IOException e) {
+                log.warn("failed to clean up " + workDir, e);
+            }
+        }
+    }
+
+    private RetValType video_processing(FunInput input, Path workDir) throws Exception {
         String key = input.getKey();
         int duration = input.getDuration();
         String op = input.getOp();
-        String download_path = String.format("%s", key);
+        Path keyName = (key == null) ? null : Path.of(key).getFileName();
+        if (keyName == null) {
+            throw new IllegalArgumentException("invalid key");
+        }
+        Path downloadFile = workDir.resolve(keyName).normalize();
+        if (!downloadFile.startsWith(workDir)) {
+            throw new IllegalArgumentException("invalid key");
+        }
+        String download_path = downloadFile.toString();
         boolean debug = Boolean.parseBoolean(input.debug);
-	if (input.getInput_bucket() != null) {
-            input_bucket = input.getInput_bucket();
-	}
-	if (input.getOutput_bucket() != null) {
-            output_bucket = input.getOutput_bucket();
-	}
+        // Buckets are deploy-time settings only; a request must not choose them.
+        if (input.getInput_bucket() != null || input.getOutput_bucket() != null) {
+            throw new IllegalArgumentException("input_bucket and output_bucket cannot be set in a request");
+        }
+        if (input_bucket == null || input_bucket.isEmpty() || (debug && (output_bucket == null || output_bucket.isEmpty()))) {
+            throw new IllegalStateException("knativebench.video-processing.input_bucket (and output_bucket when debug is true) must be configured");
+        }
 
         long download_begin = System.nanoTime();
         download(input_bucket, key, download_path);

@@ -50,8 +50,6 @@ This application receives the following parameters from POST data in JSON format
 
 |Name         |Value                         |Required?|Default|Default is customizable?|
 |:-----------:|:------------------------------------|:-:|:------|:----------------------:|
-|input_bucket |COS bucket to download input files     |Y|(None) |Y|
-|output_bucket|COS bucket to upload output files      |Y|(None) |Y|
 |key          |COS object key of the input/output file|Y|(None) |Y|
 |debug        |Flag if output is uploaded to COS      |N|false  |N|
 
@@ -60,11 +58,9 @@ For example:
 curl http://localhost:8080/dna-visualization \
      -X POST \
      -H 'Content-Type: application/json' \
-     -d '{"input_bucket":"MyInputBucket", \
-          "output_bucket":"MyOutputBucket", \
-          "key":"FASTAfiles/NewSequence.fasta"}
+     -d '{"key":"FASTAfiles/NewSequence.fasta"}'
 ```
-The above example downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket `MyInputBucket`,
+The above example downloads a FASTA file `FASTAfiles/NewSequence.fasta` from the configured input bucket,
 transforms the DNA sequence to a two-dimensional plot using the Squiggle method, but
 does not upload the output to a COS bucket.
 
@@ -82,20 +78,22 @@ curl http://<broker-endpoint>:<port>/ \
      -H 'Ce-Specversion: 1.0' \
      -H 'Ce-Type: dna-visualization' \
      -H 'Content-Type: application/json' \
-     -d '{"input_bucket":"MyInputBucket", \
-          "output_bucket":"MyOutputBucket", \
-          "key":"FASTAfiles/NewSequence.fasta", \
+     -d '{"key":"FASTAfiles/NewSequence.fasta", \
           "debug":"true"}'
 ```
-This request downloads a FASTA file `FASTAfiles/NewSequence.fasta` from a COS bucket
-`MyInputBucket`, transforms the DNA sequence to a two-dimensional plot using the Squiggle method,
-and uploads the output to a COS bucket `MyOutputBucket` with the same object key because
+This request downloads a FASTA file `FASTAfiles/NewSequence.fasta` from the configured input bucket,
+transforms the DNA sequence to a two-dimensional plot using the Squiggle method,
+and uploads the output to the configured output bucket with the same object key because
 `debug` parameter is set to `true`.
 
-## Customizing the Default Value of Input Parameters
+## Configuring Buckets and the Default Key
 
-The default values of the three parameters can be customized by using environment variables
+The input and output buckets are deploy-time settings and cannot be set in a request
+(a request containing `input_bucket` or `output_bucket` is rejected).
+They, and the default value of `key`, are set by using environment variables
 or by modifying `resources/application.properties`.  The following table describes this.
+See also [UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
+
 |Name         |Environment Variable              |Key in `application.properties`   |
 |:-----------:|:---------------------------------|:---------------------------------|
 |input_bucket |KNATIVEBENCH_DNA_VIS_INPUT_BUCKET |knativebench.dna-vis.input_bucket |

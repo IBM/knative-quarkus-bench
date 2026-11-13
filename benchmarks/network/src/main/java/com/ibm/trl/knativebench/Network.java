@@ -48,10 +48,14 @@ public class Network {
         String address = input.getServer_address();
         int port = Integer.valueOf(input.getServer_port());
         int repetitions = Integer.valueOf(input.getRepetitions());
-	if (input.getOutput_bucket() != null) {
-            output_bucket = input.getOutput_bucket();
+        // Buckets are deploy-time settings only; a request must not choose them.
+        if (input.getOutput_bucket() != null) {
+            throw new IllegalArgumentException("output_bucket cannot be set in a request");
         }
         boolean debug = input.getDebug();
+        if (debug && (output_bucket == null || output_bucket.isEmpty())) {
+            throw new IllegalStateException("knativebench.network.output_bucket must be configured when debug is true");
+        }
 
         long processTimeBegin = System.nanoTime();
         List<Long[]> times = new ArrayList<Long[]>();
