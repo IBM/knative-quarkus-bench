@@ -10,7 +10,7 @@ import org.jboss.logging.Logger;
 
 import io.quarkus.funqy.Funq;
 
-public class Sleep {
+public class HelloWorld {
     static double nanosecInSec = 1_000_000_000.0;
     static Map<String, Integer> size_generators = Map.of("test",  1,
                                                          "small", 100,
