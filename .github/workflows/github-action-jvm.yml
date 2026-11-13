@@ -8,6 +8,9 @@ on:
       - 'LICENSE'
       - 'samples/**'
       - '.github/workflows/github-action-native.yml'
+permissions:
+  contents: read
+  packages: write
 jobs:
   build-jvm:
     runs-on: ubuntu-latest
