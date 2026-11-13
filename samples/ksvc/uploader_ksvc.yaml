@@ -37,3 +37,13 @@ spec:
                 configMapKeyRef:
                   name: cos-endpoint
                   key: s3Endpoint
+            - name: KNATIVEBENCH_UPLOADER_INPUT_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-buckets
+                  key: uploaderInputBucket
+            - name: KNATIVEBENCH_UPLOADER_OUTPUT_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-buckets
+                  key: uploaderOutputBucket

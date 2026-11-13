@@ -75,7 +75,7 @@ public class GraphBFS {
 
         Graph<Integer, DefaultEdge> inputGraph = genGraph(graphSize, retVal);
 
-        var verticies = new ArrayList<Integer>(graphSize);
+        var vertices = new ArrayList<Integer>(graphSize);
         var layers    = new ArrayList<Integer>(graphSize);
         var parents   = new Integer[graphSize];
 
@@ -89,7 +89,7 @@ public class GraphBFS {
             Integer v = it.next();
             int depth = it.getDepth(v);
 
-            verticies.add(v);
+            vertices.add(v);
             parents[v.intValue()] = it.getParent(v);
 
             if(depth != lastDepth) {
@@ -104,7 +104,7 @@ public class GraphBFS {
         layers.removeIf((i) -> i == null);
 
         if(debug) {
-            retVal.result = Map.of("verticies", verticies, "layers", layers, "parents", new ArrayList<Integer>(Arrays.asList(parents)));
+            retVal.result = Map.of("verticies", vertices, "layers", layers, "parents", new ArrayList<Integer>(Arrays.asList(parents)));
         }
 
         retVal.measurement.put("compute_time", (process_end - process_begin)/nanosecInSec);

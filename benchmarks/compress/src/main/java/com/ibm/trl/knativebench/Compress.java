@@ -46,14 +46,17 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 import io.quarkus.funqy.Funq;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 public class Compress {
     private Logger log;
 
     private String AWS_REGION = "ap-south-1";
     private String AWS_ENDPOINT = "defaultvalue";
-    private String input_bucket = "";
-    private String output_bucket = "";
+    @ConfigProperty(name = "knativebench.compress.input_bucket", defaultValue = "")
+    String input_bucket;
+    @ConfigProperty(name = "knativebench.compress.output_bucket", defaultValue = "")
+    String output_bucket;
 
     private Region region = Region.AP_SOUTH_1; // any region is OK
     private URI endpointOverride = null;
@@ -165,7 +168,14 @@ public class Compress {
             ListObjectsV2Response result = s3.listObjectsV2(request);
             for (S3Object object : result.contents()) {
                 if (object.key().startsWith(key)) {
-                    downloadFile(bucket, object.key(), dirPath.concat("/").concat(object.key()));
+                    // Object keys become local paths; refuse any that escape dirPath (e.g. via "..").
+                    File base = new File(dirPath).toPath().normalize().toFile();
+                    File target = new File(dirPath.concat("/").concat(object.key())).toPath().normalize().toFile();
+                    if (!target.toPath().startsWith(base.toPath())) {
+                        log.warn("Skipping object with unsafe key: "+object.key());
+                        continue;
+                    }
+                    downloadFile(bucket, object.key(), target.toString());
                 }
             }
 
@@ -199,19 +209,24 @@ public class Compress {
         if (input != null) {
             if (input.size != null)
                 key = input.size;
-            if (input.input_bucket != null)
-                input_bucket = input.input_bucket;
-            if (input.output_bucket != null)
-                output_bucket = input.output_bucket;
+            // Buckets are deploy-time settings only; a request must not choose them.
+            if (input.input_bucket != null || input.output_bucket != null)
+                throw new IllegalArgumentException("input_bucket and output_bucket cannot be set in a request");
         }
 
-	if (input_bucket == null || output_bucket == null) {
-            retVal.result.put("message", "ERROR: Compress unable to run. input_bucket and output_bucket need to be set.");
+	if (input_bucket == null || input_bucket.isEmpty() || output_bucket == null || output_bucket.isEmpty()) {
+            retVal.result.put("message", "ERROR: Compress unable to run. knativebench.compress.input_bucket and knativebench.compress.output_bucket need to be configured.");
             return (retVal);
 	}
 
-        downloadPath=new File(String.format("/tmp/%s-%s",key,uuid));
-        downloadPath.mkdirs();
+        // size comes from the request and is used in local paths, so only allow simple names.
+        if (!key.matches("[A-Za-z0-9_-]+")) {
+            retVal.result.put("message", "ERROR: Compress unable to run. size contains invalid characters.");
+            return (retVal);
+        }
+
+        // Private per-request directory created by the JVM, not named by the caller.
+        downloadPath = Files.createTempDirectory("compress-").toFile();
         long downloadStartTime = System.nanoTime();
         downloadDirectory(input_bucket, key, downloadPath.toString());
         long downloadStopTime = System.nanoTime();

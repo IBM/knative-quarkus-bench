@@ -40,3 +40,13 @@ spec:
                 configMapKeyRef:
                   name: cos-endpoint
                   key: endpoint
+            - name: KNATIVEBENCH_DNA_VIS_INPUT_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-buckets
+                  key: dnaVisInputBucket
+            - name: KNATIVEBENCH_DNA_VIS_OUTPUT_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-buckets
+                  key: dnaVisOutputBucket

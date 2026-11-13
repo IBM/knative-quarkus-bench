@@ -37,3 +37,8 @@ spec:
                 configMapKeyRef:
                   name: cos-endpoint
                   key: endpoint
+            - name: KNATIVEBENCH_CLOCK_SYNCHRONIZATION_OUTPUT_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-buckets
+                  key: clockOutputBucket

@@ -30,12 +30,12 @@ Functions with parameters only accept POST requests. Functions without parameter
 
 ### Sample curl command:
 ```
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "20202", "repetitions": "5", "request_id":"IpsumLoremomethingSayunnySay", "income_timestamp": "test", "skipUploading":"true"}' -X POST http://localhost:8080/network | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"request_id": "tmp_key", "server_address": "127.0.0.1", "server_port": "20202", "repetitions": "5", "request_id":"my-request", "income_timestamp": "test", "skipUploading":"true"}' -X POST http://localhost:8080/network | jq
 ```
 The result looks like:
 ```
 {
-  "result": "network-benchmark-results-IpsumLoremomethingSayunnySay.csv"
+  "result": "network-benchmark-results-my-request.csv"
 }
 ```
 Valid choices of the test data size are `test`, `small`, and `large`, where the graph sizes are set to `1`, `100`, and `1,000`, respectively.

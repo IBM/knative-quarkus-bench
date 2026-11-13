@@ -40,3 +40,13 @@ spec:
                 configMapKeyRef:
                   name: cos-endpoint
                   key: endpoint
+            - name: KNATIVEBENCH_VIDEO_PROCESSING_INPUT_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-buckets
+                  key: videoInputBucket
+            - name: KNATIVEBENCH_VIDEO_PROCESSING_OUTPUT_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: cos-buckets
+                  key: videoOutputBucket

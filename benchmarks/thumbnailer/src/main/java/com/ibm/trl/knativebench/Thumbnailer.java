@@ -53,11 +53,12 @@ public class Thumbnailer {
         int width = object_width;
         int height = object_height;
         boolean debug = Boolean.parseBoolean(input.debug);
-        if (input.getInput_bucket() != null) {
-            input_bucket = input.getInput_bucket();
+        // Buckets are deploy-time settings only; a request must not choose them.
+        if (input.getInput_bucket() != null || input.getOutput_bucket() != null) {
+            throw new IllegalArgumentException("input_bucket and output_bucket cannot be set in a request");
         }
-        if (input.getOutput_bucket() != null) {
-            output_bucket = input.getOutput_bucket();
+        if (input_bucket == null || input_bucket.isEmpty() || (debug && (output_bucket == null || output_bucket.isEmpty()))) {
+            throw new IllegalStateException("knativebench.thumbnailer.input_bucket (and output_bucket when debug is true) must be configured");
         }
 
         long download_begin = System.nanoTime();
@@ -115,13 +116,18 @@ public class Thumbnailer {
     }
     
     private String upload_stream(String bucket, String[] file, BufferedImage bytes_data) throws IOException {
-        File upload_file = new File(file[1]);
-        ImageIO.write(bytes_data, "png", upload_file);
-        String key = String.join("/", file);
-        PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
-        s3.putObject(objectRequest, RequestBody.fromFile(upload_file.toPath()));
+        // Use a private temporary file; the request-derived name is only used as the S3 key.
+        File upload_file = File.createTempFile("thumbnailer_", ".png");
+        try {
+            ImageIO.write(bytes_data, "png", upload_file);
+            String key = String.join("/", file);
+            PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
+            s3.putObject(objectRequest, RequestBody.fromFile(upload_file.toPath()));
 
-        return key;
+            return key;
+        } finally {
+            upload_file.delete();
+        }
     }
 
     public static class FunInput {

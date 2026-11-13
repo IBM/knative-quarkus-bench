@@ -54,12 +54,15 @@ public class DnaVis {
                                input.input_bucket, input.output_bucket, input.key, debug));
 
         if(input != null) {
-            if(input.input_bucket != null)
-                input_bucket = input.input_bucket;
-            if(input.output_bucket != null)
-                output_bucket = input.output_bucket;
+            // Buckets are deploy-time settings only; a request must not choose them.
+            if(input.input_bucket != null || input.output_bucket != null)
+                throw new IllegalArgumentException("input_bucket and output_bucket cannot be set in a request");
             if(input.key != null)
                 key = input.key;
+        }
+
+        if (input_bucket == null || input_bucket.isEmpty()) {
+            throw new IllegalStateException("knativebench.dna-vis.input_bucket must be configured");
         }
 
         // Create temporary files

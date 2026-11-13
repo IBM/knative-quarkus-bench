@@ -64,19 +64,58 @@ public class ImageRecognition {
     String input_bucket;
 
 
+    // Request values are used in local file names, so confine them to a given root
+    // (rejects absolute paths and ".." segments that would escape it).
+    private static String confine(java.nio.file.Path root, String name) {
+        java.nio.file.Path p = (name == null) ? null : root.resolve(name).normalize();
+        if (p == null || name.startsWith("/") || !p.startsWith(root) || p.equals(root)) {
+            throw new IllegalArgumentException("invalid file name");
+        }
+        return p.toString();
+    }
+
+    // The model and synset files are downloaded once and reused by later requests,
+    // so they live in a private directory that lasts as long as the service.
+    private static java.nio.file.Path sharedDir;
+
+    private static synchronized java.nio.file.Path sharedDir() throws IOException {
+        if (sharedDir == null) {
+            sharedDir = Files.createTempDirectory("image-recognition-model");
+        }
+        return sharedDir;
+    }
+
     @Funq("image-recognition")
     public RetValType image_recognition(FunInput input) throws IOException {
+        // Each request gets its own private directory for the downloaded image.
+        java.nio.file.Path workDir = Files.createTempDirectory("image-recognition");
+        try {
+            return image_recognition(input, workDir);
+        } finally {
+            try (java.util.stream.Stream<java.nio.file.Path> paths = Files.walk(workDir)) {
+                paths.sorted(java.util.Comparator.reverseOrder()).forEach(p -> p.toFile().delete());
+            } catch (IOException e) {
+                log.warn("failed to clean up " + workDir, e);
+            }
+        }
+    }
+
+    private RetValType image_recognition(FunInput input, java.nio.file.Path workDir) throws IOException {
         String key = input.getInput();
-        String key_path = String.format("/tmp/%s-%s", key, UUID.randomUUID());
+        String key_path = confine(workDir, String.format("%s-%s", key, UUID.randomUUID()));
 
         String model_key = input.getModel();
-        String model_key_path = String.join("/", "/tmp", model_key);
+        String model_key_path = confine(sharedDir(), model_key);
 
         String synset = input.getSynset();
-        String synset_path = String.join("/", "/tmp", synset);
+        String synset_path = confine(sharedDir(), synset);
 
+        // Buckets are deploy-time settings only; a request must not choose them.
         if (input.getInput_bucket() != null) {
-            input_bucket = input.getInput_bucket();
+            throw new IllegalArgumentException("input_bucket cannot be set in a request");
+        }
+        if (input_bucket == null || input_bucket.isEmpty()) {
+            throw new IllegalStateException("knativebench.image-recognition.input_bucket must be configured");
         }
 
         String image_path = key_path;
@@ -181,9 +220,7 @@ public class ImageRecognition {
         
         log.info("retVal.measurement="+retVal.measurement.toString());
 
-        Files.delete(Paths.get(URI.create("file:///" + key_path)));
-
-        return retVal; 
+        return retVal;
     }
 
     public void downloadFile(String bucket, String key, String filePath) throws Exception {

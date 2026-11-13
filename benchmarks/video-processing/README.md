@@ -24,12 +24,16 @@ To run the stand-alone native version:
 target/video-processing-1.0.0-SNAPSHOT-runner
 ```
 
+The input and output buckets are deploy-time settings (environment variables
+`KNATIVEBENCH_VIDEO_PROCESSING_INPUT_BUCKET` and `KNATIVEBENCH_VIDEO_PROCESSING_OUTPUT_BUCKET`, or
+`knativebench.video-processing.input_bucket` and `knativebench.video-processing.output_bucket`
+in `application.properties`). They cannot be set in a request.
+See [UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
+
 This application receives the following parameters from POST data in JSON format:
 
 |Name         |Value                         |Required?|Default|
 |:-----------:|:------------------------------------|:-:|:------:|
-|input_bucket |COS bucket to download input files     |Y|(None) |
-|output_bucket|COS bucket to upload output files      |Y|(None) |
 |key          |COS object key of the input file       |Y|(None) |
 |duration     |Video duration in seconds              |N|duration of the input video |
 |op           |"extract-gif" for gif generation or "watermark" for watermark video generation |Y|(None)|

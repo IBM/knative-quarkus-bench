@@ -24,13 +24,17 @@ To run the stand-alone native version:
 target/clock-synchronization-1.0.0-SNAPSHOT-runner
 ```
 
+The output bucket is a deploy-time setting (environment variable
+`KNATIVEBENCH_CLOCK_SYNCHRONIZATION_OUTPUT_BUCKET` or `knativebench.clock-synchronization.output_bucket`
+in `application.properties`). It cannot be set in a request.
+See [UsingCloudObjectStorage.md](../UsingCloudObjectStorage.md).
+
 This application receives the following parameters from POST data in JSON format:
 
 |Name         |Value                         |Required?|Default|
 |:---------------:|:-----------------------------------------------|:-:|:-----:|
-|output_bucket    |COS bucket to download input files              |Y  |(None) |
 |server_address   |Server IP address                               |Y  |(None) |
-|server_pot       |Server port number                              |Y  |(None) |
+|server_port      |Server port number                              |Y  |(None) |
 |repetitions      |Number of repetition to finish earlier          |N  |1      |
 |request_id       |any string that will be included in the message |N  |"test" |
 |debug            |Flag if output is uploaded to COS               |N  |false  |
@@ -38,7 +42,7 @@ This application receives the following parameters from POST data in JSON format
 For example:
 
 ```shell
-curl -s -w "\n" -H 'Content-Type:application/json' -d '{"output_bucket":"MyOutputBucket", "server_address": "127.0.0.1", "server_port": "20202"}' -X POST http://localhost:8080/clock-synchronization | jq
+curl -s -w "\n" -H 'Content-Type:application/json' -d '{"server_address": "127.0.0.1", "server_port": "20202"}' -X POST http://localhost:8080/clock-synchronization | jq
 ```
 The result looks like this:
 ```
